@@ -111,7 +111,7 @@ contract FlashloanDoSomething is Test, MerkleTreeHelper {
         uint256 flashloanAmount = 100_000 * 1e6; // 100k USDC
 
         // create ManageLeaf array for all operations
-        ManageLeaf[] memory leafs = new ManageLeaf[](4);
+        ManageLeaf[] memory leafs = new ManageLeaf[](64);
 
         // balancerV2 flashloan leafs
         _addBalancerFlashloanLeafs(leafs, getAddress(sourceChain, "USDC")); // 1 leaf
