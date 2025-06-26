@@ -85,19 +85,22 @@ contract ForkAaveBorrowPositionIntegration is Test, MerkleTreeHelper {
         deal(getAddress(sourceChain, "SUSDE"), address(boringVault), 100_000e18);
 
         // create ManageLeaf array for all operations
-        ManageLeaf[] memory leafs = new ManageLeaf[](16);
+        ManageLeaf[] memory leafs = new ManageLeaf[](64);
 
+        // balancerV2 flashloan leafs
+        _addBalancerFlashloanLeafs(leafs, getAddress(sourceChain, "USDC")); // 1 leaf
         // add AaveV3 Leafs
         ERC20[] memory supplyAssets = new ERC20[](1);
         supplyAssets[0] = getERC20(sourceChain, "SUSDE");
         ERC20[] memory borrowAssets = new ERC20[](1);
         borrowAssets[0] = getERC20(sourceChain, "USDC");
-        _addBalancerFlashloanLeafs(leafs, getAddress(sourceChain, "USDC")); // 1 leaf
         _addAaveV3Leafs(leafs, supplyAssets, borrowAssets); //  10 leafs
         _addCurveLeafs(
             leafs, getAddress(sourceChain, "Usde_Usdc_Curve_Pool"), 2, getAddress(sourceChain, "Usde_Usdc_Curve_Gauge")
-        ); // 8 leafs
+        ); // 9 leafs
         _addERC4626Leafs(leafs, ERC4626(getAddress(sourceChain, "SUSDE"))); // 5 leafs
+
+        console.log("latest leafIndex:", leafIndex);
 
         // // add flashloan leaf at the end
         // leafs[15] = ManageLeaf(
@@ -151,6 +154,7 @@ contract ForkAaveBorrowPositionIntegration is Test, MerkleTreeHelper {
         // leafs[13].argumentAddresses[0] = getAddress(sourceChain, "boringVault");
 
         bytes32[][] memory manageTree = _generateMerkleTree(leafs);
+        console.log("length of manageTree:", manageTree.length);
 
         vm.prank(manager.owner());
         manager.setManageRoot(address(this), manageTree[manageTree.length - 1][0]);
@@ -168,7 +172,7 @@ contract ForkAaveBorrowPositionIntegration is Test, MerkleTreeHelper {
                 false,
                 "approve(address,uint256)",
                 new address[](1),
-                "",
+                string.concat("Approve Curve pool to spend ", getERC20(sourceChain, "USDC").symbol()),
                 rawDataDecoderAndSanitizer
             );
             flashloanLeafs[0].argumentAddresses[0] = getAddress(sourceChain, "Usde_Usdc_Curve_Pool");
@@ -189,7 +193,12 @@ contract ForkAaveBorrowPositionIntegration is Test, MerkleTreeHelper {
                 false,
                 "approve(address,uint256)",
                 new address[](1),
-                "",
+                string.concat(
+                    "Approve ",
+                    getERC20(sourceChain, "SUSDE").symbol(),
+                    " to spend ",
+                    getERC20(sourceChain, "USDE").symbol()
+                ),
                 rawDataDecoderAndSanitizer
             );
             flashloanLeafs[2].argumentAddresses[0] = getAddress(sourceChain, "SUSDE");
@@ -200,7 +209,9 @@ contract ForkAaveBorrowPositionIntegration is Test, MerkleTreeHelper {
                 false,
                 "deposit(uint256,address)",
                 new address[](1),
-                "",
+                string.concat(
+                    "Deposit ", getERC20(sourceChain, "USDE").symbol(), " for ", getERC20(sourceChain, "SUSDE").symbol()
+                ),
                 rawDataDecoderAndSanitizer
             );
             flashloanLeafs[3].argumentAddresses[0] = getAddress(sourceChain, "boringVault");
@@ -211,18 +222,34 @@ contract ForkAaveBorrowPositionIntegration is Test, MerkleTreeHelper {
                 false,
                 "approve(address,uint256)",
                 new address[](1),
-                "",
+                string.concat("Approve ", "Aave V3", " Pool to spend ", getERC20(sourceChain, "SUSDE").symbol()),
                 rawDataDecoderAndSanitizer
             );
-            flashloanLeafs[4].argumentAddresses[0] = getAddress(sourceChain, "poolV3");
+            flashloanLeafs[4].argumentAddresses[0] = getAddress(sourceChain, "v3Pool");
 
-            flashloanLeafs[5] = leafs[3];
             // supply susde to aave
-            flashloanLeafs[5] = ManageLeaf();
+            flashloanLeafs[5] = ManageLeaf(
+                getAddress(sourceChain, "v3Pool"),
+                false,
+                "supply(address,uint256,address,uint16)",
+                new address[](2),
+                string.concat("Supply ", getERC20(sourceChain, "SUSDE").symbol(), " to Aave V3"),
+                getAddress(sourceChain, "rawDataDecoderAndSanitizer")
+            );
+            flashloanLeafs[5].argumentAddresses[0] = getAddress(sourceChain, "SUSDE");
+            flashloanLeafs[5].argumentAddresses[1] = getAddress(sourceChain, "boringVault");
 
-            flashloanLeafs[6] = leafs[4]; // borrow usdc from aave
-
-            bytes32[][] memory flashloanManageProofs = _getProofsUsingTree(flashloanLeafs, manageTree);
+            // borrow usdc from aave
+            flashloanLeafs[6] = ManageLeaf(
+                getAddress(sourceChain, "v3Pool"),
+                false,
+                "borrow(address,uint256,uint256,uint16,address)",
+                new address[](2),
+                string.concat("Borrow ", getERC20(sourceChain, "USDC").symbol(), " from Aave V3"),
+                getAddress(sourceChain, "rawDataDecoderAndSanitizer")
+            );
+            flashloanLeafs[6].argumentAddresses[0] = getAddress(sourceChain, "USDC");
+            flashloanLeafs[6].argumentAddresses[1] = getAddress(sourceChain, "boringVault");
 
             address[] memory targets = new address[](7);
             targets[0] = getAddress(sourceChain, "USDC"); // approve curve usde_usdc pool to spend usdc
@@ -282,8 +309,8 @@ contract ForkAaveBorrowPositionIntegration is Test, MerkleTreeHelper {
                 "borrow(address,uint256,uint256,uint16,address)",
                 getAddress(sourceChain, "USDC"),
                 flashloanAmount,
-                2,
-                0,
+                uint256(2),
+                uint16(0),
                 getAddress(sourceChain, "boringVault")
             );
 
@@ -292,6 +319,8 @@ contract ForkAaveBorrowPositionIntegration is Test, MerkleTreeHelper {
             for (uint256 i = 0; i < 7; i++) {
                 decodersAndSanitizers[i] = getAddress(sourceChain, "rawDataDecoderAndSanitizer");
             }
+
+            bytes32[][] memory flashloanManageProofs = _getProofsUsingTree(flashloanLeafs, manageTree);
 
             userData = abi.encode(flashloanManageProofs, decodersAndSanitizers, targets, targetData, values);
         }
@@ -310,7 +339,16 @@ contract ForkAaveBorrowPositionIntegration is Test, MerkleTreeHelper {
             );
 
             ManageLeaf[] memory manageLeafs = new ManageLeaf[](1);
-            manageLeafs[0] = leafs[15];
+            manageLeafs[0] = ManageLeaf(
+                getAddress(sourceChain, "manager"),
+                false,
+                "flashLoan(address,address[],uint256[],bytes)",
+                new address[](2),
+                string.concat("Flashloan ", getERC20(sourceChain, "USDC").symbol(), " from Balancer Vault"),
+                getAddress(sourceChain, "rawDataDecoderAndSanitizer")
+            );
+            manageLeafs[0].argumentAddresses[0] = getAddress(sourceChain, "managerAddress");
+            manageLeafs[0].argumentAddresses[1] = getAddress(sourceChain, "USDC");
 
             bytes32[][] memory manageProofs = _getProofsUsingTree(manageLeafs, manageTree);
 
@@ -318,7 +356,7 @@ contract ForkAaveBorrowPositionIntegration is Test, MerkleTreeHelper {
             address[] memory decodersAndSanitizers = new address[](1);
             decodersAndSanitizers[0] = getAddress(sourceChain, "rawDataDecoderAndSanitizer");
 
-            vm.prank(manager.owner());
+            // vm.prank(manager.owner());
             manager.manageVaultWithMerkleVerification(manageProofs, decodersAndSanitizers, targets, targetData, values);
         }
     }
