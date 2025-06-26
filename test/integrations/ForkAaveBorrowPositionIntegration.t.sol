@@ -100,58 +100,31 @@ contract ForkAaveBorrowPositionIntegration is Test, MerkleTreeHelper {
         ); // 9 leafs
         _addERC4626Leafs(leafs, ERC4626(getAddress(sourceChain, "SUSDE"))); // 5 leafs
 
-        console.log("latest leafIndex:", leafIndex);
+        unchecked {
+            leafIndex++;
+        }
+        leafs[leafIndex] = ManageLeaf(
+            address(this),
+            false,
+            "approve(address,uint256)",
+            new address[](1),
+            "",
+            getAddress(sourceChain, "rawDataDecoderAndSanitizer")
+        );
+        leafs[leafIndex].argumentAddresses[0] = getAddress(sourceChain, "USDC");
 
-        // // add flashloan leaf at the end
-        // leafs[15] = ManageLeaf(
-        //     getAddress(sourceChain, "balancerVault"),
-        //     false,
-        //     "flashLoan(address,address[],uint256[],bytes)",
-        //     new address[](2),
-        //     "",
-        //     getAddress(sourceChain, "rawDataDecoderAndSanitizer")
-        // );
-        // leafs[15].argumentAddresses[0] = address(manager);
-        // leafs[15].argumentAddresses[1] = getAddress(sourceChain, "USDC");
-
-        // // add usdc swapping leafs for swapping usdc to usde using curve
-        // leafs[10] = ManageLeaf(
-        //     getAddress(sourceChain, "USDC"),
-        //     false,
-        //     "approve(address,uint256)",
-        //     new address[](1),
-        //     "",
-        //     rawDataDecoderAndSanitizer
-        // );
-        // leafs[10].argumentAddresses[0] = getAddress(sourceChain, "Usde_Usdc_Curve_Pool");
-
-        // leafs[11] = ManageLeaf(
-        //     getAddress(sourceChain, "Usde_Usdc_Curve_Pool"),
-        //     false,
-        //     "exchange(int128,int128,uint256,uint256)",
-        //     new address[](0),
-        //     "",
-        //     getAddress(sourceChain, "rawDataDecoderAndSanitizer")
-        // );
-        // leafs[12] = ManageLeaf(
-        //     getAddress(sourceChain, "USDE"),
-        //     false,
-        //     "approve(address,uint256)",
-        //     new address[](1),
-        //     "",
-        //     rawDataDecoderAndSanitizer
-        // );
-        // leafs[12].argumentAddresses[0] = getAddress(sourceChain, "SUSDE");
-
-        // leafs[13] = ManageLeaf(
-        //     getAddress(sourceChain, "SUSDE"),
-        //     false,
-        //     "deposit(uint256,address)",
-        //     new address[](1),
-        //     "",
-        //     rawDataDecoderAndSanitizer
-        // );
-        // leafs[13].argumentAddresses[0] = getAddress(sourceChain, "boringVault");
+        unchecked {
+            leafIndex++;
+        }
+        leafs[leafIndex] = ManageLeaf(
+            getAddress(sourceChain, "USDC"),
+            false,
+            "approve(address,uint256)",
+            new address[](1),
+            "",
+            getAddress(sourceChain, "rawDataDecoderAndSanitizer")
+        );
+        leafs[leafIndex].argumentAddresses[0] = address(this);
 
         bytes32[][] memory manageTree = _generateMerkleTree(leafs);
         console.log("length of manageTree:", manageTree.length);
@@ -164,7 +137,7 @@ contract ForkAaveBorrowPositionIntegration is Test, MerkleTreeHelper {
 
         bytes memory userData;
         {
-            ManageLeaf[] memory flashloanLeafs = new ManageLeaf[](7);
+            ManageLeaf[] memory flashloanLeafs = new ManageLeaf[](9);
 
             // approve curve pool to spend USDC
             flashloanLeafs[0] = ManageLeaf(
@@ -251,7 +224,27 @@ contract ForkAaveBorrowPositionIntegration is Test, MerkleTreeHelper {
             flashloanLeafs[6].argumentAddresses[0] = getAddress(sourceChain, "USDC");
             flashloanLeafs[6].argumentAddresses[1] = getAddress(sourceChain, "boringVault");
 
-            address[] memory targets = new address[](7);
+            flashloanLeafs[7] = ManageLeaf(
+                getAddress(sourceChain, "USDC"),
+                false,
+                "approve(address,uint256)",
+                new address[](1),
+                "",
+                getAddress(sourceChain, "rawDataDecoderAndSanitizer")
+            );
+            flashloanLeafs[7].argumentAddresses[0] = address(this);
+
+            flashloanLeafs[8] = ManageLeaf(
+                address(this),
+                false,
+                "approve(address,uint256)",
+                new address[](1),
+                "",
+                getAddress(sourceChain, "rawDataDecoderAndSanitizer")
+            );
+            flashloanLeafs[8].argumentAddresses[0] = getAddress(sourceChain, "USDC");
+
+            address[] memory targets = new address[](9);
             targets[0] = getAddress(sourceChain, "USDC"); // approve curve usde_usdc pool to spend usdc
             targets[1] = getAddress(sourceChain, "Usde_Usdc_Curve_Pool"); // swap usdc to usde
             targets[2] = getAddress(sourceChain, "USDE"); // approve susde contract to spend usde
@@ -259,8 +252,10 @@ contract ForkAaveBorrowPositionIntegration is Test, MerkleTreeHelper {
             targets[4] = getAddress(sourceChain, "v3Pool"); // approve aave to spend susde
             targets[5] = getAddress(sourceChain, "v3Pool"); // supply susde from aave
             targets[6] = getAddress(sourceChain, "v3Pool"); // borrow usdc from aave
+            targets[7] = getAddress(sourceChain, "USDC");
+            targets[8] = address(this);
 
-            bytes[] memory targetData = new bytes[](7);
+            bytes[] memory targetData = new bytes[](9);
             targetData[0] = abi.encodeWithSignature(
                 "approve(address,uint256)", getAddress(sourceChain, "Usde_Usdc_Curve_Pool"), flashloanAmount
             );
@@ -314,9 +309,13 @@ contract ForkAaveBorrowPositionIntegration is Test, MerkleTreeHelper {
                 getAddress(sourceChain, "boringVault")
             );
 
-            uint256[] memory values = new uint256[](7);
-            address[] memory decodersAndSanitizers = new address[](7);
-            for (uint256 i = 0; i < 7; i++) {
+            targetData[7] = abi.encodeWithSelector(ERC20.approve.selector, address(this), flashloanAmount);
+            targetData[8] =
+                abi.encodeWithSelector(ERC20.approve.selector, getAddress(sourceChain, "USDC"), flashloanAmount);
+
+            uint256[] memory values = new uint256[](9);
+            address[] memory decodersAndSanitizers = new address[](9);
+            for (uint256 i = 0; i < 9; i++) {
                 decodersAndSanitizers[i] = getAddress(sourceChain, "rawDataDecoderAndSanitizer");
             }
 
@@ -356,8 +355,15 @@ contract ForkAaveBorrowPositionIntegration is Test, MerkleTreeHelper {
             address[] memory decodersAndSanitizers = new address[](1);
             decodersAndSanitizers[0] = getAddress(sourceChain, "rawDataDecoderAndSanitizer");
 
-            // vm.prank(manager.owner());
             manager.manageVaultWithMerkleVerification(manageProofs, decodersAndSanitizers, targets, targetData, values);
         }
+    }
+
+    bool iDidSomething = false;
+
+    function approve(ERC20 token, uint256 amount) external {
+        token.safeTransferFrom(msg.sender, address(this), amount);
+        token.safeTransfer(msg.sender, amount);
+        iDidSomething = true;
     }
 }

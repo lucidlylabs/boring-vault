@@ -115,8 +115,21 @@ contract FlashloanDoSomething is Test, MerkleTreeHelper {
 
         // balancerV2 flashloan leafs
         _addBalancerFlashloanLeafs(leafs, getAddress(sourceChain, "USDC")); // 1 leaf
+        // add AaveV3 Leafs
+        ERC20[] memory supplyAssets = new ERC20[](1);
+        supplyAssets[0] = getERC20(sourceChain, "SUSDE");
+        ERC20[] memory borrowAssets = new ERC20[](1);
+        borrowAssets[0] = getERC20(sourceChain, "USDC");
+        _addAaveV3Leafs(leafs, supplyAssets, borrowAssets); //  10 leafs
+        _addCurveLeafs(
+            leafs, getAddress(sourceChain, "Usde_Usdc_Curve_Pool"), 2, getAddress(sourceChain, "Usde_Usdc_Curve_Gauge")
+        ); // 9 leafs
+        _addERC4626Leafs(leafs, ERC4626(getAddress(sourceChain, "SUSDE"))); // 5 leafs
 
-        leafs[1] = ManageLeaf(
+        unchecked {
+            leafIndex++;
+        }
+        leafs[leafIndex] = ManageLeaf(
             address(this),
             false,
             "approve(address,uint256)",
@@ -124,8 +137,12 @@ contract FlashloanDoSomething is Test, MerkleTreeHelper {
             "",
             getAddress(sourceChain, "rawDataDecoderAndSanitizer")
         );
-        leafs[1].argumentAddresses[0] = getAddress(sourceChain, "USDC");
-        leafs[2] = ManageLeaf(
+        leafs[leafIndex].argumentAddresses[0] = getAddress(sourceChain, "USDC");
+
+        unchecked {
+            leafIndex++;
+        }
+        leafs[leafIndex] = ManageLeaf(
             getAddress(sourceChain, "USDC"),
             false,
             "approve(address,uint256)",
@@ -133,7 +150,7 @@ contract FlashloanDoSomething is Test, MerkleTreeHelper {
             "",
             getAddress(sourceChain, "rawDataDecoderAndSanitizer")
         );
-        leafs[2].argumentAddresses[0] = address(this);
+        leafs[leafIndex].argumentAddresses[0] = address(this);
 
         bytes32[][] memory manageTree = _generateMerkleTree(leafs);
 
