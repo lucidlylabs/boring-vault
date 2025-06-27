@@ -88,39 +88,60 @@ contract ForkAaveBorrowPositionIntegration is Test, MerkleTreeHelper {
         // create ManageLeaf array for all operations
         ManageLeaf[] memory leafs = new ManageLeaf[](64);
 
-        _addBalancerFlashloanLeafs(leafs, getAddress(sourceChain, "USDC"));
         ERC20[] memory supplyAssets = new ERC20[](1);
         supplyAssets[0] = getERC20(sourceChain, "SUSDE");
         ERC20[] memory borrowAssets = new ERC20[](1);
         borrowAssets[0] = getERC20(sourceChain, "USDC");
         _addAaveV3Leafs(leafs, supplyAssets, borrowAssets);
-        _addCurveLeafs(
-            leafs, getAddress(sourceChain, "Usde_Usdc_Curve_Pool"), 2, getAddress(sourceChain, "Usde_Usdc_Curve_Gauge")
-        );
-        _addERC4626Leafs(leafs, ERC4626(getAddress(sourceChain, "SUSDE")));
 
         bytes32[][] memory manageTree = _generateMerkleTree(leafs);
-        console.log("last leafIndex", leafIndex);
-        console.log("length of manageTree:", manageTree.length);
 
         vm.prank(manager.owner());
         manager.setManageRoot(address(this), manageTree[manageTree.length - 1][0]);
+
+        ManageLeaf[] memory manageLeafs = new ManageLeaf[](2);
+        manageLeafs[0] = ManageLeaf(
+            getAddress(sourceChain, "SUSDE"),
+            false,
+            "approve(address,uint256)",
+            new address[](1),
+            "",
+            getAddress(sourceChain, "rawDataDecoderAndSanitizer")
+        );
+        manageLeafs[0].argumentAddresses[0] = getAddress(sourceChain, "v3Pool");
+
+        manageLeafs[1] = ManageLeaf(
+            getAddress(sourceChain, "v3Pool"),
+            false,
+            "supply(address,uint256,address,uint16)",
+            new address[](2),
+            string.concat("Supply ", getERC20(sourceChain, "SUSDE").symbol(), " to Aave V3"),
+            getAddress(sourceChain, "rawDataDecoderAndSanitizer")
+        );
+        manageLeafs[1].argumentAddresses[0] = getAddress(sourceChain, "SUSDE");
+        manageLeafs[1].argumentAddresses[1] = getAddress(sourceChain, "boringVault");
+
+        bytes32[][] memory manageProofs = _getProofsUsingTree(manageLeafs, manageTree);
 
         address[] memory targets = new address[](2);
         targets[0] = getAddress(sourceChain, "SUSDE");
         targets[1] = getAddress(sourceChain, "v3Pool");
 
         bytes[] memory targetData = new bytes[](2);
-
-        ManageLeaf[] memory manageLeafs = new ManageLeaf[](2);
-        manageLeafs[0] = leafs[1];
-        manageLeafs[1] = leafs[2];
-
-        bytes32[][] memory manageProofs = _getProofsUsingTree(manageLeafs, manageTree);
+        targetData[0] =
+            abi.encodeWithSignature("approve(address,uint256)", getAddress(sourceChain, "v3Pool"), type(uint256).max);
+        targetData[1] = abi.encodeWithSignature(
+            "supply(address,uint256,address,uint16)",
+            getAddress(sourceChain, "SUSDE"),
+            1000e18,
+            getAddress(sourceChain, "boringVault"),
+            0
+        );
 
         uint256[] memory values = new uint256[](2);
         address[] memory decodersAndSanitizers = new address[](2);
         decodersAndSanitizers[0] = getAddress(sourceChain, "rawDataDecoderAndSanitizer");
+        decodersAndSanitizers[1] = getAddress(sourceChain, "rawDataDecoderAndSanitizer");
 
         manager.manageVaultWithMerkleVerification(manageProofs, decodersAndSanitizers, targets, targetData, values);
     }
