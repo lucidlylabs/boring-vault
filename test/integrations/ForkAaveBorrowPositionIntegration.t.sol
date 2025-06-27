@@ -82,6 +82,7 @@ contract ForkAaveBorrowPositionIntegration is Test, MerkleTreeHelper {
 
     function testAaveFlashBorrow() external {
         uint256 flashloanAmount = 100_000 * 1e6; // 100k USDC
+        deal(getAddress(sourceChain, "USDC"), address(boringVault), 100_000e6);
         deal(getAddress(sourceChain, "SUSDE"), address(boringVault), 100_000e18);
 
         // create ManageLeaf array for all operations
@@ -94,7 +95,7 @@ contract ForkAaveBorrowPositionIntegration is Test, MerkleTreeHelper {
         supplyAssets[0] = getERC20(sourceChain, "SUSDE");
         ERC20[] memory borrowAssets = new ERC20[](1);
         borrowAssets[0] = getERC20(sourceChain, "USDC");
-        _addAaveV3Leafs(leafs, supplyAssets, borrowAssets); //  10 leafs
+        _addAaveV3Leafs(leafs, supplyAssets, borrowAssets); // 9 leafs
         _addCurveLeafs(
             leafs, getAddress(sourceChain, "Usde_Usdc_Curve_Pool"), 2, getAddress(sourceChain, "Usde_Usdc_Curve_Gauge")
         ); // 9 leafs
@@ -126,7 +127,21 @@ contract ForkAaveBorrowPositionIntegration is Test, MerkleTreeHelper {
         );
         leafs[leafIndex].argumentAddresses[0] = address(this);
 
+        unchecked {
+            leafIndex++;
+        }
+        leafs[leafIndex] = ManageLeaf(
+            getAddress(sourceChain, "SUSDE"),
+            false,
+            "approve(address,uint256)",
+            new address[](1),
+            "",
+            getAddress(sourceChain, "rawDataDecoderAndSanitizer")
+        );
+        leafs[leafIndex].argumentAddresses[0] = getAddress(sourceChain, "v3Pool");
+
         bytes32[][] memory manageTree = _generateMerkleTree(leafs);
+        console.log("last leafIndex", leafIndex);
         console.log("length of manageTree:", manageTree.length);
 
         vm.prank(manager.owner());
@@ -137,7 +152,7 @@ contract ForkAaveBorrowPositionIntegration is Test, MerkleTreeHelper {
 
         bytes memory userData;
         {
-            ManageLeaf[] memory flashloanLeafs = new ManageLeaf[](9);
+            ManageLeaf[] memory flashloanLeafs = new ManageLeaf[](4);
 
             // approve curve pool to spend USDC
             flashloanLeafs[0] = ManageLeaf(
@@ -149,6 +164,7 @@ contract ForkAaveBorrowPositionIntegration is Test, MerkleTreeHelper {
                 rawDataDecoderAndSanitizer
             );
             flashloanLeafs[0].argumentAddresses[0] = getAddress(sourceChain, "Usde_Usdc_Curve_Pool");
+            // flashloanLeafs[0] = leafs[11];
 
             // swap USDC for USDE on curve pool
             flashloanLeafs[1] = ManageLeaf(
@@ -159,6 +175,7 @@ contract ForkAaveBorrowPositionIntegration is Test, MerkleTreeHelper {
                 "",
                 getAddress(sourceChain, "rawDataDecoderAndSanitizer")
             );
+            // flashloanLeafs[1] = leafs[12];
 
             // approve SUSDE to spend USDE
             flashloanLeafs[2] = ManageLeaf(
@@ -175,6 +192,7 @@ contract ForkAaveBorrowPositionIntegration is Test, MerkleTreeHelper {
                 rawDataDecoderAndSanitizer
             );
             flashloanLeafs[2].argumentAddresses[0] = getAddress(sourceChain, "SUSDE");
+            // flashloanLeafs[2] = leafs[19];
 
             // deposit USDE into SUSDE contract
             flashloanLeafs[3] = ManageLeaf(
@@ -182,80 +200,90 @@ contract ForkAaveBorrowPositionIntegration is Test, MerkleTreeHelper {
                 false,
                 "deposit(uint256,address)",
                 new address[](1),
-                string.concat(
-                    "Deposit ", getERC20(sourceChain, "USDE").symbol(), " for ", getERC20(sourceChain, "SUSDE").symbol()
-                ),
+                // string.concat(
+                //     "Deposit ", getERC20(sourceChain, "USDE").symbol(), " for ", getERC20(sourceChain, "SUSDE").symbol()
+                // ),
+                "",
                 rawDataDecoderAndSanitizer
             );
             flashloanLeafs[3].argumentAddresses[0] = getAddress(sourceChain, "boringVault");
+            // flashloanLeafs[3] = leafs[20];
 
             // approve aave to spend SUSDE
-            flashloanLeafs[4] = ManageLeaf(
-                getAddress(sourceChain, "SUSDE"),
-                false,
-                "approve(address,uint256)",
-                new address[](1),
-                string.concat("Approve ", "Aave V3", " Pool to spend ", getERC20(sourceChain, "SUSDE").symbol()),
-                rawDataDecoderAndSanitizer
-            );
-            flashloanLeafs[4].argumentAddresses[0] = getAddress(sourceChain, "v3Pool");
+            // flashloanLeafs[4] = ManageLeaf(
+            //     getAddress(sourceChain, "SUSDE"),
+            //     false,
+            //     "approve(address,uint256)",
+            //     new address[](1),
+            //     "",
+            //     getAddress(sourceChain, "rawDataDecoderAndSanitizer")
+            // );
+            // flashloanLeafs[4].argumentAddresses[0] = getAddress(sourceChain, "v3Pool");
 
-            // supply susde to aave
-            flashloanLeafs[5] = ManageLeaf(
-                getAddress(sourceChain, "v3Pool"),
-                false,
-                "supply(address,uint256,address,uint16)",
-                new address[](2),
-                string.concat("Supply ", getERC20(sourceChain, "SUSDE").symbol(), " to Aave V3"),
-                getAddress(sourceChain, "rawDataDecoderAndSanitizer")
-            );
-            flashloanLeafs[5].argumentAddresses[0] = getAddress(sourceChain, "SUSDE");
-            flashloanLeafs[5].argumentAddresses[1] = getAddress(sourceChain, "boringVault");
+            // console.log("leafs[26]:");
+            // _logLeafInfo(leafs[26]);
+            // flashloanLeafs[4] = leafs[26];
 
-            // borrow usdc from aave
-            flashloanLeafs[6] = ManageLeaf(
-                getAddress(sourceChain, "v3Pool"),
-                false,
-                "borrow(address,uint256,uint256,uint16,address)",
-                new address[](2),
-                string.concat("Borrow ", getERC20(sourceChain, "USDC").symbol(), " from Aave V3"),
-                getAddress(sourceChain, "rawDataDecoderAndSanitizer")
-            );
-            flashloanLeafs[6].argumentAddresses[0] = getAddress(sourceChain, "USDC");
-            flashloanLeafs[6].argumentAddresses[1] = getAddress(sourceChain, "boringVault");
+            // // supply susde to aave
+            // flashloanLeafs[5] = ManageLeaf(
+            //     getAddress(sourceChain, "v3Pool"),
+            //     false,
+            //     "supply(address,uint256,address,uint16)",
+            //     new address[](2),
+            //     string.concat("Supply ", getERC20(sourceChain, "SUSDE").symbol(), " to Aave V3"),
+            //     getAddress(sourceChain, "rawDataDecoderAndSanitizer")
+            // );
+            // flashloanLeafs[5].argumentAddresses[0] = getAddress(sourceChain, "SUSDE");
+            // flashloanLeafs[5].argumentAddresses[1] = getAddress(sourceChain, "boringVault");
+            // // flashloanLeafs[5] = leafs[3];
 
-            flashloanLeafs[7] = ManageLeaf(
-                getAddress(sourceChain, "USDC"),
-                false,
-                "approve(address,uint256)",
-                new address[](1),
-                "",
-                getAddress(sourceChain, "rawDataDecoderAndSanitizer")
-            );
-            flashloanLeafs[7].argumentAddresses[0] = address(this);
+            // // borrow usdc from aave
+            // flashloanLeafs[6] = ManageLeaf(
+            //     getAddress(sourceChain, "v3Pool"),
+            //     false,
+            //     "borrow(address,uint256,uint256,uint16,address)",
+            //     new address[](2),
+            //     string.concat("Borrow ", getERC20(sourceChain, "USDC").symbol(), " from Aave V3"),
+            //     getAddress(sourceChain, "rawDataDecoderAndSanitizer")
+            // );
+            // flashloanLeafs[6].argumentAddresses[0] = getAddress(sourceChain, "USDC");
+            // flashloanLeafs[6].argumentAddresses[1] = getAddress(sourceChain, "boringVault");
+            // // flashloanLeafs[6] = leafs[5];
 
-            flashloanLeafs[8] = ManageLeaf(
-                address(this),
-                false,
-                "approve(address,uint256)",
-                new address[](1),
-                "",
-                getAddress(sourceChain, "rawDataDecoderAndSanitizer")
-            );
-            flashloanLeafs[8].argumentAddresses[0] = getAddress(sourceChain, "USDC");
+            // flashloanLeafs[7] = ManageLeaf(
+            //     getAddress(sourceChain, "USDC"),
+            //     false,
+            //     "approve(address,uint256)",
+            //     new address[](1),
+            //     "",
+            //     getAddress(sourceChain, "rawDataDecoderAndSanitizer")
+            // );
+            // flashloanLeafs[7].argumentAddresses[0] = address(this);
+            // // flashloanLeafs[7] = leafs[26];
 
-            address[] memory targets = new address[](9);
+            // flashloanLeafs[8] = ManageLeaf(
+            //     address(this),
+            //     false,
+            //     "approve(address,uint256)",
+            //     new address[](1),
+            //     "",
+            //     getAddress(sourceChain, "rawDataDecoderAndSanitizer")
+            // );
+            // flashloanLeafs[8].argumentAddresses[0] = getAddress(sourceChain, "USDC");
+            // flashloanLeafs[8] = leafs[25];
+
+            address[] memory targets = new address[](4);
             targets[0] = getAddress(sourceChain, "USDC"); // approve curve usde_usdc pool to spend usdc
             targets[1] = getAddress(sourceChain, "Usde_Usdc_Curve_Pool"); // swap usdc to usde
             targets[2] = getAddress(sourceChain, "USDE"); // approve susde contract to spend usde
             targets[3] = getAddress(sourceChain, "SUSDE"); // deposit usde into susde contract
-            targets[4] = getAddress(sourceChain, "v3Pool"); // approve aave to spend susde
-            targets[5] = getAddress(sourceChain, "v3Pool"); // supply susde from aave
-            targets[6] = getAddress(sourceChain, "v3Pool"); // borrow usdc from aave
-            targets[7] = getAddress(sourceChain, "USDC");
-            targets[8] = address(this);
+            // targets[4] = getAddress(sourceChain, "v3Pool"); // approve aave to spend susde
+            // targets[5] = getAddress(sourceChain, "v3Pool"); // supply susde from aave
+            // targets[6] = getAddress(sourceChain, "v3Pool"); // borrow usdc from aave
+            // targets[7] = getAddress(sourceChain, "USDC");
+            // targets[8] = address(this);
 
-            bytes[] memory targetData = new bytes[](9);
+            bytes[] memory targetData = new bytes[](4);
             targetData[0] = abi.encodeWithSignature(
                 "approve(address,uint256)", getAddress(sourceChain, "Usde_Usdc_Curve_Pool"), flashloanAmount
             );
@@ -287,35 +315,35 @@ contract ForkAaveBorrowPositionIntegration is Test, MerkleTreeHelper {
                 "deposit(uint256,address)", abi.decode(result, (uint256)), getAddress(sourceChain, "boringVault")
             );
 
-            uint256 totalSusdeBalanceAfterFlashloan = 100_000e18 + abi.decode(previewDepositResult, (uint256));
-            targetData[4] = abi.encodeWithSignature(
-                "approve(address,uint256)", getAddress(sourceChain, "v3Pool"), totalSusdeBalanceAfterFlashloan
-            );
+            // uint256 totalSusdeBalanceAfterFlashloan = 100_000e18 + abi.decode(previewDepositResult, (uint256));
+            // targetData[4] = abi.encodeWithSignature(
+            //     "approve(address,uint256)", getAddress(sourceChain, "v3Pool"), totalSusdeBalanceAfterFlashloan
+            // );
 
-            targetData[5] = abi.encodeWithSignature(
-                "supply(address,uint256,address,uint16)",
-                getAddress(sourceChain, "SUSDE"),
-                totalSusdeBalanceAfterFlashloan,
-                getAddress(sourceChain, "boringVault"),
-                0
-            );
+            // targetData[5] = abi.encodeWithSignature(
+            //     "supply(address,uint256,address,uint16)",
+            //     getAddress(sourceChain, "SUSDE"),
+            //     totalSusdeBalanceAfterFlashloan,
+            //     getAddress(sourceChain, "boringVault"),
+            //     0
+            // );
 
-            targetData[6] = abi.encodeWithSignature(
-                "borrow(address,uint256,uint256,uint16,address)",
-                getAddress(sourceChain, "USDC"),
-                flashloanAmount,
-                uint256(2),
-                uint16(0),
-                getAddress(sourceChain, "boringVault")
-            );
+            // targetData[6] = abi.encodeWithSignature(
+            //     "borrow(address,uint256,uint256,uint16,address)",
+            //     getAddress(sourceChain, "USDC"),
+            //     flashloanAmount,
+            //     uint256(2),
+            //     uint16(0),
+            //     getAddress(sourceChain, "boringVault")
+            // );
 
-            targetData[7] = abi.encodeWithSelector(ERC20.approve.selector, address(this), flashloanAmount);
-            targetData[8] =
-                abi.encodeWithSelector(ERC20.approve.selector, getAddress(sourceChain, "USDC"), flashloanAmount);
+            // targetData[7] = abi.encodeWithSelector(ERC20.approve.selector, address(this), flashloanAmount);
+            // targetData[8] =
+            //     abi.encodeWithSelector(ERC20.approve.selector, getAddress(sourceChain, "USDC"), flashloanAmount);
 
-            uint256[] memory values = new uint256[](9);
-            address[] memory decodersAndSanitizers = new address[](9);
-            for (uint256 i = 0; i < 9; i++) {
+            uint256[] memory values = new uint256[](4);
+            address[] memory decodersAndSanitizers = new address[](4);
+            for (uint256 i = 0; i < 4; i++) {
                 decodersAndSanitizers[i] = getAddress(sourceChain, "rawDataDecoderAndSanitizer");
             }
 
@@ -365,5 +393,18 @@ contract ForkAaveBorrowPositionIntegration is Test, MerkleTreeHelper {
         token.safeTransferFrom(msg.sender, address(this), amount);
         token.safeTransfer(msg.sender, amount);
         iDidSomething = true;
+    }
+
+    function _logLeafInfo(ManageLeaf memory leaf) internal pure {
+        console.log("target:", leaf.target);
+        console.log("canSendValue:", leaf.canSendValue);
+        console.log("signature:", leaf.signature);
+        for (uint256 i; i < leaf.argumentAddresses.length; i++) {
+            console.log(
+                string.concat("argumentAddresses[", vm.toString(i), "]: ", vm.toString(leaf.argumentAddresses[i]))
+            );
+        }
+        console.log("description:", leaf.description);
+        console.log("decoderAndSanitizer:", leaf.decoderAndSanitizer);
     }
 }
