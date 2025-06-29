@@ -296,6 +296,10 @@ contract ChainValues {
         values[mainnet]["frxUSD"] = 0xCAcd6fd266aF91b8AeD52aCCc382b4e165586E29.toBytes32();
         values[mainnet]["sfrxUSD"] = 0xcf62F905562626CfcDD2261162a51fd02Fc9c5b6.toBytes32();
         values[mainnet]["SYRUP"] = 0x643C4E15d7d62Ad0aBeC4a9BD4b001aA3Ef52d66.toBytes32();
+        values[mainnet]["RLP"] = 0x4956b52aE2fF65D74CA2d61207523288e4528f96.toBytes32();
+        values[mainnet]["USR"] = 0x66a1E37c9b0eAddca17d3662D6c05F4DECf3e110.toBytes32();
+        values[mainnet]["wstUSR"] = 0x1202F5C7b4B9E47a1A484E8B270be34dbbC75055.toBytes32();
+        values[mainnet]["cUSDO"] = 0xaD55aebc9b8c03FC43cd9f62260391c13c23e7c0.toBytes32();
 
         // Rate providers
         values[mainnet]["WEETH_RATE_PROVIDER"] = 0xCd5fE23C85820F7B72D0926FC9b05b43E359b7ee.toBytes32();
@@ -750,6 +754,10 @@ contract ChainValues {
             0x21e55c99123958ff5667f824948c97d0f64dfaa6e2848062e72bc68d200d35f9;
         values[mainnet]["eUSDePT_05_28_25_DAI_915"] = 0xae4571cdcad4191b9a59d1bb27a10a1b05c92c84fe423e4886d5781a30a9c8f1;
         values[mainnet]["syrupUSDC_USDC_915"] = 0x729badf297ee9f2f6b3f717b96fd355fc6ec00422284ce1968e76647b258cf44;
+        values[mainnet]["PT-syrupUSDC-28AUG2025_USDC_915"] =
+            0x3bdb58058b41bb700458ba3df317e254244ddec7fc35fec93d2d53475cc6ebdc;
+        values[mainnet]["PT-iUSD-4SEP2025_USDC_915"] =
+            0x3a3b0aab54883f5b2561d8327fbe234142db4f50f87574cd07daf2ed3fbee01a;
 
         values[mainnet]["WBTC_USDC_86"] = 0x3a85e619751152991742810df6ec69ce473daef99e28a64ab2340d7b7ccfee49;
         values[mainnet]["WBTC_USDT_86"] = 0xa921ef34e2fc7a27ccc50ae7e4b154e16c9799d3387076c421423ef52ac4df99;
@@ -935,7 +943,9 @@ contract ChainValues {
 
         values[mainnet]["pendle_beraSTONE_04_09_2025"] = 0x7561C5CCfe41A26B33944B58C70D6a3CB63E881c.toBytes32();
 
+        values[mainnet]["pendle_syrupUSDC_08_28_2025"] = 0x9A63FA80b5DDFd3Cab23803fdB93ad2c18F3d5aa.toBytes32();
         values[mainnet]["pendle_syrupUSDC_04_23_2025"] = 0x580E40c15261F7Baf18eA50F562118aE99361096.toBytes32();
+        values[mainnet]["pendle_iUSD_09_04_2025"] = 0x2353193fa14A6477a4523e2C078e4063022FCf66.toBytes32();
 
         values[mainnet]["pendle_eUSDe_05_28_2025"] = 0x85667e484a32d884010Cf16427D90049CCf46e97.toBytes32();
 
