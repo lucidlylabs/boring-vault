@@ -53,6 +53,8 @@ contract CreateSyUsdMorphoAgentMerkleRootScript is Script, MerkleTreeHelper {
         _addCcipBridgeLeafs(leafs, ccipArbitrumChainSelector, bridgeAssets, feeTokens);
         _addCcipBridgeLeafs(leafs, ccipBscChainSelector, bridgeAssets, feeTokens);
 
+        _addInfiniV1Leafs(leafs, getAddress(sourceChain, "USDC"));
+
         _addBalancerFlashloanLeafs(leafs, getAddress(sourceChain, "USDC"));
         _addBalancerFlashloanLeafs(leafs, getAddress(sourceChain, "USDT"));
         _addBalancerFlashloanLeafs(leafs, getAddress(sourceChain, "DAI"));

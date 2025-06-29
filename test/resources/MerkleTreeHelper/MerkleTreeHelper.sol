@@ -19,6 +19,7 @@ contract MerkleTreeHelper is CommonBase, ChainValues, Test {
     string public sourceChain;
     uint256 leafIndex = type(uint256).max;
 
+    mapping(address => mapping(address => bool)) public tokenToSpenderToApprovalInTree;
     mapping(address => mapping(address => mapping(address => bool))) public ownerToTokenToSpenderToApprovalInTree;
     mapping(address => mapping(address => mapping(address => bool))) public ownerToOneInchSellTokenToBuyTokenToInTree;
     mapping(address => mapping(address => mapping(address => bool))) public ownerToOdosSellTokenToBuyTokenToInTree;
@@ -11441,6 +11442,125 @@ contract MerkleTreeHelper is CommonBase, ChainValues, Test {
         );
 
         _addERC4626Leafs(leafs, ERC4626(swToken));
+    }
+
+    // InfiniV1
+
+    function _addInfiniV1Leafs(ManageLeaf[] memory leafs, address depositTokenAddress) internal {
+        // approve gateway to spend deposit token if not already added
+        if (!tokenToSpenderToApprovalInTree[depositTokenAddress][getAddress(sourceChain, "InfiniGatewayContract")]) {
+            unchecked {
+                leafIndex++;
+            }
+            leafs[leafIndex] = ManageLeaf(
+                depositTokenAddress,
+                false,
+                "approve(address,uint256)",
+                new address[](1),
+                string.concat("approve InfiniV1 Gateway to spend", ERC20(depositTokenAddress).symbol()),
+                getAddress(sourceChain, "rawDataDecoderAndSanitizer")
+            );
+            leafs[leafIndex].argumentAddresses[0] = getAddress(sourceChain, "InfiniGatewayContract");
+            tokenToSpenderToApprovalInTree[depositTokenAddress][getAddress(sourceChain, "InfiniGatewayContract")] = true;
+        }
+        unchecked {
+            leafIndex++;
+        }
+
+        if (
+            !tokenToSpenderToApprovalInTree[getAddress(sourceChain, "iUSD")][getAddress(
+                sourceChain, "InfiniGatewayContract"
+            )]
+        ) {
+            unchecked {
+                leafIndex++;
+            }
+            leafs[leafIndex] = ManageLeaf(
+                depositTokenAddress,
+                false,
+                "approve(address,uint256)",
+                new address[](1),
+                "approve InfiniV1 Gateway to spend iUSD",
+                getAddress(sourceChain, "rawDataDecoderAndSanitizer")
+            );
+            leafs[leafIndex].argumentAddresses[0] = getAddress(sourceChain, "InfiniGatewayContract");
+            tokenToSpenderToApprovalInTree[getAddress(sourceChain, "iUSD")][getAddress(
+                sourceChain, "InfiniGatewayContract"
+            )] = true;
+        }
+        unchecked {
+            leafIndex++;
+        }
+
+        // mint iUSD using ERC20(depositTokenAddress)
+        leafs[leafIndex] = ManageLeaf(
+            getAddress(sourceChain, "InfiniGatewayContract"),
+            false,
+            "mint(address,uint256)",
+            new address[](1),
+            string.concat("mint iUSD with ", ERC20(depositTokenAddress).symbol()),
+            getAddress(sourceChain, "rawDataDecoderAndSanitizer")
+        );
+        leafs[leafIndex].argumentAddresses[0] = getAddress(sourceChain, "boringVault");
+        unchecked {
+            leafIndex++;
+        }
+
+        // mint and stake using ERC20(depositTokenAddress)
+        leafs[leafIndex] = ManageLeaf(
+            getAddress(sourceChain, "InfiniGatewayContract"),
+            false,
+            "mintAndStake(address,uint256)",
+            new address[](1),
+            string.concat("mint and stake to get siUSD with ", ERC20(depositTokenAddress).symbol()),
+            getAddress(sourceChain, "rawDataDecoderAndSanitizer")
+        );
+        leafs[leafIndex].argumentAddresses[0] = getAddress(sourceChain, "boringVault");
+        unchecked {
+            leafIndex++;
+        }
+
+        // stake iUSD to mint siUSD
+        leafs[leafIndex] = ManageLeaf(
+            getAddress(sourceChain, "InfiniGatewayContract"),
+            false,
+            "stake(address,uint256)",
+            new address[](1),
+            "stake iUSD",
+            getAddress(sourceChain, "rawDataDecoderAndSanitizer")
+        );
+        leafs[leafIndex].argumentAddresses[0] = getAddress(sourceChain, "boringVault");
+        unchecked {
+            leafIndex++;
+        }
+
+        // unstake siUSD to get iUSD
+        leafs[leafIndex] = ManageLeaf(
+            getAddress(sourceChain, "InfiniGatewayContract"),
+            false,
+            "unstake(address,uint256)",
+            new address[](1),
+            "unstake siUSD",
+            getAddress(sourceChain, "rawDataDecoderAndSanitizer")
+        );
+        leafs[leafIndex].argumentAddresses[0] = getAddress(sourceChain, "boringVault");
+        unchecked {
+            leafIndex++;
+        }
+
+        // redeem iUSD to get USDC back
+        leafs[leafIndex] = ManageLeaf(
+            getAddress(sourceChain, "InfiniGatewayContract"),
+            false,
+            "redeem(address,uint256)",
+            new address[](1),
+            "redeem iUSD to get USDC",
+            getAddress(sourceChain, "rawDataDecoderAndSanitizer")
+        );
+        leafs[leafIndex].argumentAddresses[0] = getAddress(sourceChain, "boringVault");
+        unchecked {
+            leafIndex++;
+        }
     }
 
     // ========================================= Odos =========================================

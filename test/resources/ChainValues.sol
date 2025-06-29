@@ -709,6 +709,14 @@ contract ChainValues {
         values[mainnet]["ezEthEthAdapter"] = 0xF4a3e183F59D2599ee3DF213ff78b1B3b1923696.toBytes32();
         values[mainnet]["ezEthEthDataFeedId"] = 0x657a4554482f4554480000000000000000000000000000000000000000000000;
 
+        // Infini
+        values[mainnet]["InfiniGatewayContract"] = 0x3f04b65Ddbd87f9CE0A2e7Eb24d80e7fb87625b5.toBytes32();
+        values[mainnet]["iUSD"] = 0x48f9e38f3070AD8945DFEae3FA70987722E3D89c.toBytes32();
+        values[mainnet]["siUSD"] = 0xDBDC1Ef57537E34680B898E1FEBD3D68c7389bCB.toBytes32();
+        values[mainnet]["PT_iUSD_9_04_2025"] = 0x5f2F6324AA5590e408BA892e39ceC4C0afB16068.toBytes32();
+        values[mainnet]["SY_iUSD_9_04_2025"] = 0xDBDC1Ef57537E34680B898E1FEBD3D68c7389bCB.toBytes32();
+        values[mainnet]["LP_iUSD_9_04_2025"] = 0x2353193fa14A6477a4523e2C078e4063022FCf66.toBytes32();
+
         // Maker
         values[mainnet]["dsrManager"] = 0x373238337Bfe1146fb49989fc222523f83081dDb.toBytes32();
 
