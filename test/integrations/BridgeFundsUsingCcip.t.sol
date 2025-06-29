@@ -27,8 +27,6 @@ import "forge-std/StdJson.sol";
  * @dev Optionally can change `--with-gas-price` to something more reasonable
  */
 contract BridgeFundsToEthereum is Test, MerkleTreeHelper {
-    uint256 public privateKey;
-
     address public rawDataDecoderAndSanitizerEthereum = 0xedbB1308b8E213d7C76F65Ca11cF38136b8a8a83;
     address public rawDataDecoderAndSanitizerBase01 = 0x53F0b212d28320DD0aB504AbD6871941EFf5AD45;
     address public rawDataDecoderAndSanitizerArbitrum01 = 0x53F0b212d28320DD0aB504AbD6871941EFf5AD45;
@@ -64,7 +62,6 @@ contract BridgeFundsToEthereum is Test, MerkleTreeHelper {
     uint8 public constant SOLVER_ORIGIN_ROLE = 33;
 
     function setUp() external {
-        privateKey = vm.envUint("BORING_DEVELOPER");
         vm.createSelectFork("base");
         setSourceChainName("base");
     }
