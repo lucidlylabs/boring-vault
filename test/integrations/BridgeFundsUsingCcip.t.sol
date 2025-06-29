@@ -19,7 +19,7 @@ import {RolesAuthority, Authority} from "@solmate/auth/authorities/RolesAuthorit
 import {MerkleTreeHelper} from "test/resources/MerkleTreeHelper/MerkleTreeHelper.sol";
 import {BalancerVault} from "src/interfaces/BalancerVault.sol";
 
-import "forge-std/Test.sol";
+import {Test, console} from "forge-std/Test.sol";
 import "forge-std/StdJson.sol";
 
 /**
@@ -64,15 +64,17 @@ contract BridgeFundsToEthereum is Test, MerkleTreeHelper {
     function setUp() external {
         vm.createSelectFork("base");
         setSourceChainName("base");
-    }
 
-    function test__BridgeUsingCcip() external {
         setAddress(true, base, "boringVault", address(boringVault));
         setAddress(true, base, "managerAddress", address(manager));
         setAddress(true, base, "accountantAddress", address(accountant));
         setAddress(true, base, "rawDataDecoderAndSanitizer", rawDataDecoderAndSanitizerBase01);
+    }
 
+    function test__BridgeUsingCcip() external {
+        address agent = 0xF171cAf19B2a55B015a68D80C337a16216775509;
         ManageLeaf[] memory leafs = new ManageLeaf[](1024);
+
         {
             ERC20[] memory feeAssets = new ERC20[](2);
             feeAssets[0] = getERC20(sourceChain, "USDC");
@@ -101,13 +103,14 @@ contract BridgeFundsToEthereum is Test, MerkleTreeHelper {
 
             _addLeafsFor1InchGeneralSwapping(leafs, oneInchAssets, kind);
             _addOdosSwapLeafs(leafs, oneInchAssets, kind);
-
             _addERC4626Leafs(leafs, ERC4626(getAddress(sourceChain, "YearnOgUsdc")));
         }
 
         bytes32[][] memory manageTree = _generateMerkleTree(leafs);
 
-        // create leafs
+        vm.prank(manager.owner());
+        manager.setManageRoot(agent, manageTree[manageTree.length - 1][0]);
+
         ManageLeaf[] memory manageLeafs = new ManageLeaf[](3);
         manageLeafs[0] = ManageLeaf(
             getAddress(sourceChain, "WETH"),
@@ -142,6 +145,18 @@ contract BridgeFundsToEthereum is Test, MerkleTreeHelper {
         manageLeafs[2].argumentAddresses[2] = getAddress(sourceChain, "USDC");
         manageLeafs[2].argumentAddresses[3] = getAddress(sourceChain, "WETH");
 
+        // for (uint256 i = 0; i < leafIndex; i++) {
+        //     if (
+        //         keccak256(bytes(leafs[i].signature))
+        //             == keccak256("ccipSend(uint64,(bytes,bytes,(address,uint256)[],address,bytes))")
+        //     ) {
+        //         console.log("leafIndex:", i);
+        //         console.log("description:", leafs[i].description);
+        //     }
+        // }
+
+        // manageLeafs[2] = leafs[6];
+
         bytes32[][] memory manageProofs = _getProofsUsingTree(manageLeafs, manageTree);
 
         address[] memory targets = new address[](3);
@@ -153,10 +168,11 @@ contract BridgeFundsToEthereum is Test, MerkleTreeHelper {
         targetData[0] = abi.encodeWithSignature(
             "approve(address,uint256)", getAddress(sourceChain, "ccipRouter"), type(uint256).max
         );
-        targetData[1] = abi.encodeWithSignature("approve(address,uint256)", getAddress(sourceChain, "ccipRouter"), 10e6);
+        targetData[1] =
+            abi.encodeWithSignature("approve(address,uint256)", getAddress(sourceChain, "ccipRouter"), 100e6);
 
         DecoderCustomTypes.EVM2AnyMessage memory message;
-        message.receiver = abi.encode(address(this));
+        message.receiver = abi.encode(getAddress(sourceChain, "boringVault"));
         message.data = "";
         message.tokenAmounts = new DecoderCustomTypes.EVMTokenAmount[](1);
         message.tokenAmounts[0].token = getAddress(sourceChain, "USDC");
@@ -173,7 +189,7 @@ contract BridgeFundsToEthereum is Test, MerkleTreeHelper {
         decodersAndSanitizers[1] = rawDataDecoderAndSanitizerBase01;
         decodersAndSanitizers[2] = rawDataDecoderAndSanitizerBase01;
 
-        vm.prank(0xF171cAf19B2a55B015a68D80C337a16216775509);
+        vm.prank(agent);
         manager.manageVaultWithMerkleVerification(manageProofs, decodersAndSanitizers, targets, targetData, values);
     }
 }
