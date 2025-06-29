@@ -19,7 +19,7 @@ contract CreateSyUsdMultiChainMerkleRootScript is Script, MerkleTreeHelper {
     address public accountantAddress = 0x03D9a9cE13D16C7cFCE564f41bd7E85E5cde8Da6;
     address public boringVault = 0x279CAD277447965AF3d24a78197aad1B02a2c589;
     address public managerAddress = 0x9B3e565ffC70c4b72516BC2dbec4b3c790940CE8;
-    address public rawDataDecoderAndSanitizer01 = 0xedbB1308b8E213d7C76F65Ca11cF38136b8a8a83;
+    address public rawDataDecoderAndSanitizer01 = 0x53F0b212d28320DD0aB504AbD6871941EFf5AD45;
 
     function setUp() external {
         setSourceChainName(base);
