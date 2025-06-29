@@ -1374,6 +1374,8 @@ contract ChainValues {
 
         values[base]["USDC"] = 0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913.toBytes32();
         values[base]["USDT"] = 0xfde4C96c8593536E31F229EA8f37b2ADa2699bb2.toBytes32();
+        values[base]["USDS"] = 0x820C137fa70C8691f0e44Dc420a5e53c168921Dc.toBytes32();
+        values[base]["GHO"] = 0x6Bb7a212910682DCFdbd5BCBb3e28FB4E8da10Ee.toBytes32();
         values[base]["WETH"] = 0x4200000000000000000000000000000000000006.toBytes32();
         values[base]["WEETH"] = 0x04C0599Ae5A44757c0af6F9eC3b93da8976c150A.toBytes32();
         values[base]["WSTETH"] = 0xc1CBa3fCea344f92D9239c08C0568f6F2F0ee452.toBytes32();
@@ -1437,6 +1439,7 @@ contract ChainValues {
         values[base]["gauntletLBTCcore"] = 0x0D05e6ec0A10f9fFE9229EAA785c11606a1d13Fb.toBytes32();
         values[base]["seamlessCbBTC"] = 0x5a47C803488FE2BB0A0EAaf346b420e4dF22F3C7.toBytes32();
         values[base]["moonwellCbBTC"] = 0x543257eF2161176D7C8cD90BA65C2d4CaEF5a796.toBytes32();
+        values[base]["YearnOgUsdc"] = 0xef417a2512C5a41f69AE4e021648b69a7CdE5D03.toBytes32();
 
         values[base]["uniV3Router"] = 0x2626664c2603336E57B271c5C0b26F421741e481.toBytes32();
 
@@ -1468,6 +1471,9 @@ contract ChainValues {
         values[base]["lbtcBridge"] = 0xA869817b48b25EeE986bdF4bE04062e6fd2C418B.toBytes32();
 
         values[base]["lbtcBridge"] = 0xA869817b48b25EeE986bdF4bE04062e6fd2C418B.toBytes32();
+
+        // ccip
+        values[base]["ccipRouter"] = 0x881e3A65B4d4a04dD529061dd0071cf975F58bCD.toBytes32();
     }
 
     function _addArbitrumValues() private {
