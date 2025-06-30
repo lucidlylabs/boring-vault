@@ -714,7 +714,7 @@ contract ChainValues {
         values[mainnet]["iUSD"] = 0x48f9e38f3070AD8945DFEae3FA70987722E3D89c.toBytes32();
         values[mainnet]["siUSD"] = 0xDBDC1Ef57537E34680B898E1FEBD3D68c7389bCB.toBytes32();
         values[mainnet]["PT_iUSD_9_04_2025"] = 0x5f2F6324AA5590e408BA892e39ceC4C0afB16068.toBytes32();
-        values[mainnet]["SY_iUSD_9_04_2025"] = 0xDBDC1Ef57537E34680B898E1FEBD3D68c7389bCB.toBytes32();
+        values[mainnet]["SY_iUSD_9_04_2025"] = 0x47743a9203E636674467Ff58B7AB0aE0ee6f97cb.toBytes32();
         values[mainnet]["LP_iUSD_9_04_2025"] = 0x2353193fa14A6477a4523e2C078e4063022FCf66.toBytes32();
 
         // Maker
@@ -841,6 +841,7 @@ contract ChainValues {
 
         // Pendle
         values[mainnet]["pendleMarketFactory"] = 0x1A6fCc85557BC4fB7B534ed835a03EF056552D52.toBytes32();
+        values[mainnet]["pendleSwap"] = 0xd4F480965D2347d421F1bEC7F545682E5Ec2151D.toBytes32();
         values[mainnet]["pendleRouter"] = 0x888888888889758F76e7103c6CbF23ABbF58F946.toBytes32();
         values[mainnet]["pendleOracle"] = 0x66a1096C6366b2529274dF4f5D8247827fe4CEA8.toBytes32();
         values[mainnet]["pendleLimitOrderRouter"] = 0x000000000000c9B3E2C3Ec88B1B4c0cD853f4321.toBytes32();
@@ -1341,6 +1342,9 @@ contract ChainValues {
         // Odos
         values[mainnet]["odosRouterV2"] = 0xCf5540fFFCdC3d510B18bFcA6d2b9987b0772559.toBytes32();
         values[mainnet]["odosExecutor"] = 0xd768d1Fe6Ef1449A54F9409400fe9d0E4954ea3F.toBytes32();
+
+        // Kyberswap
+        values[mainnet]["kyberswapMetaAggregationRouterV2"] = 0x6131B5fae19EA4f9D964eAc0408E4408b66337b5.toBytes32();
 
         // Level
         values[mainnet]["levelMinter"] = 0x8E7046e27D14d09bdacDE9260ff7c8c2be68a41f.toBytes32();
