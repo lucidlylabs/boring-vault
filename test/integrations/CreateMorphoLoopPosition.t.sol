@@ -67,82 +67,11 @@ contract CreateMorphoLoopPosition is Test, MerkleTreeHelper {
         setAddress(true, base, "rawDataDecoderAndSanitizer", rawDataDecoderAndSanitizerEthereum);
     }
 
-    function test__BridgeUsingCcip() external {
+    function test__CreateMorphoBorrowPosition() external {
         address agent = 0xF171cAf19B2a55B015a68D80C337a16216775509;
         ManageLeaf[] memory leafs = new ManageLeaf[](1024);
 
-        {
-            ERC20[] memory feeAssets = new ERC20[](3);
-            feeAssets[0] = getERC20(sourceChain, "USDC");
-            feeAssets[1] = getERC20(sourceChain, "USDT");
-            feeAssets[2] = getERC20(sourceChain, "USDS");
-            _addLeafsForFeeClaiming(leafs, getAddress(sourceChain, "accountantAddress"), feeAssets, false);
-
-            ERC20[] memory bridgeAssets = new ERC20[](2);
-            bridgeAssets[0] = getERC20(sourceChain, "USDC");
-            bridgeAssets[1] = getERC20(sourceChain, "USDT");
-            ERC20[] memory feeTokens = new ERC20[](2);
-            feeTokens[0] = getERC20(sourceChain, "WETH");
-            feeTokens[1] = getERC20(sourceChain, "GHO");
-
-            _addCcipBridgeLeafs(leafs, ccipBaseChainSelector, bridgeAssets, feeTokens);
-            _addCcipBridgeLeafs(leafs, ccipArbitrumChainSelector, bridgeAssets, feeTokens);
-            _addCcipBridgeLeafs(leafs, ccipBscChainSelector, bridgeAssets, feeTokens);
-
-            _addInfiniV1Leafs(leafs, getAddress(sourceChain, "USDC"));
-
-            _addBalancerFlashloanLeafs(leafs, getAddress(sourceChain, "USDC"));
-            _addBalancerFlashloanLeafs(leafs, getAddress(sourceChain, "USDT"));
-            _addBalancerFlashloanLeafs(leafs, getAddress(sourceChain, "DAI"));
-            _addBalancerFlashloanLeafs(leafs, getAddress(sourceChain, "USDS"));
-            _addBalancerFlashloanLeafs(leafs, getAddress(sourceChain, "WETH"));
-
-            _addMorphoBlueSupplyLeafs(leafs, getBytes32(sourceChain, "syrupUSDC_USDC_915"));
-            _addMorphoBlueSupplyLeafs(leafs, getBytes32(sourceChain, "PT-syrupUSDC-28AUG2025_USDC_915"));
-            _addMorphoBlueSupplyLeafs(leafs, getBytes32(sourceChain, "PT-iUSD-4SEP2025_USDC_915"));
-            _addMorphoBlueCollateralLeafs(leafs, getBytes32(sourceChain, "syrupUSDC_USDC_915"));
-            _addMorphoBlueCollateralLeafs(leafs, getBytes32(sourceChain, "PT-syrupUSDC-28AUG2025_USDC_915"));
-            _addMorphoBlueCollateralLeafs(leafs, getBytes32(sourceChain, "PT-iUSD-4SEP2025_USDC_915"));
-
-            _addPendleMarketLeafs(leafs, getAddress(sourceChain, "pendle_iUSD_09_04_2025"), false);
-            _addPendleMarketLeafs(leafs, getAddress(sourceChain, "pendle_syrupUSDC_08_28_2025"), false);
-
-            // 1inch assets;
-            address[] memory oneInchAssets = new address[](10);
-            oneInchAssets[0] = getAddress(sourceChain, "USDC");
-            oneInchAssets[1] = getAddress(sourceChain, "SUSDE");
-            oneInchAssets[2] = getAddress(sourceChain, "USDS");
-            oneInchAssets[3] = getAddress(sourceChain, "USDT");
-            oneInchAssets[4] = getAddress(sourceChain, "USDE");
-            oneInchAssets[5] = getAddress(sourceChain, "lvlUSD");
-            oneInchAssets[6] = getAddress(sourceChain, "RLP");
-            oneInchAssets[7] = getAddress(sourceChain, "USR");
-            oneInchAssets[8] = getAddress(sourceChain, "wstUSR");
-            oneInchAssets[9] = getAddress(sourceChain, "cUSDO");
-            SwapKind[] memory kind = new SwapKind[](10);
-            kind[0] = SwapKind.BuyAndSell;
-            kind[1] = SwapKind.BuyAndSell;
-            kind[2] = SwapKind.BuyAndSell;
-            kind[3] = SwapKind.BuyAndSell;
-            kind[4] = SwapKind.BuyAndSell;
-            kind[5] = SwapKind.BuyAndSell;
-            kind[6] = SwapKind.BuyAndSell;
-            kind[7] = SwapKind.BuyAndSell;
-            kind[8] = SwapKind.BuyAndSell;
-            kind[9] = SwapKind.BuyAndSell;
-            _addLeafsFor1InchGeneralSwapping(leafs, oneInchAssets, kind);
-            _addOdosSwapLeafs(leafs, oneInchAssets, kind);
-
-            ERC20[] memory supplyAssets = new ERC20[](1);
-            supplyAssets[0] = getERC20(sourceChain, "SUSDE");
-            ERC20[] memory borrowAssets = new ERC20[](2);
-            borrowAssets[0] = getERC20(sourceChain, "USDC");
-            borrowAssets[1] = getERC20(sourceChain, "USDT");
-            _addAaveV3Leafs(leafs, supplyAssets, borrowAssets);
-
-            _addERC4626Leafs(leafs, ERC4626(getAddress(sourceChain, "SUSDE")));
-        }
-
+        _addLeafs(leafs);
         bytes32[][] memory manageTree = _generateMerkleTree(leafs);
 
         vm.startPrank(manager.owner());
@@ -157,114 +86,403 @@ contract CreateMorphoLoopPosition is Test, MerkleTreeHelper {
         // 5. deposit PT-iUSD on morpho
         // 6. borrow USDC
 
-        uint256 flashloanAmount = 100000e6;
-
-        ManageLeaf[] memory manageLeafs = new ManageLeaf[](3);
+        uint256 flashloanAmount = 455000e6;
+        uint256 cacheUsdcBalance = getERC20(sourceChain, "USDC").balanceOf(getAddress(sourceChain, "boringVault"));
+        uint256 totalCapital = flashloanAmount + cacheUsdcBalance;
 
         bytes memory userData;
         {
-            ManageLeaf[] memory flashloanLeafs = new ManageLeaf[6];
+            // ManageLeaf[] memory flashloanLeafs = new ManageLeaf[](7);
 
-            // approve pendle router to spend usdc
-            flashloanLeafs[0] = ManageLeaf(
-                getAddress(sourceChain, "USDC"),
-                false,
-                "approve(address,uint256)",
-                new address[](1),
-                "",
-                getAddress(sourceChain, "rawDataDecoderAndSanitizer")
-            );
-            flashloanLeafs[0].argumentAddresses[0] = getAddress(sourceChain, "pendleRouter");
+            // // approve pendle router to spend usdc
+            // flashloanLeafs[0] = ManageLeaf(
+            //     getAddress(sourceChain, "USDC"),
+            //     false,
+            //     "approve(address,uint256)",
+            //     new address[](1),
+            //     "",
+            //     getAddress(sourceChain, "rawDataDecoderAndSanitizer")
+            // );
+            // flashloanLeafs[0].argumentAddresses[0] = getAddress(sourceChain, "pendleRouter");
 
-            // mint SY-iUSD using USDC
-            flashloanLeafs[1] = ManageLeaf(
-                getAddress(sourceChain, "pendleRouter"),
-                false,
-                "mintSyFromToken(address,address,uint256,(address,uint256,address,address,(uint8,address,bytes,bool)))",
-                new address[](6),
-                "",
-                getAddress(sourceChain, "rawDataDecoderAndSanitizer")
-            );
-            leafs[1].argumentAddresses[0] = getAddress(sourceChain, "boringVault");
-            leafs[1].argumentAddresses[1] = getAddress(sourceChain, "SY_iUSD_9_04_202");
-            leafs[1].argumentAddresses[2] = getAddress(sourceChain, "USDC");
-            leafs[1].argumentAddresses[3] = getAddress(sourceChain, "USDC");
-            leafs[1].argumentAddresses[4] = address(0);
-            leafs[1].argumentAddresses[5] = address(0);
+            // // mint SY-iUSD using USDC
+            // flashloanLeafs[1] = ManageLeaf(
+            //     getAddress(sourceChain, "pendleRouter"),
+            //     false,
+            //     "mintSyFromToken(address,address,uint256,(address,uint256,address,address,(uint8,address,bytes,bool)))",
+            //     new address[](6),
+            //     "",
+            //     getAddress(sourceChain, "rawDataDecoderAndSanitizer")
+            // );
+            // leafs[1].argumentAddresses[0] = getAddress(sourceChain, "boringVault");
+            // leafs[1].argumentAddresses[1] = getAddress(sourceChain, "SY_iUSD_9_04_2025");
+            // leafs[1].argumentAddresses[2] = getAddress(sourceChain, "USDC");
+            // leafs[1].argumentAddresses[3] = getAddress(sourceChain, "USDC");
+            // leafs[1].argumentAddresses[4] = address(0);
+            // leafs[1].argumentAddresses[5] = address(0);
 
-            // swap SY for PT
-            flashloanLeafs[2] = ManageLeaf(
-                getAddress(sourceChain, "pendleRouter"),
-                false,
-                "swapExactSyForPt(address,address,uint256,uint256,(uint256,uint256,uint256,uint256,uint256),(address,uint256,((uint256,uint256,uint256,uint8,address,address,address,address,uint256,uint256,uint256,bytes),bytes,uint256)[],((uint256,uint256,uint256,uint8,address,address,address,address,uint256,uint256,uint256,bytes),bytes,uint256)[],bytes))",
-                new address[](2),
-                "",
-                getAddress(sourceChain, "rawDataDecoderAndSanitizer")
-            );
-            flashloanLeafs[2].argumentAddresses[0] = getAddress(sourceChain, "boringVault");
-            flashloanLeafs[2].argumentAddresses[1] = getAddress(sourceChain, "LP_iUSD_9_04_2025");
+            // flashloanLeafs[2] = ManageLeaf(
+            //     getAddress(sourceChain, "SY_iUSD_9_04_2025"),
+            //     false,
+            //     "approve(address,uint256)",
+            //     new address[](1),
+            //     "",
+            //     getAddress(sourceChain, "rawDataDecoderAndSanitizer")
+            // );
+            // flashloanLeafs[2].argumentAddresses[0] = getAddress(sourceChain, "pendleRouter");
 
-            // approve morpho to spend PT-iUSD
-            flashloanLeafs[3] = ManageLeaf(
-                getAddress(sourceChain, "PT_iUSD_9_04_2025"),
-                false,
-                "approve(address,uint256)",
-                new address[](1),
-                "",
-                getAddress(sourceChain, "rawDataDecoderAndSanitizer")
-            );
-            flashloanLeafs[0].argumentAddresses[0] = getAddress(sourceChain, "pendleRouter");
+            // // swap SY for PT
+            // flashloanLeafs[3] = ManageLeaf(
+            //     getAddress(sourceChain, "pendleRouter"),
+            //     false,
+            //     "swapExactSyForPt(address,address,uint256,uint256,(uint256,uint256,uint256,uint256,uint256),(address,uint256,((uint256,uint256,uint256,uint8,address,address,address,address,uint256,uint256,uint256,bytes),bytes,uint256)[],((uint256,uint256,uint256,uint8,address,address,address,address,uint256,uint256,uint256,bytes),bytes,uint256)[],bytes))",
+            //     new address[](2),
+            //     "",
+            //     getAddress(sourceChain, "rawDataDecoderAndSanitizer")
+            // );
+            // flashloanLeafs[3].argumentAddresses[0] = getAddress(sourceChain, "boringVault");
+            // flashloanLeafs[3].argumentAddresses[1] = getAddress(sourceChain, "LP_iUSD_9_04_2025");
 
-            IMB.MarketParams memory marketParams = IMB(getAddress(sourceChain, "morphoBlue")).idToMarketParams(
-                getBytes32(sourceChain, "PT-iUSD-4SEP2025_USDC_915")
-            );
+            // // approve morpho to spend PT-iUSD
+            // flashloanLeafs[4] = ManageLeaf(
+            //     getAddress(sourceChain, "PT_iUSD_9_04_2025"),
+            //     false,
+            //     "approve(address,uint256)",
+            //     new address[](1),
+            //     "",
+            //     getAddress(sourceChain, "rawDataDecoderAndSanitizer")
+            // );
+            // flashloanLeafs[4].argumentAddresses[0] = getAddress(sourceChain, "pendleRouter");
 
-            // supply PT-iUSD collateral on morpho
-            flashloanLeafs[4] = ManageLeaf(
-                getAddress(sourceChain, "morphoBlue"),
-                false,
-                "supplyCollateral((address,address,address,address,uint256),uint256,address,bytes)",
-                new address[](5),
-                "",
-                getAddress(sourceChain, "rawDataDecoderAndSanitizer")
-            );
-            flashloanLeafs[4].argumentAddresses[0] = marketParams.loanToken;
-            flashloanLeafs[4].argumentAddresses[1] = marketParams.collateralToken;
-            flashloanLeafs[4].argumentAddresses[2] = marketParams.oracle;
-            flashloanLeafs[4].argumentAddresses[3] = marketParams.irm;
-            flashloanLeafs[4].argumentAddresses[4] = getAddress(sourceChain, "boringVault");
+            // IMB.MarketParams memory marketParams = IMB(getAddress(sourceChain, "morphoBlue")).idToMarketParams(
+            //     getBytes32(sourceChain, "PT-iUSD-4SEP2025_USDC_915")
+            // );
 
-            flashloanLeafs[5] = ManageLeaf(
-                getAddress(sourceChain, "morphoBlue"),
-                false,
-                "borrow((address,address,address,address,uint256),uint256,uint256,address,address)",
-                new address[](6),
-                "",
-                getAddress(sourceChain, "rawDataDecoderAndSanitizer")
-            );
-            flashloanLeafs[5].argumentAddresses[0] = marketParams.loanToken;
-            flashloanLeafs[5].argumentAddresses[1] = marketParams.collateralToken;
-            flashloanLeafs[5].argumentAddresses[2] = marketParams.oracle;
-            flashloanLeafs[5].argumentAddresses[3] = marketParams.irm;
-            flashloanLeafs[5].argumentAddresses[4] = getAddress(sourceChain, "boringVault");
-            flashloanLeafs[5].argumentAddresses[5] = getAddress(sourceChain, "boringVault");
+            // // supply PT-iUSD collateral on morpho
+            // flashloanLeafs[5] = ManageLeaf(
+            //     getAddress(sourceChain, "morphoBlue"),
+            //     false,
+            //     "supplyCollateral((address,address,address,address,uint256),uint256,address,bytes)",
+            //     new address[](5),
+            //     "",
+            //     getAddress(sourceChain, "rawDataDecoderAndSanitizer")
+            // );
+            // flashloanLeafs[5].argumentAddresses[0] = marketParams.loanToken;
+            // flashloanLeafs[5].argumentAddresses[1] = marketParams.collateralToken;
+            // flashloanLeafs[5].argumentAddresses[2] = marketParams.oracle;
+            // flashloanLeafs[5].argumentAddresses[3] = marketParams.irm;
+            // flashloanLeafs[5].argumentAddresses[4] = getAddress(sourceChain, "boringVault");
 
-            address[] memory targets = new address[](6);
+            // // borrow usdc from morpho
+            // flashloanLeafs[6] = ManageLeaf(
+            //     getAddress(sourceChain, "morphoBlue"),
+            //     false,
+            //     "borrow((address,address,address,address,uint256),uint256,uint256,address,address)",
+            //     new address[](6),
+            //     "",
+            //     getAddress(sourceChain, "rawDataDecoderAndSanitizer")
+            // );
+            // flashloanLeafs[6].argumentAddresses[0] = marketParams.loanToken;
+            // flashloanLeafs[6].argumentAddresses[1] = marketParams.collateralToken;
+            // flashloanLeafs[6].argumentAddresses[2] = marketParams.oracle;
+            // flashloanLeafs[6].argumentAddresses[3] = marketParams.irm;
+            // flashloanLeafs[6].argumentAddresses[4] = getAddress(sourceChain, "boringVault");
+            // flashloanLeafs[6].argumentAddresses[5] = getAddress(sourceChain, "boringVault");
+
+            bytes32[][] memory flashloanManageProofs = _createFlashloanManageLeafs(manageTree);
+
+            address[] memory targets = new address[](7);
             targets[0] = getAddress(sourceChain, "USDC");
             targets[1] = getAddress(sourceChain, "pendleRouter");
-            targets[2] = getAddress(sourceChain, "pendleRouter");
-            targets[3] = getAddress(sourceChain, "PT_iUSD_9_04_2025");
-            targets[4] = getAddress(sourceChain, "morphoBlue");
+            targets[2] = getAddress(sourceChain, "SY_iUSD_9_04_2025");
+            targets[3] = getAddress(sourceChain, "pendleRouter");
+            targets[4] = getAddress(sourceChain, "PT_iUSD_9_04_2025");
             targets[5] = getAddress(sourceChain, "morphoBlue");
+            targets[6] = getAddress(sourceChain, "morphoBlue");
 
-            bytes[] memory targetData = new bytes[](6);
+            bytes[] memory targetData = new bytes[](7);
+
+            DecoderCustomTypes.MarketParams memory params = DecoderCustomTypes.MarketParams(
+                getAddress(sourceChain, "USDC"),
+                getAddress(sourceChain, "PT_iUSD_9_04_2025"),
+                0x826F361C22A687DbC34B52777a1c3Dcf1F5e3B70,
+                0x870aC11D48B15DB9a138Cf899d20F13F79Ba00BC,
+                0.915e18
+            );
 
             targetData[0] = abi.encodeWithSignature(
                 "approve(address,uint256)", getAddress(sourceChain, "pendleRouter"), type(uint256).max
             );
-        }
 
-        vm.prank(agent);
-        manager.manageVaultWithMerkleVerification(manageProofs, decodersAndSanitizers, targets, targetData, values);
+            DecoderCustomTypes.SwapData memory swapData =
+                DecoderCustomTypes.SwapData(DecoderCustomTypes.SwapType.NONE, address(0), hex"", false);
+            DecoderCustomTypes.TokenInput memory tokenInput = DecoderCustomTypes.TokenInput(
+                getAddress(sourceChain, "USDC"), totalCapital, getAddress(sourceChain, "iUSD"), address(0), swapData
+            );
+            targetData[1] = abi.encodeWithSignature(
+                "mintSyFromToken(address,address,uint256,(address,uint256,address,address,(uint8,address,bytes,bool)))",
+                address(boringVault),
+                getAddress(sourceChain, "SY_iUSD_9_04_2025"),
+                0,
+                tokenInput
+            );
+
+            targetData[2] = abi.encodeWithSignature(
+                "approve(address,uint256)", getAddress(sourceChain, "pendleRouter"), type(uint256).max
+            );
+
+            DecoderCustomTypes.ApproxParams memory approxParams =
+                DecoderCustomTypes.ApproxParams(0, type(uint256).max, 0, 2566, 1e14);
+            DecoderCustomTypes.LimitOrderData memory limitOrderData;
+            targetData[3] = abi.encodeWithSignature(
+                "swapExactSyForPt(address,address,uint256,uint256,(uint256,uint256,uint256,uint256,uint256),(address,uint256,((uint256,uint256,uint256,uint8,address,address,address,address,uint256,uint256,uint256,bytes),bytes,uint256)[],((uint256,uint256,uint256,uint8,address,address,address,address,uint256,uint256,uint256,bytes),bytes,uint256)[],bytes))",
+                address(boringVault),
+                getAddress(sourceChain, "LP_iUSD_9_04_2025"),
+                totalCapital,
+                0,
+                approxParams,
+                limitOrderData
+            );
+
+            targetData[4] = abi.encodeWithSignature(
+                "approve(address,uint256)", getAddress(sourceChain, "pendleRouter"), type(uint256).max
+            );
+
+            targetData[5] = abi.encodeWithSignature(
+                "supplyCollateral((address,address,address,address,uint256),uint256,address,bytes)",
+                params,
+                totalCapital,
+                address(boringVault),
+                hex""
+            );
+
+            targetData[6] = abi.encodeWithSignature(
+                "borrow((address,address,address,address,uint256),uint256,uint256,address,address)",
+                params,
+                flashloanAmount,
+                0,
+                address(boringVault),
+                address(boringVault)
+            );
+
+            uint256[] memory values = new uint256[](7);
+            address[] memory decodersAndSanitizers = new address[](7);
+            for (uint256 i = 0; i < 7; i++) {
+                decodersAndSanitizers[i] = getAddress(sourceChain, "rawDataDecoderAndSanitizer");
+            }
+
+            userData = abi.encode(flashloanManageProofs, decodersAndSanitizers, targets, targetData, values);
+        }
+        {
+            address[] memory targets = new address[](1);
+            targets[0] = getAddress(sourceChain, "manager");
+
+            address[] memory tokensToBorrow = new address[](1);
+            tokensToBorrow[0] = getAddress(sourceChain, "USDC");
+            uint256[] memory amountsToBorrow = new uint256[](1);
+            amountsToBorrow[0] = flashloanAmount;
+            bytes[] memory targetData = new bytes[](1);
+            targetData[0] = abi.encodeWithSelector(
+                BalancerVault.flashLoan.selector, address(manager), tokensToBorrow, amountsToBorrow, userData
+            );
+
+            ManageLeaf[] memory manageLeafs = new ManageLeaf[](1);
+            manageLeafs[0] = ManageLeaf(
+                getAddress(sourceChain, "manager"),
+                false,
+                "flashLoan(address,address[],uint256[],bytes)",
+                new address[](2),
+                string.concat("Flashloan ", getERC20(sourceChain, "USDC").symbol(), " from Balancer Vault"),
+                getAddress(sourceChain, "rawDataDecoderAndSanitizer")
+            );
+
+            manageLeafs[0].argumentAddresses[0] = getAddress(sourceChain, "managerAddress");
+            manageLeafs[0].argumentAddresses[1] = getAddress(sourceChain, "USDC");
+
+            bytes32[][] memory manageProofs = _getProofsUsingTree(manageLeafs, manageTree);
+
+            uint256[] memory values = new uint256[](1);
+            address[] memory decodersAndSanitizers = new address[](1);
+            decodersAndSanitizers[0] = getAddress(sourceChain, "rawDataDecoderAndSanitizer");
+
+            vm.prank(agent);
+            manager.manageVaultWithMerkleVerification(manageProofs, decodersAndSanitizers, targets, targetData, values);
+        }
+    }
+
+    function _createFlashloanManageLeafs(bytes32[][] memory manageTree)
+        internal
+        returns (bytes32[][] memory flashloanManageProofs)
+    {
+        ManageLeaf[] memory flashloanLeafs = new ManageLeaf[](7);
+
+        // approve pendle router to spend usdc
+        flashloanLeafs[0] = ManageLeaf(
+            getAddress(sourceChain, "USDC"),
+            false,
+            "approve(address,uint256)",
+            new address[](1),
+            "",
+            getAddress(sourceChain, "rawDataDecoderAndSanitizer")
+        );
+        flashloanLeafs[0].argumentAddresses[0] = getAddress(sourceChain, "pendleRouter");
+
+        // mint SY-iUSD using USDC
+        flashloanLeafs[1] = ManageLeaf(
+            getAddress(sourceChain, "pendleRouter"),
+            false,
+            "mintSyFromToken(address,address,uint256,(address,uint256,address,address,(uint8,address,bytes,bool)))",
+            new address[](6),
+            "",
+            getAddress(sourceChain, "rawDataDecoderAndSanitizer")
+        );
+        flashloanLeafs[1].argumentAddresses[0] = getAddress(sourceChain, "boringVault");
+        flashloanLeafs[1].argumentAddresses[1] = getAddress(sourceChain, "SY_iUSD_9_04_2025");
+        flashloanLeafs[1].argumentAddresses[2] = getAddress(sourceChain, "USDC");
+        flashloanLeafs[1].argumentAddresses[3] = getAddress(sourceChain, "USDC");
+        flashloanLeafs[1].argumentAddresses[4] = address(0);
+        flashloanLeafs[1].argumentAddresses[5] = address(0);
+
+        flashloanLeafs[2] = ManageLeaf(
+            getAddress(sourceChain, "SY_iUSD_9_04_2025"),
+            false,
+            "approve(address,uint256)",
+            new address[](1),
+            "",
+            getAddress(sourceChain, "rawDataDecoderAndSanitizer")
+        );
+        flashloanLeafs[2].argumentAddresses[0] = getAddress(sourceChain, "pendleRouter");
+
+        // swap SY for PT
+        flashloanLeafs[3] = ManageLeaf(
+            getAddress(sourceChain, "pendleRouter"),
+            false,
+            "swapExactSyForPt(address,address,uint256,uint256,(uint256,uint256,uint256,uint256,uint256),(address,uint256,((uint256,uint256,uint256,uint8,address,address,address,address,uint256,uint256,uint256,bytes),bytes,uint256)[],((uint256,uint256,uint256,uint8,address,address,address,address,uint256,uint256,uint256,bytes),bytes,uint256)[],bytes))",
+            new address[](2),
+            "",
+            getAddress(sourceChain, "rawDataDecoderAndSanitizer")
+        );
+        flashloanLeafs[3].argumentAddresses[0] = getAddress(sourceChain, "boringVault");
+        flashloanLeafs[3].argumentAddresses[1] = getAddress(sourceChain, "LP_iUSD_9_04_2025");
+
+        // approve morpho to spend PT-iUSD
+        flashloanLeafs[4] = ManageLeaf(
+            getAddress(sourceChain, "PT_iUSD_9_04_2025"),
+            false,
+            "approve(address,uint256)",
+            new address[](1),
+            "",
+            getAddress(sourceChain, "rawDataDecoderAndSanitizer")
+        );
+        flashloanLeafs[4].argumentAddresses[0] = getAddress(sourceChain, "pendleRouter");
+
+        IMB.MarketParams memory marketParams = IMB(getAddress(sourceChain, "morphoBlue")).idToMarketParams(
+            getBytes32(sourceChain, "PT-iUSD-4SEP2025_USDC_915")
+        );
+
+        // supply PT-iUSD collateral on morpho
+        flashloanLeafs[5] = ManageLeaf(
+            getAddress(sourceChain, "morphoBlue"),
+            false,
+            "supplyCollateral((address,address,address,address,uint256),uint256,address,bytes)",
+            new address[](5),
+            "",
+            getAddress(sourceChain, "rawDataDecoderAndSanitizer")
+        );
+        flashloanLeafs[5].argumentAddresses[0] = marketParams.loanToken;
+        flashloanLeafs[5].argumentAddresses[1] = marketParams.collateralToken;
+        flashloanLeafs[5].argumentAddresses[2] = marketParams.oracle;
+        flashloanLeafs[5].argumentAddresses[3] = marketParams.irm;
+        flashloanLeafs[5].argumentAddresses[4] = getAddress(sourceChain, "boringVault");
+
+        // borrow usdc from morpho
+        flashloanLeafs[6] = ManageLeaf(
+            getAddress(sourceChain, "morphoBlue"),
+            false,
+            "borrow((address,address,address,address,uint256),uint256,uint256,address,address)",
+            new address[](6),
+            "",
+            getAddress(sourceChain, "rawDataDecoderAndSanitizer")
+        );
+        flashloanLeafs[6].argumentAddresses[0] = marketParams.loanToken;
+        flashloanLeafs[6].argumentAddresses[1] = marketParams.collateralToken;
+        flashloanLeafs[6].argumentAddresses[2] = marketParams.oracle;
+        flashloanLeafs[6].argumentAddresses[3] = marketParams.irm;
+        flashloanLeafs[6].argumentAddresses[4] = getAddress(sourceChain, "boringVault");
+        flashloanLeafs[6].argumentAddresses[5] = getAddress(sourceChain, "boringVault");
+
+        flashloanManageProofs = _getProofsUsingTree(flashloanLeafs, manageTree);
+    }
+
+    function _addLeafs(ManageLeaf[] memory leafs) internal {
+        ERC20[] memory feeAssets = new ERC20[](3);
+        feeAssets[0] = getERC20(sourceChain, "USDC");
+        feeAssets[1] = getERC20(sourceChain, "USDT");
+        feeAssets[2] = getERC20(sourceChain, "USDS");
+        _addLeafsForFeeClaiming(leafs, getAddress(sourceChain, "accountantAddress"), feeAssets, false);
+
+        ERC20[] memory bridgeAssets = new ERC20[](2);
+        bridgeAssets[0] = getERC20(sourceChain, "USDC");
+        bridgeAssets[1] = getERC20(sourceChain, "USDT");
+        ERC20[] memory feeTokens = new ERC20[](2);
+        feeTokens[0] = getERC20(sourceChain, "WETH");
+        feeTokens[1] = getERC20(sourceChain, "GHO");
+
+        _addCcipBridgeLeafs(leafs, ccipBaseChainSelector, bridgeAssets, feeTokens);
+        _addCcipBridgeLeafs(leafs, ccipArbitrumChainSelector, bridgeAssets, feeTokens);
+        _addCcipBridgeLeafs(leafs, ccipBscChainSelector, bridgeAssets, feeTokens);
+
+        _addInfiniV1Leafs(leafs, getAddress(sourceChain, "USDC"));
+
+        _addBalancerFlashloanLeafs(leafs, getAddress(sourceChain, "USDC"));
+        _addBalancerFlashloanLeafs(leafs, getAddress(sourceChain, "USDT"));
+        _addBalancerFlashloanLeafs(leafs, getAddress(sourceChain, "DAI"));
+        _addBalancerFlashloanLeafs(leafs, getAddress(sourceChain, "USDS"));
+        _addBalancerFlashloanLeafs(leafs, getAddress(sourceChain, "WETH"));
+
+        _addMorphoBlueSupplyLeafs(leafs, getBytes32(sourceChain, "syrupUSDC_USDC_915"));
+        _addMorphoBlueSupplyLeafs(leafs, getBytes32(sourceChain, "PT-syrupUSDC-28AUG2025_USDC_915"));
+        _addMorphoBlueSupplyLeafs(leafs, getBytes32(sourceChain, "PT-iUSD-4SEP2025_USDC_915"));
+        _addMorphoBlueCollateralLeafs(leafs, getBytes32(sourceChain, "syrupUSDC_USDC_915"));
+        _addMorphoBlueCollateralLeafs(leafs, getBytes32(sourceChain, "PT-syrupUSDC-28AUG2025_USDC_915"));
+        _addMorphoBlueCollateralLeafs(leafs, getBytes32(sourceChain, "PT-iUSD-4SEP2025_USDC_915"));
+
+        _addPendleMarketLeafs(leafs, getAddress(sourceChain, "pendle_iUSD_09_04_2025"), false);
+        _addPendleMarketLeafs(leafs, getAddress(sourceChain, "pendle_syrupUSDC_08_28_2025"), false);
+
+        // 1inch assets;
+        address[] memory oneInchAssets = new address[](10);
+        oneInchAssets[0] = getAddress(sourceChain, "USDC");
+        oneInchAssets[1] = getAddress(sourceChain, "SUSDE");
+        oneInchAssets[2] = getAddress(sourceChain, "USDS");
+        oneInchAssets[3] = getAddress(sourceChain, "USDT");
+        oneInchAssets[4] = getAddress(sourceChain, "USDE");
+        oneInchAssets[5] = getAddress(sourceChain, "lvlUSD");
+        oneInchAssets[6] = getAddress(sourceChain, "RLP");
+        oneInchAssets[7] = getAddress(sourceChain, "USR");
+        oneInchAssets[8] = getAddress(sourceChain, "wstUSR");
+        oneInchAssets[9] = getAddress(sourceChain, "cUSDO");
+        SwapKind[] memory kind = new SwapKind[](10);
+        kind[0] = SwapKind.BuyAndSell;
+        kind[1] = SwapKind.BuyAndSell;
+        kind[2] = SwapKind.BuyAndSell;
+        kind[3] = SwapKind.BuyAndSell;
+        kind[4] = SwapKind.BuyAndSell;
+        kind[5] = SwapKind.BuyAndSell;
+        kind[6] = SwapKind.BuyAndSell;
+        kind[7] = SwapKind.BuyAndSell;
+        kind[8] = SwapKind.BuyAndSell;
+        kind[9] = SwapKind.BuyAndSell;
+        _addLeafsFor1InchGeneralSwapping(leafs, oneInchAssets, kind);
+        _addOdosSwapLeafs(leafs, oneInchAssets, kind);
+
+        ERC20[] memory supplyAssets = new ERC20[](1);
+        supplyAssets[0] = getERC20(sourceChain, "SUSDE");
+        ERC20[] memory borrowAssets = new ERC20[](2);
+        borrowAssets[0] = getERC20(sourceChain, "USDC");
+        borrowAssets[1] = getERC20(sourceChain, "USDT");
+        _addAaveV3Leafs(leafs, supplyAssets, borrowAssets);
+
+        _addERC4626Leafs(leafs, ERC4626(getAddress(sourceChain, "SUSDE")));
     }
 }
