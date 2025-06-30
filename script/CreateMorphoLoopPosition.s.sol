@@ -19,10 +19,16 @@ import {RolesAuthority, Authority} from "@solmate/auth/authorities/RolesAuthorit
 import {MerkleTreeHelper, IMB, PendleMarket, PendleSy} from "test/resources/MerkleTreeHelper/MerkleTreeHelper.sol";
 import {BalancerVault} from "src/interfaces/BalancerVault.sol";
 
-import {Test, console} from "forge-std/Test.sol";
+import "forge-std/Script.sol";
 import "forge-std/StdJson.sol";
 
-contract CreateMorphoLoopPosition is Test, MerkleTreeHelper {
+/**
+ *  source .env && forge script script/DeployDecoderAndSanitizer.s.sol:DeployDecoderAndSanitizerScript --broadcast --etherscan-api-key $ETHERSCAN_KEY --verify --with-gas-price 30000000000
+ * @dev Optionally can change `--with-gas-price` to something more reasonable
+ */
+contract CreateMorphoLoopPosition is Script, MerkleTreeHelper {
+    uint256 public privateKey;
+
     address public rawDataDecoderAndSanitizerEthereum = 0xedbB1308b8E213d7C76F65Ca11cF38136b8a8a83;
     address public rawDataDecoderAndSanitizerBase01 = 0x53F0b212d28320DD0aB504AbD6871941EFf5AD45;
     address public rawDataDecoderAndSanitizerArbitrum01 = 0x53F0b212d28320DD0aB504AbD6871941EFf5AD45;
@@ -35,6 +41,7 @@ contract CreateMorphoLoopPosition is Test, MerkleTreeHelper {
         AccountantWithRateProviders(0x03D9a9cE13D16C7cFCE564f41bd7E85E5cde8Da6);
     BoringOnChainQueue internal queue = BoringOnChainQueue(0xF632c10b19f2a0451cD4A653fC9ca0c15eA1040b);
     BoringSolver internal solver = BoringSolver(0x1d82e9bCc8F325caBBca6E6A3B287fE586536805);
+    address agent = 0xF171cAf19B2a55B015a68D80C337a16216775509;
 
     uint8 public constant MANAGER_ROLE = 1;
     uint8 public constant MINTER_ROLE = 2;
@@ -58,6 +65,8 @@ contract CreateMorphoLoopPosition is Test, MerkleTreeHelper {
     uint8 public constant SOLVER_ORIGIN_ROLE = 33;
 
     function setUp() external {
+        privateKey = vm.envUint("BORING_DEVELOPER");
+
         vm.createSelectFork("mainnet");
         setSourceChainName("mainnet");
 
@@ -68,29 +77,23 @@ contract CreateMorphoLoopPosition is Test, MerkleTreeHelper {
         setAddress(true, mainnet, "rawDataDecoderAndSanitizer", rawDataDecoderAndSanitizerEthereum);
     }
 
-    function test__CreateMorphoBorrowPosition() external {
-        address agent = 0xF171cAf19B2a55B015a68D80C337a16216775509;
+    function run() public {
         ManageLeaf[] memory leafs = new ManageLeaf[](1024);
-
         _addLeafs(leafs);
         bytes32[][] memory manageTree = _generateMerkleTree(leafs);
 
-        vm.startPrank(manager.owner());
+        vm.createSelectFork("mainnet");
+        setSourceChainName("mainnet");
+
+        vm.startBroadcast(privateKey);
         manager.setManageRoot(agent, manageTree[manageTree.length - 1][0]);
         manager.setManageRoot(getAddress(sourceChain, "managerAddress"), manageTree[manageTree.length - 1][0]);
-        vm.stopPrank();
+        vm.stopBroadcast();
 
-        // 1. approve infini gatewa to spend USDC
-        // 2. mint iUSD
-        // 3. approve pendle router to mint
-        // 2. mint SY-iUSD
-        // 3. swap SY for PT
-        // 4. approve morpho to spend PT-iUSD
-        // 5. deposit PT-iUSD on morpho
-        // 6. borrow USDC
+        vm.startBroadcast(vm.envUint("BORING_MORPHO_AGENT"));
 
-        uint256 flashloanAmount = 420000e6;
-        uint256 cacheUsdcBalance = getERC20(sourceChain, "USDC").balanceOf(getAddress(sourceChain, "boringVault"));
+        uint256 flashloanAmount = 60000e6;
+        uint256 cacheUsdcBalance = 20000e6;
         uint256 totalCapital = flashloanAmount + cacheUsdcBalance;
 
         bytes memory userData;
@@ -170,7 +173,7 @@ contract CreateMorphoLoopPosition is Test, MerkleTreeHelper {
             targetData[7] = abi.encodeWithSignature(
                 "supplyCollateral((address,address,address,address,uint256),uint256,address,bytes)",
                 params,
-                496975732446590162100771,
+                81237593219981001548273,
                 address(boringVault),
                 hex""
             );
@@ -223,9 +226,10 @@ contract CreateMorphoLoopPosition is Test, MerkleTreeHelper {
             }
 
             bytes32[][] memory manageProofs = _getProofsUsingTree(manageLeafs, manageTree);
-            vm.prank(agent);
             manager.manageVaultWithMerkleVerification(manageProofs, decodersAndSanitizers, targets, targetData, values);
         }
+
+        vm.stopBroadcast();
     }
 
     function _createFlashloanManageLeafs(bytes32[][] memory manageTree)
