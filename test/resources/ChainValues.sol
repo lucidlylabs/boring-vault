@@ -717,6 +717,14 @@ contract ChainValues {
         values[mainnet]["SY_iUSD_9_04_2025"] = 0x47743a9203E636674467Ff58B7AB0aE0ee6f97cb.toBytes32();
         values[mainnet]["LP_iUSD_9_04_2025"] = 0x2353193fa14A6477a4523e2C078e4063022FCf66.toBytes32();
 
+        // Falcon USDf
+        values[mainnet]["USDf"] = 0xFa2B947eEc368f42195f24F36d2aF29f7c24CeC2.toBytes32();
+        values[mainnet]["sUSDf"] = 0xc8CF6D7991f15525488b2A83Df53468D682Ba4B0.toBytes32();
+        values[mainnet]["PT_sUSDf_9_25_2025"] = 0xAB365C0879024481E4ad3b47bd6FeA9c10014FbC.toBytes32();
+        values[mainnet]["SY_sUSDf_9_25_2025"] = 0xa780d7F775B4eFf6846A8c28981f086bC6a7d637.toBytes32();
+        values[mainnet]["LP_sUSDf_9_25_2025"] = 0x45F163E583D34b8E276445dd3Da9aE077D137d72.toBytes32();
+        values[mainnet]["USDC_USDf_Curve_Pool"] = 0x72310DAAed61321b02B08A547150c07522c6a976.toBytes32();
+
         // Maker
         values[mainnet]["dsrManager"] = 0x373238337Bfe1146fb49989fc222523f83081dDb.toBytes32();
 
@@ -1186,6 +1194,9 @@ contract ChainValues {
         values[mainnet]["stargateSolvBTC"] = 0xB12979Ff302Ac903849948037A51792cF7186E8e.toBytes32();
         values[mainnet]["stargatesrUSD"] = 0x316cd39632Cac4F4CdfC21757c4500FE12f64514.toBytes32();
         values[mainnet]["stargateNative"] = 0x77b2043768d28E9C9aB44E1aBfC95944bcE57931.toBytes32();
+
+        // SiloV2
+        values[mainnet]["silo_PT-sUSDf_25Sep_USDC_config"] = 0x376E74bc0575E032f28dFE612eE8533108C98f98.toBytes32();
 
         // Merkl
         values[mainnet]["merklDistributor"] = 0x3Ef3D8bA38EBe18DB133cEc108f4D14CE00Dd9Ae.toBytes32();
