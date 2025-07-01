@@ -85,10 +85,10 @@ contract CreateMorphoLoopPosition is Script, MerkleTreeHelper {
         vm.createSelectFork("mainnet");
         setSourceChainName("mainnet");
 
-        vm.startBroadcast(privateKey);
-        manager.setManageRoot(agent, manageTree[manageTree.length - 1][0]);
-        manager.setManageRoot(getAddress(sourceChain, "managerAddress"), manageTree[manageTree.length - 1][0]);
-        vm.stopBroadcast();
+        // vm.startBroadcast(privateKey);
+        // manager.setManageRoot(agent, manageTree[manageTree.length - 1][0]);
+        // manager.setManageRoot(getAddress(sourceChain, "managerAddress"), manageTree[manageTree.length - 1][0]);
+        // vm.stopBroadcast();
 
         vm.startBroadcast(vm.envUint("BORING_MORPHO_AGENT"));
 
