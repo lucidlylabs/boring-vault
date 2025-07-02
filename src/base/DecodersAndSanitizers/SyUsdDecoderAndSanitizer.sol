@@ -12,6 +12,7 @@ import {NativeWrapperDecoderAndSanitizer} from "./Protocols/NativeWrapperDecoder
 import {PendleRouterDecoderAndSanitizer} from "./Protocols/PendleRouterDecoderAndSanitizer.sol";
 import {CCIPDecoderAndSanitizer} from "./Protocols/CCIPDecoderAndSanitizer.sol";
 import {InfiniDecoderAndSanitizer} from "./Protocols/InfiniDecoderAndSanitizer.sol";
+import {SiloDecoderAndSanitizer} from "./Protocols/SiloDecoderAndSanitizer.sol";
 
 contract SyUsdDecoderAndSanitizer is
     UniswapV3DecoderAndSanitizer,
@@ -23,7 +24,8 @@ contract SyUsdDecoderAndSanitizer is
     NativeWrapperDecoderAndSanitizer,
     PendleRouterDecoderAndSanitizer,
     CCIPDecoderAndSanitizer,
-    InfiniDecoderAndSanitizer
+    InfiniDecoderAndSanitizer,
+    SiloDecoderAndSanitizer
 {
     constructor(address _uniswapV3NonFungiblePositionManager)
         UniswapV3DecoderAndSanitizer(_uniswapV3NonFungiblePositionManager)

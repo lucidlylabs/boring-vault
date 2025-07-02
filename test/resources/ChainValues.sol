@@ -724,6 +724,7 @@ contract ChainValues {
         values[mainnet]["SY_sUSDf_9_25_2025"] = 0xa780d7F775B4eFf6846A8c28981f086bC6a7d637.toBytes32();
         values[mainnet]["LP_sUSDf_9_25_2025"] = 0x45F163E583D34b8E276445dd3Da9aE077D137d72.toBytes32();
         values[mainnet]["USDC_USDf_Curve_Pool"] = 0x72310DAAed61321b02B08A547150c07522c6a976.toBytes32();
+        values[mainnet]["USDC_USDf_Curve_Gauge"] = 0x156527deF9a2AB4F54C849575f23dC4BB439d9d9.toBytes32();
 
         // Maker
         values[mainnet]["dsrManager"] = 0x373238337Bfe1146fb49989fc222523f83081dDb.toBytes32();
