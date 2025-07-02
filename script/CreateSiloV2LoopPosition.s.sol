@@ -98,7 +98,7 @@ contract CreateSiloV2LoopPosition is Script, MerkleTreeHelper {
         vm.startBroadcast(vm.envUint("BORING_MORPHO_AGENT"));
 
         uint256 cacheUsdcBalance = 50000e6;
-        uint256 flashloanAmount = cacheUsdcBalance * 7;
+        uint256 flashloanAmount = cacheUsdcBalance * 65 / 10;
         uint256 totalCapital = flashloanAmount + cacheUsdcBalance;
 
         bytes memory userData;
@@ -116,7 +116,7 @@ contract CreateSiloV2LoopPosition is Script, MerkleTreeHelper {
             targets[7] = getAddress(sourceChain, "pendleRouter");
             targets[8] = getAddress(sourceChain, "PT_sUSDf_9_25_2025");
             targets[9] = 0xB19C9622c629f1d246abB1D76be6F79CC2537e32; // silo0
-            targets[10] = 0x5CD6614d11C3dD84fb941E5BE2F5A454C88e32b6; // silo0
+            targets[10] = 0x5CD6614d11C3dD84fb941E5BE2F5A454C88e32b6; // silo1
 
             bytes[] memory targetData = new bytes[](11);
 
@@ -151,7 +151,7 @@ contract CreateSiloV2LoopPosition is Script, MerkleTreeHelper {
             );
             uint256 totalSusdfBalance = abi.decode(previewDepositResult, (uint256));
             console.log("total sUSDf minted:", totalSusdfBalance);
-            totalSusdfBalance = 99 * totalSusdfBalance / 100;
+            totalSusdfBalance = 999 * totalSusdfBalance / 1000;
 
             targetData[4] = abi.encodeWithSignature(
                 "approve(address,uint256)", getAddress(sourceChain, "pendleRouter"), type(uint256).max
@@ -195,7 +195,7 @@ contract CreateSiloV2LoopPosition is Script, MerkleTreeHelper {
                 "approve(address,uint256)", 0xB19C9622c629f1d246abB1D76be6F79CC2537e32, type(uint256).max
             );
 
-            uint256 approxPtAmountBought = 99 * uint256(403743753701352451216535) / 100;
+            uint256 approxPtAmountBought = 999 * uint256(378560077894168263161107) / 1000;
             targetData[9] =
                 abi.encodeWithSignature("deposit(uint256,address)", approxPtAmountBought, address(boringVault));
 
@@ -244,6 +244,20 @@ contract CreateSiloV2LoopPosition is Script, MerkleTreeHelper {
             bytes32[][] memory manageProofs = _getProofsUsingTree(manageLeafs, manageTree);
             manager.manageVaultWithMerkleVerification(manageProofs, decodersAndSanitizers, targets, targetData, values);
         }
+
+        address SILO_LENS = 0xF5875422734412EBbF6D4A074b7dE0a276BcDC88;
+        address silo0 = 0xB19C9622c629f1d246abB1D76be6F79CC2537e32; // silo0
+        address silo1 = 0x5CD6614d11C3dD84fb941E5BE2F5A454C88e32b6; // silo1
+
+        (, bytes memory data0) =
+            SILO_LENS.call(abi.encodeWithSignature("getLtv(address,address)", silo0, getAddress(sourceChain, "syUSD")));
+        uint256 userLTVSilo0 = abi.decode(data0, (uint256));
+        (, bytes memory data1) =
+            SILO_LENS.call(abi.encodeWithSignature("getLtv(address,address)", silo1, getAddress(sourceChain, "syUSD")));
+        uint256 userLTVSilo1 = abi.decode(data1, (uint256));
+
+        console.log("PT-sUSDf silo ltv:", userLTVSilo0);
+        console.log("USDC silo ltv:", userLTVSilo1);
 
         vm.stopBroadcast();
     }

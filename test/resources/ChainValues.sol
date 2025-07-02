@@ -729,6 +729,9 @@ contract ChainValues {
         // Maker
         values[mainnet]["dsrManager"] = 0x373238337Bfe1146fb49989fc222523f83081dDb.toBytes32();
 
+        // Lucidly Finance
+        values[mainnet]["syUSD"] = 0x279CAD277447965AF3d24a78197aad1B02a2c589.toBytes32();
+
         // Maker
         values[mainnet]["savingsDaiAddress"] = 0x83F20F44975D03b1b09e64809B757c47f942BEeA.toBytes32();
         values[mainnet]["sDAI"] = 0x83F20F44975D03b1b09e64809B757c47f942BEeA.toBytes32();
