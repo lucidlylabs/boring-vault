@@ -33,6 +33,7 @@ contract ChainValues {
     string public constant sonicBlaze = "sonicBlaze";
     string public constant berachainTestnet = "berachainTestnet";
     string public constant bartio = "bartio";
+    string public constant katana = "katana";
 
     // Bridging constants.
     uint64 public constant ccipArbitrumChainSelector = 4949039107694359620;
