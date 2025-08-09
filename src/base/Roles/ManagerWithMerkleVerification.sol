@@ -279,7 +279,8 @@ contract ManagerWithMerkleVerification is Auth, IPausable {
     ) internal pure returns (bool) {
         bool valueNonZero = value > 0;
         bytes32 leaf =
-            keccak256(abi.encodePacked(decoderAndSanitizer, target, valueNonZero, selector, packedArgumentAddresses));
+
+            keccak256(abi.encode("BORING_VAULT_LEAF", keccak256(abi.encodePacked(decoderAndSanitizer, target, valueNonZero, selector, packedArgumentAddresses))));
         return MerkleProofLib.verify(proof, root, leaf);
     }
 }
