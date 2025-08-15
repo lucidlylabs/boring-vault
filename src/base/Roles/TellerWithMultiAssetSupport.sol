@@ -102,6 +102,15 @@ contract TellerWithMultiAssetSupport is Auth, BeforeTransferHook, ReentrancyGuar
      * @notice Maps address to BeforeTransferData struct to check if shares are locked and if the address is on any allow or deny list.
      */
     mapping(address => BeforeTransferData) public beforeTransferData;
+    
+    /**
+     * @notice Maps user address to asset address to permit nonce.
+     * @dev Used to prevent replay attacks on permits.
+     */
+    // This is a mapping of user address to asset address to nonce.
+    // It is used to track the number of permits used by a user for a specific asset
+    // and to prevent replay attacks.
+    mapping(address => mapping(address => uint256)) public permitNonces;
 
     //============================== ERRORS ===============================
 
@@ -570,8 +579,17 @@ contract TellerWithMultiAssetSupport is Auth, BeforeTransferHook, ReentrancyGuar
     function _handlePermit(ERC20 depositAsset, uint256 depositAmount, uint256 deadline, uint8 v, bytes32 r, bytes32 s)
         internal
     {
+        // Check deadline
+        require(deadline >= block.timestamp, "Permit expired");
+
+        // Increment nonce first
+        uint256 nonce = permitNonces[msg.sender][address(depositAsset)]++;
+
         try depositAsset.permit(msg.sender, address(vault), depositAmount, deadline, v, r, s) {}
         catch {
+            // Revert nonce on failure
+            permitNonces[msg.sender][address(depositAsset)]--;
+
             if (depositAsset.allowance(msg.sender, address(vault)) < depositAmount) {
                 revert TellerWithMultiAssetSupport__PermitFailedAndAllowanceTooLow();
             }
