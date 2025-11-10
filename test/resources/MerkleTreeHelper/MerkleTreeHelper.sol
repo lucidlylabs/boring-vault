@@ -12923,20 +12923,20 @@ contract MerkleTreeHelper is CommonBase, ChainValues, Test {
     }
 
     // ========================================= USDT0 HyperCore<>HyperEVM =========================================
-    function _addUsdt0HlInteractionLeaves(ManageLeaf[] memory leafs) internal {
+    function _addUsdt0HlInteractionLeafs(ManageLeaf[] memory leafs) internal {
         unchecked {
             leafIndex++;
         }
 
         leafs[leafIndex] = ManageLeaf(
-            getAddress(sourceChain, "USDC"),
+            getAddress(sourceChain, "USDT0"),
             false,
             "transfer(address,uint256)",
-            new address[](0),
-            string.concat("Transfer USDC to Hyperliquid Bridge2"),
+            new address[](1),
+            string.concat("Transfer USDT0 to USDT0 Core System Address"),
             getAddress(sourceChain, "rawDataDecoderAndSanitizer")
         );
-        leafs[leafIndex].argumentAddresses[0] = getAddress(sourceChain, "Bridge2");
+        leafs[leafIndex].argumentAddresses[0] = getAddress(sourceChain, "USDT0CoreSystemAddress");
     }
 
     // ========================================= Arbitrum Hyperliquid Bridge 2 =========================================
