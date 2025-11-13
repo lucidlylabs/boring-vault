@@ -53,7 +53,7 @@ contract CreateTestVault1Leafs is Script, MerkleTreeHelper {
     //   }
     // }
 
-    address public rawDataDecoderAndSanitizerHyperevm = 0x0Ac1819A5EA6cAf05306b8955bC1a1680fA7B63A;
+    address public rawDataDecoderAndSanitizerHyperevm = 0x756d741E6c54A4ECeeF75C05d096Ad9DbA777FF4;
 
     RolesAuthority internal rolesAuthority = RolesAuthority(0xcd5E9EBC1E35f20Af809E9668810c55cCc15b28E);
     BoringVault internal boringVault = BoringVault(payable(0x4dBAd8E2e62CAF522081b769e04AbCA560FFA137));

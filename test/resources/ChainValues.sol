@@ -173,6 +173,10 @@ contract ChainValues {
 
         // Bunjee
         values[hyperevm]["BunjeeInbox"] = 0x7ad979C6b0C9924F79ea571280071595ba13D002.toBytes32();
+
+        // Uniswap V3
+        values[hyperevm]["uniswapV3NonFungiblePositionManager"] = 0xeaD19AE861c29bBb2101E834922B2FEee69B9091.toBytes32();
+        values[hyperevm]["uniV3Router"] = 0x1EbDFC75FfE3ba3de61E7138a3E8706aC841Af9B.toBytes32();
     }
 
     function _addMainnetValues() private {
