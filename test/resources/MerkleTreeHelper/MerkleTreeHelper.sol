@@ -11803,6 +11803,91 @@ contract MerkleTreeHelper is CommonBase, ChainValues, Test {
         }
     }
 
+    // ========================================= Avalanche C-Chain Bridge / Core Bridge =========================================
+    // @dev note that ERC20 is fine here as ETH is not supported and must be converted to WETH first
+    function _addAvalancheBridgeLeafs(ManageLeaf[] memory leafs, ERC20[] memory assets) internal {
+        if (keccak256(abi.encode(sourceChain)) == keccak256(abi.encode(mainnet))) {
+            for (uint256 i = 0; i < assets.length; i++) {
+                //approve USDC if there
+                if (address(assets[i]) == getAddress(sourceChain, "USDC")) {
+                    unchecked {
+                        leafIndex++;
+                    }
+                    leafs[leafIndex] = ManageLeaf(
+                        address(assets[i]),
+                        false,
+                        "approve(address,uint256)",
+                        new address[](1),
+                        string.concat("Approve USDC Token Router to spend ", assets[i].symbol()),
+                        getAddress(sourceChain, "rawDataDecoderAndSanitizer")
+                    );
+                    leafs[leafIndex].argumentAddresses[0] = getAddress(sourceChain, "usdcTokenRouter");
+
+                    unchecked {
+                        leafIndex++;
+                    }
+                    leafs[leafIndex] = ManageLeaf(
+                        getAddress(sourceChain, "usdcTokenRouter"),
+                        false,
+                        "transferTokens(uint256,uint32,address,address)",
+                        new address[](3),
+                        string.concat("Transfer USDC to TokenRouter to bridge"),
+                        getAddress(sourceChain, "rawDataDecoderAndSanitizer")
+                    );
+                    leafs[leafIndex].argumentAddresses[0] = address(1);
+                    leafs[leafIndex].argumentAddresses[1] = getAddress(sourceChain, "boringVault");
+                    leafs[leafIndex].argumentAddresses[2] = getAddress(sourceChain, "USDC");
+                }
+
+                if (address(assets[i]) != getAddress(sourceChain, "USDC")) {
+                    //@dev add regular transfer leaves for all assets that are not USDC
+                    //@notice must be supported by bridge in the first place
+                    _addTransferLeafs(leafs, assets[i], getAddress(sourceChain, "avalancheBridge"));
+                }
+            }
+        }
+
+        if (keccak256(abi.encode(sourceChain)) == keccak256(abi.encode(avalanche))) {
+            for (uint256 i = 0; i < assets.length; i++) {
+                console.log("RUNNING AVALANCHE");
+                //approve USDC if there
+                if (address(assets[i]) == getAddress(sourceChain, "USDC")) {
+                    unchecked {
+                        leafIndex++;
+                    }
+                    leafs[leafIndex] = ManageLeaf(
+                        address(assets[i]),
+                        false,
+                        "approve(address,uint256)",
+                        new address[](1),
+                        string.concat("Approve USDC Token Router to spend ", assets[i].symbol()),
+                        getAddress(sourceChain, "rawDataDecoderAndSanitizer")
+                    );
+                    leafs[leafIndex].argumentAddresses[0] = getAddress(sourceChain, "usdcTokenRouter");
+
+                    unchecked {
+                        leafIndex++;
+                    }
+                    leafs[leafIndex] = ManageLeaf(
+                        getAddress(sourceChain, "usdcTokenRouter"),
+                        false,
+                        "transferTokens(uint256,uint32,address,address)",
+                        new address[](3),
+                        string.concat("Transfer USDC to TokenRouter to bridge"),
+                        getAddress(sourceChain, "rawDataDecoderAndSanitizer")
+                    );
+                    leafs[leafIndex].argumentAddresses[0] = address(0);
+                    leafs[leafIndex].argumentAddresses[1] = getAddress(sourceChain, "boringVault");
+                    leafs[leafIndex].argumentAddresses[2] = getAddress(sourceChain, "USDC");
+                }
+
+                if (address(assets[i]) != getAddress(sourceChain, "USDC")) {
+                    revert("Contracts not supported for assets other than USDC");
+                }
+            }
+        }
+    }
+
     // ========================================= Agglayer =========================================
 
     function _addAgglayerBridgeLeafs(

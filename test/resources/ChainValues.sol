@@ -1457,6 +1457,10 @@ contract ChainValues {
 
         // King
         values[mainnet]["kingMerkleDistributor"] = 0x6Db24Ee656843E3fE03eb8762a54D86186bA6B64.toBytes32();
+
+        // Avalanche Bridge
+        values[mainnet]["usdcTokenRouter"] = 0xD835dbD135AD8a27214ecdEE79E7a41337865648.toBytes32();
+        values[mainnet]["avalancheBridge"] = 0x8EB8a3b98659Cce290402893d0123abb75E3ab28.toBytes32();
     }
 
     function _addBaseValues() private {
@@ -2540,5 +2544,19 @@ contract ChainValues {
         values[katana]["BungeeInbox"] = 0x7ad979C6b0C9924F79ea571280071595ba13D002.toBytes32();
         values[katana]["BungeeGateway"] = 0x8f503B6d9fFdae8d375d1E226b71B4B3144D3849.toBytes32();
         values[katana]["BungeeDelegate"] = 0x86C950FE91D96Fa113A96eE23EDc7C517b94BFDC.toBytes32();
+    }
+
+    function _addAvalancheValues() private {
+        values[avalanche]["deployerAddress"] = 0x5F2F11ad8656439d5C14d9B351f8b09cDaC2A02d.toBytes32();
+        values[avalanche]["txBundlerAddress"] = 0x5F2F11ad8656439d5C14d9B351f8b09cDaC2A02d.toBytes32();
+        values[avalanche]["vault"] = address(1).toBytes32();
+
+        // ERC20s
+        values[avalanche]["USDC"] = 0xB97EF9Ef8734C71904D8002F8b6Bc66Dd9c48a6E.toBytes32();
+        values[avalanche]["USDC.e"] = 0xA7D7079b0FEaD91F3e65f86E8915Cb59c1a4C664.toBytes32();
+        values[avalanche]["WETH"] = 0x49D5c2BdFfac6CE2BFdB6640F4F80f226bc10bAB.toBytes32();
+
+        // Avalanche Bridge
+        values[avalanche]["usdcTokenRouter"] = 0xD835dbD135AD8a27214ecdEE79E7a41337865648.toBytes32();
     }
 }
