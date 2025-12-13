@@ -47,6 +47,7 @@ contract FluidIntegTest is Test, MerkleTreeHelper {
     using AddressToBytes32Lib for address;
 
     ERC20 public USDC;
+    ERC20 public USDT;
     ERC20 public WBTC;
     ERC20 public cbBTC;
     address public owner;
@@ -117,9 +118,16 @@ contract FluidIntegTest is Test, MerkleTreeHelper {
 
     function setUp() external {
         setSourceChainName("mainnet");
+        // Setup forked environment.
+        string memory rpcKey = "MAINNET_RPC_URL";
+        uint256 blockNumber = 24003640;
+
+        _startFork(rpcKey, blockNumber);
+        
         vm.createSelectFork(sourceChain);
         owner = 0x1b514df3413DA9931eB31f2Ab72e32c0A507Cad5;
         USDC = getERC20(sourceChain, "USDC");
+        USDT= getERC20(sourceChain, "USDT");
         WBTC = getERC20(sourceChain, "WBTC");
         cbBTC = getERC20(sourceChain, "cbBTC");
 
@@ -202,10 +210,10 @@ contract FluidIntegTest is Test, MerkleTreeHelper {
         targetData[3] = abi.encodeWithSignature(
             "operate(uint256,int256,int256,int256,int256,address)",
             0,
-            10e8,
-            10e8,
+            10e8, // supply token0
+            10e8, // suply token1
             10,
-            100000e6,
+            100000e6, // debt token to
             getAddress(sourceChain, "boringVault")
         );
         // //borrow
@@ -252,11 +260,145 @@ contract FluidIntegTest is Test, MerkleTreeHelper {
         console.log("Balance of USDC",USDC.balanceOf(getAddress(sourceChain, "boringVault")));
         console.log("Balance of WBTC",WBTC.balanceOf(getAddress(sourceChain, "boringVault")));
         console.log("Balance of cbBTC",cbBTC.balanceOf(getAddress(sourceChain, "boringVault")));
+    }
 
-      
+    // Fluid smart debt Integration
+    function test__FluidSmartDebtInteg() public {
+        // give roles
 
+        vm.startPrank(rolesAuthority.owner());
+        rolesAuthority.setRoleCapability(
+            STRATEGIST_ROLE, address(manager), manager.manageVaultWithMerkleVerification.selector, true
+        );
+        rolesAuthority.setUserRole(address(this), STRATEGIST_ROLE, true);
+        vm.stopPrank();
+
+        deal(getAddress(sourceChain, "WBTC"), address(boringVault), 1_00e18);
+        // deal(getAddress(sourceChain, "cbBTC"), address(boringVault), 1_00e18);
+
+        ERC20[] memory supplyTokens = new ERC20[](1);
+        supplyTokens[0] = getERC20(sourceChain, "WBTC");
+
+        ERC20[] memory borrowTokens = new ERC20[](2);
+        borrowTokens[0] = getERC20(sourceChain, "USDC");
+        borrowTokens[1] = getERC20(sourceChain, "USDT");
+
+        uint256 dexType = 2000; //T3 VAULT
+
+        //3 approvals, 1 leaf for `operate()`, 1 leaf for `operatePerfect()`
+        ManageLeaf[] memory leafs = new ManageLeaf[](32);
+        _addFluidDexLeafs(
+            leafs, getAddress(sourceChain, "wBTC-DexUSDC-USDT"), dexType, supplyTokens, borrowTokens, false
+        );
+
+        bytes32[][] memory manageTree = _generateMerkleTree(leafs);
 
         
+        vm.prank(manager.owner());
+        manager.setManageRoot(address(this), manageTree[manageTree.length - 1][0]);
+
+        for (uint256 i = 0; i < 32; i++) {
+            console.log(leafs[i].description);
+        }
+
+        ManageLeaf[] memory manageLeafs = new ManageLeaf[](5);
+        manageLeafs[0] = leafs[0]; //approval supply
+        manageLeafs[1] = leafs[1]; //approval borrow0
+        manageLeafs[2] = leafs[2]; //approval borrow1
+        manageLeafs[3] = leafs[3]; //operate() deposit and borrow params
+        manageLeafs[4] = leafs[3]; //operate() borrow params
+        // manageLeafs[5] = leafs[3]; //operate() payback params
+
+        
+        bytes32[][] memory manageProofs = _getProofsUsingTree(manageLeafs, manageTree);
+
+        address[] memory targets = new address[](5);
+        targets[0] = getAddress(sourceChain, "WBTC");
+        targets[1] = getAddress(sourceChain, "USDC");
+        targets[2] = getAddress(sourceChain, "USDT");
+        targets[3] = getAddress(sourceChain, "wBTC-DexUSDC-USDT");
+        targets[4] = getAddress(sourceChain, "wBTC-DexUSDC-USDT");
+        // targets[4] = getAddress(sourceChain, "wBTC-cbBTCDex-USDC");
+        // targets[5] = getAddress(sourceChain, "wBTC-cbBTCDex-USDC");
+
+
+        bytes[] memory targetData = new bytes[](5);
+        targetData[0] =
+            abi.encodeWithSignature("approve(address,uint256)", getAddress(sourceChain, "wBTC-DexUSDC-USDT"), 1000e18);
+        targetData[1] =
+            abi.encodeWithSignature("approve(address,uint256)", getAddress(sourceChain, "wBTC-DexUSDC-USDT"), 1000e18);
+        targetData[2] =
+            abi.encodeWithSignature("approve(address,uint256)", getAddress(sourceChain, "wBTC-DexUSDC-USDT"), 1000e18);
+        //deposit and borrow in 1 transaction
+        targetData[3] = abi.encodeWithSignature(
+            "operate(uint256,int256,int256,int256,int256,address)",
+            0,
+            10e8, // collat to supply
+            100e6, // debt token 0 to borrow
+            100e6, // debt token 1 to borrow
+            type(int256).max, // positive for borrowing
+            getAddress(sourceChain, "boringVault")
+        );
+        uint256 nftId = 9338;
+        targetData[4] = abi.encodeWithSignature(
+            "operate(uint256,int256,int256,int256,int256,address)",
+            nftId,
+            0,
+            10e6,
+            10e6,
+            type(int256).max,
+            getAddress(sourceChain, "boringVault")
+        );
+        // //borrow
+        // targetData[4] = abi.encodeWithSignature(
+        //     "operate(uint256,int256,int256,int256,int256,address)",
+        //     nftId,
+        //     0,
+        //     0,
+        //     0,
+        //     1e6,
+        //     getAddress(sourceChain, "boringVault")
+        // );
+        // //payback
+        // targetData[5] = abi.encodeWithSignature(
+        //     "operate(uint256,int256,int256,int256,int256,address)",
+        //     nftId,
+        //     0,
+        //     0,
+        //     0,
+        //     -1e5,
+        //     getAddress(sourceChain, "boringVault")
+        // );
+        uint256[] memory values = new uint256[](5);
+        
+        address[] memory decodersAndSanitizers = new address[](5);
+        decodersAndSanitizers[0] = rawDataDecoderAndSanitizer;
+        decodersAndSanitizers[1] = rawDataDecoderAndSanitizer;
+        decodersAndSanitizers[2] = rawDataDecoderAndSanitizer;
+        decodersAndSanitizers[3] = rawDataDecoderAndSanitizer;
+        decodersAndSanitizers[4] = rawDataDecoderAndSanitizer;
+
+        uint256 cachedUSDC = USDC.balanceOf(getAddress(sourceChain, "boringVault"));
+        uint256 cachedWBTC = WBTC.balanceOf(getAddress(sourceChain, "boringVault"));
+        uint256 cachedUSDT = USDT.balanceOf(getAddress(sourceChain, "boringVault"));
+
+
+
+        manager.manageVaultWithMerkleVerification(manageProofs, decodersAndSanitizers, targets, targetData, values);
+
+
+        console.log("Cached balance of USDC",cachedUSDC);
+        console.log("Cached balance of WBTC",cachedWBTC);
+        console.log("Cached balance of USDT",cachedUSDT);
+
+        console.log("Balance of USDC",USDC.balanceOf(getAddress(sourceChain, "boringVault")));
+        console.log("Balance of WBTC",WBTC.balanceOf(getAddress(sourceChain, "boringVault")));
+        console.log("Balance of USDT",USDT.balanceOf(getAddress(sourceChain, "boringVault")));
+    }
+
+    function _startFork(string memory rpcKey, uint256 blockNumber) internal returns (uint256 forkId) {
+        forkId = vm.createFork(vm.envString(rpcKey), blockNumber);
+        vm.selectFork(forkId);
     }
 }
 
