@@ -283,7 +283,7 @@ contract FluidIntegTest is Test, MerkleTreeHelper {
         borrowTokens[0] = getERC20(sourceChain, "USDC");
         borrowTokens[1] = getERC20(sourceChain, "USDT");
 
-        uint256 dexType = 2000; //T3 VAULT
+        uint256 dexType = 3000; //T3 VAULT
 
         //3 approvals, 1 leaf for `operate()`, 1 leaf for `operatePerfect()`
         ManageLeaf[] memory leafs = new ManageLeaf[](32);
