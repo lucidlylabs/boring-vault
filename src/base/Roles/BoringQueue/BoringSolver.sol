@@ -66,6 +66,21 @@ contract BoringSolver is IBoringSolver, Auth, Multicall {
     }
 
     /**
+     * @notice Atomically process a single user withdraw by redeeming Boring Vault shares.
+     */
+    function boringRedeemAtomicWithdraw(
+        address user,
+        address assetOut,
+        uint128 amountOfShares,
+        uint16 discount,
+        address teller
+    ) external requiresAuth {
+        bytes memory solveData = abi.encode(SolveType.BORING_REDEEM, msg.sender, teller, true);
+
+        queue.atomicOnChainWithdraw(user, assetOut, amountOfShares, discount, solveData);
+    }
+
+    /**
      * @notice Solve multiple user requests to redeem Boring Vault shares and mint new Boring Vault shares.
      * @dev In order for this to work, the fromAccountant must have the toBoringVaults rate provider setup.
      */
@@ -248,4 +263,3 @@ contract BoringSolver is IBoringSolver, Auth, Multicall {
         ERC20(toBoringVault).approve(address(queue), requiredShares);
     }
 }
-

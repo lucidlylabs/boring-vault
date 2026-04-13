@@ -139,6 +139,9 @@ contract DeploySolver is Script, ContractNames, Test {
         _addRoleCapabilityIfNotPresent(OWNER_ROLE, solverAddress, Auth.setAuthority.selector);
         _addRoleCapabilityIfNotPresent(OWNER_ROLE, solverAddress, Auth.transferOwnership.selector);
         _addRoleCapabilityIfNotPresent(SOLVER_ORIGIN_ROLE, solverAddress, BoringSolver.boringRedeemSolve.selector);
+        _addRoleCapabilityIfNotPresent(
+            SOLVER_ORIGIN_ROLE, solverAddress, BoringSolver.boringRedeemAtomicWithdraw.selector
+        );
         _addRoleCapabilityIfNotPresent(SOLVER_ORIGIN_ROLE, solverAddress, BoringSolver.boringRedeemMintSolve.selector);
 
         _bundleTxs(1);

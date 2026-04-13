@@ -164,7 +164,11 @@ contract DeployBoringQueuesScript is Script, ContractNames, MerkleTreeHelper {
         rolesAuthority.setRoleCapability(
             CAN_SOLVE_ROLE, solver, BoringOnChainQueue.solveOnChainWithdraws.selector, true
         );
+        rolesAuthority.setRoleCapability(
+            CAN_SOLVE_ROLE, address(queue), BoringOnChainQueue.atomicOnChainWithdraw.selector, true
+        );
         rolesAuthority.setRoleCapability(CAN_SOLVE_ROLE, solver, BoringSolver.boringRedeemSolve.selector, true);
+        rolesAuthority.setRoleCapability(CAN_SOLVE_ROLE, solver, BoringSolver.boringRedeemAtomicWithdraw.selector, true);
         rolesAuthority.setRoleCapability(CAN_SOLVE_ROLE, solver, BoringSolver.boringRedeemMintSolve.selector, true);
 
         // ONLY_QUEUE_ROLE

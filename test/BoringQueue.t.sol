@@ -27,6 +27,8 @@ contract BoringQueueTest is Test, MerkleTreeHelper {
     uint8 public constant BURNER_ROLE = 2;
     uint8 public constant SOLVER_ROLE = 3;
     uint8 public constant QUEUE_ROLE = 4;
+    uint8 public constant ATOMIC_SOLVER_ROLE = 223;
+    uint8 public constant ONLY_QUEUE_CALLBACK_ROLE = 222;
 
     address public weETHs = 0x917ceE801a67f933F2e6b33fC0cD1ED2d5909D88;
     AccountantWithRateProviders public weETHs_accountant =
@@ -94,8 +96,14 @@ contract BoringQueueTest is Test, MerkleTreeHelper {
         liquidEth_roles_authority.setPublicCapability(
             address(boringSolver), BoringSolver.boringRedeemSelfSolve.selector, true
         );
-        liquidEth_roles_authority.setRoleCapability(222, address(boringSolver), BoringSolver.boringSolve.selector, true);
-        liquidEth_roles_authority.setUserRole(address(boringQueue), 222, true);
+        liquidEth_roles_authority.setRoleCapability(
+            ATOMIC_SOLVER_ROLE, address(boringQueue), BoringOnChainQueue.atomicOnChainWithdraw.selector, true
+        );
+        liquidEth_roles_authority.setUserRole(address(boringSolver), ATOMIC_SOLVER_ROLE, true);
+        liquidEth_roles_authority.setRoleCapability(
+            ONLY_QUEUE_CALLBACK_ROLE, address(boringSolver), BoringSolver.boringSolve.selector, true
+        );
+        liquidEth_roles_authority.setUserRole(address(boringQueue), ONLY_QUEUE_CALLBACK_ROLE, true);
         vm.stopPrank();
 
         // Give test user some Liquid ETH shares.
@@ -236,6 +244,39 @@ contract BoringQueueTest is Test, MerkleTreeHelper {
 
         assertEq(WETH.balanceOf(testUser), requests[0].amountOfAssets, "User should have received their wETH.");
         assertGt(wETHDelta, 0, "This address should have received some wETH.");
+    }
+
+    function testRedeemAtomicWithdraw(uint128 amountOfShares, uint16 discount) external {
+        amountOfShares = uint128(bound(amountOfShares, 0.01e18, 1_000e18));
+        discount = uint16(bound(discount, 1, 100));
+
+        boringQueue.setWithdrawCapacity(address(WETH), amountOfShares + 1);
+
+        uint128 expectedAssets = boringQueue.previewAssetsOut(address(WETH), amountOfShares, discount);
+        uint256 startingShares = ERC20(liquidEth).balanceOf(testUser);
+        uint256 startingWeth = WETH.balanceOf(testUser);
+        uint256 solverOriginWeth = WETH.balanceOf(address(this));
+        uint96 nonceBefore = boringQueue.nonce();
+        bytes32[] memory requestIdsBefore = boringQueue.getRequestIds();
+        (,,,,,, uint256 withdrawCapacityBefore) = boringQueue.withdrawAssets(address(WETH));
+
+        vm.prank(testUser);
+        ERC20(liquidEth).safeApprove(address(boringQueue), amountOfShares);
+
+        boringSolver.boringRedeemAtomicWithdraw(testUser, address(WETH), amountOfShares, discount, liquidEth_teller);
+
+        (,,,,,, uint256 withdrawCapacityAfter) = boringQueue.withdrawAssets(address(WETH));
+
+        assertEq(boringQueue.nonce(), nonceBefore, "Nonce should not change for atomic withdraws.");
+        assertEq(
+            boringQueue.getRequestIds().length, requestIdsBefore.length, "Atomic withdraw should not create requests."
+        );
+        assertEq(
+            ERC20(liquidEth).balanceOf(testUser), startingShares - amountOfShares, "User shares should be redeemed."
+        );
+        assertEq(WETH.balanceOf(testUser), startingWeth + expectedAssets, "User should receive atomic withdraw assets.");
+        assertEq(withdrawCapacityAfter, withdrawCapacityBefore - amountOfShares, "Capacity should decrease.");
+        assertGt(WETH.balanceOf(address(this)) - solverOriginWeth, 0, "Solver origin should receive excess assets.");
     }
 
     function test2RedeemSolve() external {

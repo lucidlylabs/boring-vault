@@ -160,6 +160,16 @@ contract BoringOnChainQueue is Auth, ReentrancyGuard, IPausable {
 
     event OnChainWithdrawSolved(bytes32 indexed requestId, address indexed user, uint256 timestamp);
 
+    event AtomicOnChainWithdraw(
+        address indexed user,
+        address indexed solver,
+        address indexed assetOut,
+        uint128 amountOfShares,
+        uint128 amountOfAssets,
+        uint16 discount,
+        uint256 timestamp
+    );
+
     event WithdrawAssetStopped(address indexed assetOut);
 
     event WithdrawAssetUpdated(
@@ -438,6 +448,46 @@ contract BoringOnChainQueue is Auth, ReentrancyGuard, IPausable {
         returns (bytes32 oldRequestId, bytes32 newRequestId)
     {
         (oldRequestId, newRequestId) = _replaceOnChainWithdraw(oldRequest, discount, secondsToDeadline);
+    }
+
+    /**
+     * @notice Atomically process a withdraw without creating a queued request.
+     * @dev Transfers user shares to the solver, then collects the solved assets for the user.
+     * @param user The user to withdraw for.
+     * @param assetOut The asset to withdraw.
+     * @param amountOfShares The amount of shares to withdraw.
+     * @param discount The discount to apply to the withdraw in bps.
+     * @param solveData The data to use when solving via `boringSolve`.
+     * @return amountOfAssets The amount of assets transferred to the user.
+     */
+    function atomicOnChainWithdraw(
+        address user,
+        address assetOut,
+        uint128 amountOfShares,
+        uint16 discount,
+        bytes calldata solveData
+    ) external requiresAuth returns (uint128 amountOfAssets) {
+        _decrementWithdrawCapacity(assetOut, amountOfShares);
+        WithdrawAsset memory withdrawAsset = withdrawAssets[assetOut];
+
+        // Atomic withdraws do not enqueue a request, so use the minimum deadline only to reuse _beforeNewRequest.
+        _beforeNewRequest(withdrawAsset, amountOfShares, discount, withdrawAsset.minimumSecondsToDeadline);
+
+        amountOfAssets = previewAssetsOut(assetOut, amountOfShares, discount);
+
+        boringVault.safeTransferFrom(user, address(this), amountOfShares);
+        boringVault.safeTransfer(msg.sender, amountOfShares);
+
+        if (solveData.length > 0) {
+            IBoringSolver(msg.sender)
+                .boringSolve(msg.sender, address(boringVault), assetOut, amountOfShares, amountOfAssets, solveData);
+        }
+
+        ERC20(assetOut).safeTransferFrom(msg.sender, user, amountOfAssets);
+
+        emit AtomicOnChainWithdraw(
+            user, msg.sender, assetOut, amountOfShares, amountOfAssets, discount, block.timestamp
+        );
     }
 
     //============================== SOLVER FUNCTIONS ===============================

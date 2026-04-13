@@ -1197,7 +1197,13 @@ contract DeployArcticArchitectureWithConfigScript is Script, ChainValues {
                 CAN_SOLVE_ROLE, address(queue), BoringOnChainQueue.solveOnChainWithdraws.selector
             );
             _addRoleCapabilityIfNotPresent(
+                CAN_SOLVE_ROLE, address(queue), BoringOnChainQueue.atomicOnChainWithdraw.selector
+            );
+            _addRoleCapabilityIfNotPresent(
                 SOLVER_ORIGIN_ROLE, address(queue), BoringOnChainQueue.solveOnChainWithdraws.selector
+            );
+            _addRoleCapabilityIfNotPresent(
+                SOLVER_ORIGIN_ROLE, address(queue), BoringOnChainQueue.atomicOnChainWithdraw.selector
             );
             _addRoleCapabilityIfNotPresent(ONLY_QUEUE_ROLE, address(queueSolver), BoringSolver.boringSolve.selector);
 
@@ -1217,6 +1223,9 @@ contract DeployArcticArchitectureWithConfigScript is Script, ChainValues {
             _addRoleCapabilityIfNotPresent(OWNER_ROLE, address(queueSolver), Auth.transferOwnership.selector);
             _addRoleCapabilityIfNotPresent(
                 SOLVER_ORIGIN_ROLE, address(queueSolver), BoringSolver.boringRedeemSolve.selector
+            );
+            _addRoleCapabilityIfNotPresent(
+                SOLVER_ORIGIN_ROLE, address(queueSolver), BoringSolver.boringRedeemAtomicWithdraw.selector
             );
             _addRoleCapabilityIfNotPresent(
                 SOLVER_ORIGIN_ROLE, address(queueSolver), BoringSolver.boringRedeemMintSolve.selector
