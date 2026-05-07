@@ -6,7 +6,7 @@ import {console} from "../lib/forge-std/src/console.sol";
 import {HedgedBtcEthMmStrategyAdapter} from "src/adapters/HedgedBtcEthMmStrategyAdapter.sol";
 import {UniV3PositionTvlAdapter} from "src/adapters/Univ3TvlAdapter.sol";
 import {UniV4PositionTvlAdapter} from "src/adapters/Univ4TvlAdapter.sol";
-import {MorphoLoopTvlAdapter} from "src/adapters/MorphoPtCusdUsdcLoopTvlAdapter.sol";
+import {MorphoLoopTvlAdapter} from "src/adapters/MorphoLoopTvlAdapter.sol";
 import {CapCusdBalanceAdapter} from "src/adapters/CapCusdBalanceAdapter.sol";
 
 import {CbBtcUsdcAaveV3BalanceAdapter} from "src/adapters/cbBtcUsdcAaveV3BalanceAdapter.sol";
