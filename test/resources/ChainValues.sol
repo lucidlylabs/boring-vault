@@ -869,6 +869,10 @@ contract ChainValues {
         values[mainnet]["PT_iUSD_9_04_2025"] = 0x5f2F6324AA5590e408BA892e39ceC4C0afB16068.toBytes32();
         values[mainnet]["SY_iUSD_9_04_2025"] = 0x47743a9203E636674467Ff58B7AB0aE0ee6f97cb.toBytes32();
         values[mainnet]["LP_iUSD_9_04_2025"] = 0x2353193fa14A6477a4523e2C078e4063022FCf66.toBytes32();
+        values[mainnet]["liUSD_13w"] = 0xbd3f9814eB946E617f1d774A6762cDbec0bf087A.toBytes32();
+        values[mainnet]["euler_liUSD_13w_collateral"] = 0xF230224626BbE12Bdb0e8538Cb4Bbe1eeC48689A.toBytes32();
+        values[mainnet]["euler_USDC_120_borrow"] = 0xed059CB7Eb6251093FaE10a4483519Ab159e28D9.toBytes32();
+        values[mainnet]["euler_liUSD_oracle"] = 0x7D3da4436a415A729be72BFC39eADDa04e2bE393.toBytes32();
 
         // Falcon USDf
         values[mainnet]["USDf"] = 0xFa2B947eEc368f42195f24F36d2aF29f7c24CeC2.toBytes32();
