@@ -11719,6 +11719,91 @@ contract MerkleTreeHelper is CommonBase, ChainValues, Test {
         }
     }
 
+    // ========================================= InfiniFi USDC Euler Loop =========================================
+    /// @notice Leafs for the USDC -> liUSD-13w (Infini) -> Euler collateral -> USDC borrow loop, executed via
+    ///         a single MorphoFlashLoan transaction. Uses the vault itself as the Euler subaccount (matches
+    ///         the siUSD/Morpho loop convention where receivers are the vault).
+    function _addInfiniFiUsdcEulerLoopLeafs(ManageLeaf[] memory leafs) internal {
+        // ---------- Outer flashloan leaf ----------
+        _addMorphoBlueFlashLoanLeafs(leafs, getAddress(sourceChain, "USDC"));
+
+        // ---------- Infini Gateway: USDC -> liUSD-13w ----------
+        // approve USDC -> InfiniGateway (skip if already added by Infini V1 helper)
+        if (
+            !tokenToSpenderToApprovalInTree[getAddress(sourceChain, "USDC")][getAddress(
+                sourceChain, "InfiniGatewayContract"
+            )]
+        ) {
+            unchecked {
+                leafIndex++;
+            }
+            leafs[leafIndex] = ManageLeaf(
+                getAddress(sourceChain, "USDC"),
+                false,
+                "approve(address,uint256)",
+                new address[](1),
+                "approve InfiniGateway to spend USDC",
+                getAddress(sourceChain, "rawDataDecoderAndSanitizer")
+            );
+            leafs[leafIndex].argumentAddresses[0] = getAddress(sourceChain, "InfiniGatewayContract");
+            tokenToSpenderToApprovalInTree[getAddress(sourceChain, "USDC")][getAddress(
+                sourceChain, "InfiniGatewayContract"
+            )] = true;
+        }
+
+        // mintAndLock(_to=vault, amount, epochs=13) -> mint liUSD-13w
+        unchecked {
+            leafIndex++;
+        }
+        leafs[leafIndex] = ManageLeaf(
+            getAddress(sourceChain, "InfiniGatewayContract"),
+            false,
+            "mintAndLock(address,uint256,uint32)",
+            new address[](1),
+            "mint liUSD-13w with USDC via InfiniGateway",
+            getAddress(sourceChain, "rawDataDecoderAndSanitizer")
+        );
+        leafs[leafIndex].argumentAddresses[0] = getAddress(sourceChain, "boringVault");
+
+        // startUnwinding(shares, epochs=13) -> queue 13-week redemption
+        unchecked {
+            leafIndex++;
+        }
+        leafs[leafIndex] = ManageLeaf(
+            getAddress(sourceChain, "InfiniGatewayContract"),
+            false,
+            "startUnwinding(uint256,uint32)",
+            new address[](0),
+            "queue InfiniGateway 13-week unwind of liUSD-13w",
+            getAddress(sourceChain, "rawDataDecoderAndSanitizer")
+        );
+
+        // claimRedemption() -> after lock matures, pull USDC back
+        unchecked {
+            leafIndex++;
+        }
+        leafs[leafIndex] = ManageLeaf(
+            getAddress(sourceChain, "InfiniGatewayContract"),
+            false,
+            "claimRedemption()",
+            new address[](0),
+            "claim USDC after InfiniGateway 13-week unwind",
+            getAddress(sourceChain, "rawDataDecoderAndSanitizer")
+        );
+
+        // ---------- Euler collateral (liUSD-13w) ----------
+        ERC4626[] memory eulerDepositVaults = new ERC4626[](1);
+        eulerDepositVaults[0] = ERC4626(getAddress(sourceChain, "euler_liUSD_13w_collateral"));
+        address[] memory subaccounts = new address[](1);
+        subaccounts[0] = getAddress(sourceChain, "boringVault");
+        _addEulerDepositLeafs(leafs, eulerDepositVaults, subaccounts);
+
+        // ---------- Euler borrow (USDC) ----------
+        ERC4626[] memory eulerBorrowVaults = new ERC4626[](1);
+        eulerBorrowVaults[0] = ERC4626(getAddress(sourceChain, "euler_USDC_120_borrow"));
+        _addEulerBorrowLeafs(leafs, eulerBorrowVaults, subaccounts);
+    }
+
     // ========================================= Cap =========================================
     function _addCapLeafs(ManageLeaf[] memory leafs, address[] memory assets) internal {
         for (uint256 i = 0; i < assets.length; i++) {
