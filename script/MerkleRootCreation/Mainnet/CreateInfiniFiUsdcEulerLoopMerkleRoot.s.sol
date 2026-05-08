@@ -6,6 +6,7 @@ import {ERC20} from "@solmate/tokens/ERC20.sol";
 import {ERC4626} from "@solmate/tokens/ERC4626.sol";
 import {MerkleTreeHelper} from "test/resources/MerkleTreeHelper/MerkleTreeHelper.sol";
 import {ManagerWithMerkleVerification} from "src/base/Roles/ManagerWithMerkleVerification.sol";
+import {RolesAuthority, Authority} from "@solmate/auth/authorities/RolesAuthority.sol";
 import {Script} from "forge-std/Script.sol";
 
 contract CreateInfiniFiUsdcEulerLoopMerkleRootScript is Script, MerkleTreeHelper {
@@ -15,7 +16,10 @@ contract CreateInfiniFiUsdcEulerLoopMerkleRootScript is Script, MerkleTreeHelper
     address public boringVault = 0x96Ee83F0C132A8b29866c8Ae6E149D6e6822b291;
     address public managerAddress = 0x617f47CC5021607a46d9d76942d8103d5cc47175;
     address public accountantAddress = 0x2E6B1bA9CdE7fAD66E34122ad744c3B004adAdaF;
-    address public rolesAuthority = 0xF312FC97f7552299cd581C9238768D435A8B00B8;
+    RolesAuthority public rolesAuthority = RolesAuthority(0xF312FC97f7552299cd581C9238768D435A8B00B8);
+
+    uint8 public constant MANAGER_ROLE = 1;
+    uint8 public constant STRATEGIST_ROLE = 7;
 
     // TODO: set after deploying InfiniFiUsdcEulerLoopDecoderAndSanitizer.
     address public rawDataDecoderAndSanitizer = address(0);
@@ -65,6 +69,10 @@ contract CreateInfiniFiUsdcEulerLoopMerkleRootScript is Script, MerkleTreeHelper
         vm.startBroadcast(vm.envUint("BORING_DEVELOPER"));
         manager.setManageRoot(strategist, manageTree[manageTree.length - 1][0]);
         manager.setManageRoot(flashLoanAdapter, manageTree[manageTree.length - 1][0]);
+
+        rolesAuthority.setUserRole(flashLoanAdapter, MANAGER_ROLE, true);
+        rolesAuthority.setUserRole(flashLoanAdapter, STRATEGIST_ROLE, true);
+        rolesAuthority.setUserRole(strategist, STRATEGIST_ROLE, true);
         vm.stopBroadcast();
     }
 }
