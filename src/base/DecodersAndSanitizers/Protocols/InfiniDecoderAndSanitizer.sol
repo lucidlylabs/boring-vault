@@ -25,4 +25,16 @@ abstract contract InfiniDecoderAndSanitizer is BaseDecoderAndSanitizer {
     function redeem(address _to, uint256, uint256) external pure virtual returns (bytes memory addressesFound) {
         addressesFound = abi.encodePacked(_to);
     }
+
+    function mintAndLock(address _to, uint256, uint32) external pure virtual returns (bytes memory addressesFound) {
+        addressesFound = abi.encodePacked(_to);
+    }
+
+    function startUnwinding(uint256, uint32) external pure virtual returns (bytes memory addressesFound) {
+        return addressesFound;
+    }
+
+    function claimRedemption() external pure virtual returns (bytes memory addressesFound) {
+        return addressesFound;
+    }
 }
