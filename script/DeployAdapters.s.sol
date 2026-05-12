@@ -15,7 +15,7 @@ import {SiUsdBalanceAdapter} from "src/adapters/SiUsdBalanceAdapter.sol";
 import {CapStcusdBalanceAdapter} from "src/adapters/CapStcusdBalanceAdapter.sol";
 import {PtCusd29Jan2026BalanceAdapter} from "src/adapters/PtCusd29Jan2026BalanceAdapter.sol";
 import {MerkleTreeHelper} from "test/resources/MerkleTreeHelper/MerkleTreeHelper.sol";
-
+import {EulerEVKTvlAdapter} from "src/adapters/EulerEVKTvlAdapter.sol";
 contract DeployPtCusdLoopAdapters is Script, MerkleTreeHelper {
     function setUp() external {
         vm.createSelectFork("mainnet");
@@ -221,3 +221,39 @@ contract DeploySiUsdBalanceAdapter is Script, MerkleTreeHelper {
         vm.stopBroadcast();
     }
 }
+
+contract DeployEulerEVKTvlAdapter is Script, MerkleTreeHelper {
+    // liUSD-13w / USDC market on Euler EVK
+    address public constant COLLATERAL_VAULT = 0xF230224626BbE12Bdb0e8538Cb4Bbe1eeC48689A;
+    address public constant BORROW_VAULT = 0xed059CB7Eb6251093FaE10a4483519Ab159e28D9;
+    address public constant USDC = 0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48;
+    address public constant USDC_USD_FEED = 0x8fFfFfd4AfB6115b954Bd326cbe7B4BA576818f6;
+
+    // TODO: deploy a Chainlink-compatible feed for liUSD-13w/USD and set here.
+    address public constant LIUSD_USD_FEED = address(0);
+
+    function setUp() external {
+        setSourceChainName("mainnet");
+    }
+
+    function run() external {
+        require(LIUSD_USD_FEED != address(0), "set LIUSD_USD_FEED");
+
+        vm.startBroadcast(vm.envUint("PK"));
+
+        EulerEVKTvlAdapter adapter = new EulerEVKTvlAdapter(
+            COLLATERAL_VAULT,
+            BORROW_VAULT,
+            LIUSD_USD_FEED,
+            USDC_USD_FEED,
+            USDC_USD_FEED,
+            USDC
+        );
+
+        console.log("EulerEVKTvlAdapter deployed:", address(adapter));
+
+        vm.stopBroadcast();
+    }
+}
+
+
