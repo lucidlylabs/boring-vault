@@ -1490,6 +1490,8 @@ contract ChainValues {
         values[mainnet]["roycoEntryPoint"] = 0x63dA1229be88Fb4D20210147954a1a3e05f2581B.toBytes32();
         // Junior tranche of the syrupUSDC market.
         values[mainnet]["roycoJrSyrupUSDC"] = 0x5f340B400F892bBFDed2e5c316369Dcbf05C282A.toBytes32();
+        // Junior tranche of the stcUSD market.
+        values[mainnet]["roycoJrStcUSD"] = 0xe4060E83ad26618c7Ed56A02ce099beBA4f73b29.toBytes32();
 
         // Usual
         values[mainnet]["usualSwapperEngine"] = 0xB969B0d14F7682bAF37ba7c364b351B830a812B2.toBytes32();
