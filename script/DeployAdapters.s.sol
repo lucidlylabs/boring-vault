@@ -18,6 +18,7 @@ import {WethUsdcMorphoBalanceAdapter} from "src/adapters/WethUsdcMorphoBalanceAd
 import {SiUsdBalanceAdapter} from "src/adapters/SiUsdBalanceAdapter.sol";
 import {CapStcusdBalanceAdapter} from "src/adapters/CapStcusdBalanceAdapter.sol";
 import {PtCusd29Jan2026BalanceAdapter} from "src/adapters/PtCusd29Jan2026BalanceAdapter.sol";
+import {RoycoJrStcusdBalanceAdapter} from "src/adapters/RoycoJrStcusdBalanceAdapter.sol";
 import {MerkleTreeHelper} from "test/resources/MerkleTreeHelper/MerkleTreeHelper.sol";
 
 // contract DeployUniAdapter is Script, MerkleTreeHelper {
@@ -351,6 +352,33 @@ contract DeployUniswapV3PositionTvlAdapterScript is Script, MerkleTreeHelper {
 
         deployer.deployContract(
             "RLUSD_USDC_100 UniswapV3PositionTvlAdapter Example",
+            creationCode,
+            constructorArgs,
+            0
+        );
+
+        vm.stopBroadcast();
+    }
+}
+
+contract DeployRoycoJrStcusdBalanceAdapterScript is Script, MerkleTreeHelper {
+    Deployer private deployer =
+        Deployer(0x771263e3Bc6aCDa5aE388A3F8A0c2dd7A17275FC);
+
+    function run() external {
+        setSourceChainName("mainnet");
+        vm.startBroadcast(vm.envUint("DEPLOYER01"));
+
+        bytes memory creationCode = type(RoycoJrStcusdBalanceAdapter).creationCode;
+        bytes memory constructorArgs = abi.encode(
+            getAddress(sourceChain, "roycoJrStcUSD"),
+            getAddress(sourceChain, "stcUSD"),
+            getAddress(sourceChain, "cUSD"),
+            getAddress(sourceChain, "USDC")
+        );
+
+        deployer.deployContract(
+            "roycoJrStcUSD/USDC RoycoJrStcusdBalanceAdapter",
             creationCode,
             constructorArgs,
             0
