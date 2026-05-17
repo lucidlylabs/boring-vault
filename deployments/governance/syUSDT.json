@@ -3,7 +3,7 @@
     "chainName": "mainnet",
     "privateKeyEnvName": "PRIVATE_KEY_1",
     "multisig": "0x0000000000000000000000000000000000000000",
-    "guardian": "0x0000000000000000000000000000000000000000",
+    "guardian": "0x771263e3Bc6aCDa5aE388A3F8A0c2dd7A17275FC",
     "minDelaySeconds": 43200,
     "timelock": "0x0000000000000000000000000000000000000000",
     "currentOwners": {
