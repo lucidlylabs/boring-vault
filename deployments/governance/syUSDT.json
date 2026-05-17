@@ -1,0 +1,23 @@
+{
+    "vaultName": "syUSDT",
+    "chainName": "mainnet",
+    "privateKeyEnvName": "PRIVATE_KEY_1",
+    "multisig": "0x0000000000000000000000000000000000000000",
+    "guardian": "0x0000000000000000000000000000000000000000",
+    "minDelaySeconds": 43200,
+    "timelock": "0x0000000000000000000000000000000000000000",
+    "currentOwners": {
+        "operationalOwner": "0x1b514df3413DA9931eB31f2Ab72e32c0A507Cad5",
+        "rolesAuthorityOwner": "0x771263e3Bc6aCDa5aE388A3F8A0c2dd7A17275FC"
+    },
+    "contracts": {
+        "BoringVault": "0x2A9001e73811aEBad909aB14e453Fd0A91d7A31a",
+        "ManagerWithMerkleVerification": "0x529DE000e4AdAA243aB42b83D2563E2E7A3B182e",
+        "AccountantWithRateProviders": "0x4C937c0D0b6660a1F72263220c934F23d864495d",
+        "Teller": "0x90F9101416b1eCF7297C918Aaf775E6EE6A77760",
+        "BoringOnChainQueue": "0x67b1faa35e51fAE48e3f035cDAE6601B1CDeFB2D",
+        "QueueSolver": "0xbF3A130838C76Dd4Ec864d84BB4Df2DFb0D41CF3",
+        "RolesAuthority": "0x1B77bB2d878d3CE1C55D5621CFFDF0C6ce62BB63",
+        "Pauser": "0xC9A155AAaab347dAbaAE134F2bf6AC695ef74666"
+    }
+}
