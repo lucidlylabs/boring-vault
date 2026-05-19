@@ -125,8 +125,8 @@ contract CreateRoycoJrUsdcClusterLeafs is Script, MerkleTreeHelper {
         _addRoycoDawnLeafs(leafs, getAddress(sourceChain, "roycoJrSyrupUSDC"), getAddress(sourceChain, "syrupUSDC"));
 
         // Cap protocol: USDC <-> cUSD <-> stcUSD
-        ERC20[] memory capInputAssets = new ERC20[](1);
-        capInputAssets[0] = getERC20(sourceChain, "USDC");
+        address[] memory capInputAssets = new address[](1);
+        capInputAssets[0] = getAddress(sourceChain, "USDC");
         _addCapLeafs(leafs, capInputAssets);
 
         // Royco Dawn: async deposit/redeem on the stcUSD JR tranche
