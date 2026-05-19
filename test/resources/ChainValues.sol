@@ -432,6 +432,8 @@ contract ChainValues {
         values[mainnet]["RLUSD"] = 0x8292Bb45bf1Ee4d140127049757C2E0fF06317eD.toBytes32();
         values[mainnet]["syrupUSDC"] = 0x80ac24aA929eaF5013f6436cdA2a7ba190f5Cc0b.toBytes32();
         values[mainnet]["syrupUSDT"] = 0x356B8d89c1e1239Cbbb9dE4815c39A1474d5BA7D.toBytes32();
+        values[mainnet]["sNUSD"] = 0x08EFCC2F3e61185D0EA7F8830B3FEc9Bfa2EE313.toBytes32();
+        values[mainnet]["apyUSD"] = 0x38EEb52F0771140d10c4E9A9a72349A329Fe8a6A.toBytes32();
         values[mainnet]["ELX"] = 0x89A8c847f41C0dfA6c8B88638bACca8a0b777Da7.toBytes32();
         values[mainnet]["FRXUSD"] = 0xCAcd6fd266aF91b8AeD52aCCc382b4e165586E29.toBytes32();
         values[mainnet]["sfrxUSD"] = 0xac3E018457B222d93114458476f3E3416Abbe38F.toBytes32();
@@ -1494,6 +1496,10 @@ contract ChainValues {
         values[mainnet]["roycoJrSyrupUSDC"] = 0x5f340B400F892bBFDed2e5c316369Dcbf05C282A.toBytes32();
         // Junior tranche of the stcUSD market.
         values[mainnet]["roycoJrStcUSD"] = 0xe4060E83ad26618c7Ed56A02ce099beBA4f73b29.toBytes32();
+        // Junior tranche of the sNUSD (Staked Neutrl USD) market.
+        values[mainnet]["roycoJrSNUSD"] = 0x3821eBea3BBbE23F3dea74f24082BD0f0b67f6c5.toBytes32();
+        // Junior tranche of the apyUSD (Apyx) market.
+        values[mainnet]["roycoJrApyUSD"] = 0xAB2ab53E1e2E2c5D7202918EC8c873712bcc4a2D.toBytes32();
 
         // Usual
         values[mainnet]["usualSwapperEngine"] = 0xB969B0d14F7682bAF37ba7c364b351B830a812B2.toBytes32();
