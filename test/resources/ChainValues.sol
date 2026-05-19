@@ -270,7 +270,7 @@ contract ChainValues {
         values[mainnet]["boringDeployerContract"] = 0x771263e3Bc6aCDa5aE388A3F8A0c2dd7A17275FC.toBytes32();
 
         // morpho flashloan adapter
-        values[mainnet]["morphoBlueFlashLoanAdapterAddress"] = 0xF45e37b86A1B0Ed0488349e8950Ee59819df4650.toBytes32();
+        values[mainnet]["morphoBlueFlashLoanAdapterAddress"] = 0x82baFd173334e9cd34eB746BA6b55ffcb4d06a4d.toBytes32();
 
         // Liquid Ecosystem
         values[mainnet]["deployerAddress"] = 0x771263e3Bc6aCDa5aE388A3F8A0c2dd7A17275FC.toBytes32();
@@ -333,6 +333,7 @@ contract ChainValues {
 
         // ERC20s
         values[mainnet]["USDC"] = 0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48.toBytes32();
+        values[mainnet]["AUSD"] = 0x00000000eFE302BEAA2b3e6e1b18d08D69a9012a.toBytes32();
         values[mainnet]["WETH"] = 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2.toBytes32();
         values[mainnet]["WBTC"] = 0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599.toBytes32();
         values[mainnet]["USDT"] = 0xdAC17F958D2ee523a2206206994597C13D831ec7.toBytes32();
@@ -975,6 +976,7 @@ contract ChainValues {
         values[mainnet]["sUSDe_PYUSD_915"] = 0x90ef0c5a0dc7c4de4ad4585002d44e9d411d212d2f6258e94948beecf8b4c0d5;
         values[mainnet]["fxSAVE_USDC_86"] = 0x43e925e52d7873fa8acac90dd5f246087d55b3a34c344b71884a6352491ff459;
         values[mainnet]["srRoyUSDC_USDC_915"] = 0xacc49fbf58feb1ac971acce68f8adc177c43682d6a7087bbd4991a05cb7a2c67;
+        values[mainnet]["sUSDat_AUSD_86"] = 0x582fdc4176da0ab5c65e086603ab9ecd9188e889e16efef6e35854cf14e15065;
         values[mainnet]["cbBtc_USDC_86"] = 0x64d65c9a2d91c36d56fbc42d69e979335320169b3df63bf92789e2c8883fcc64;
         values[mainnet]["cbBtc_USDT_86"] = 0x45671fb8d5dea1c4fbca0b8548ad742f6643300eeb8dbd34ad64a658b2b05bca;
         values[mainnet]["cbBtc_RLUSD_86"] = 0xffd010618ed3cb39bb2c5de0e3e58d3d2ec9f52187a180f29723c31756a939bc;
@@ -1596,6 +1598,9 @@ contract ChainValues {
         values[mainnet]["royco-jr-syrupusdc-strategy-tvl-adapter"] =
             0xcA0e962F4c848BF01B6CE73F496533b03E194B46.toBytes32();
 
+        // tvl adapters
+        values[mainnet]["morpho_sUSDat_AUSD_86_lending"] = 0x89824d1ce9359518dC298b2B6eF7EAA08ec14e78.toBytes32();
+
         // LucidlyChainlinkOracleV1 deployments
         values[mainnet]["sUSDE_USD_oracle"] = 0xC8bd9086a40bBD9acbd855B50931F3b46f048525.toBytes32();
         values[mainnet]["sUSDS_USD_oracle"] = 0x84f4612e682091c30Fd2C108bb298C93BE961618.toBytes32();
@@ -1604,12 +1609,14 @@ contract ChainValues {
         values[mainnet]["fxSAVE_USD_oracle"] = 0x3B2046cBeD2115C147b2455FF3e9354c5a2D2fB8.toBytes32();
         values[mainnet]["stcUSD_USD_oracle"] = 0xaCEd1A8d71F5e15e47A1547B9C9C9716e5325056.toBytes32();
         values[mainnet]["syUSD_USD_oracle"] = 0x5aE0460096DBc858385a3b1D9D3f0840Fa40E3eB.toBytes32();
+        values[mainnet]["sUSDat_USD_oracle"] = 0x6E64Ca5aae0A55B431e6116B3Aa996FA32f5DCFc.toBytes32(); // considers USDat and USDC at 1:1
         values[mainnet]["royco-jr-syrupUSDC_USD_oracle"] = 0xf0AE373FA07D9DCA03F2A084042Fd8132016cBE5.toBytes32();
         values[mainnet]["roycoJrUsdcClusterUSDC_USD_oracle"] = 0x8082e7Bbe282f8b4399686E4E0e10Ca64Cb916aD.toBytes32();
 
         // chainlink feeds
         values[mainnet]["USDC_USD_oracle"] = 0x8fFfFfd4AfB6115b954Bd326cbe7B4BA576818f6.toBytes32();
         values[mainnet]["USDT_USD_oracle"] = 0x3E7d1eAB13ad0104d2750B8863b489D65364e32D.toBytes32();
+        values[mainnet]["AUSD_USD_oracle"] = 0xB00341502DfEA6Ced8A5786b4059d29dA5E4D1FD.toBytes32();
         values[mainnet]["PYUSD_USD_oracle"] = 0x8f1dF6D7F2db73eECE86a18b4381F4707b918FB1.toBytes32();
         values[mainnet]["RLUSD_USD_oracle"] = 0x26C46B7aD0012cA71F2298ada567dC9Af14E7f2A.toBytes32();
         values[mainnet]["CBBTC_USD_oracle"] = 0x2665701293fCbEB223D11A08D826563EDcCE423A.toBytes32();
