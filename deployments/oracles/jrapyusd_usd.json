@@ -3,7 +3,7 @@
   "deploymentName": "LucidlyChainlinkRoycoTrancheOracleV1_jrApyUSD_USD",
   "name": "jr-apyUSD/USD",
   "tranche": "0xAB2ab53E1e2E2c5D7202918EC8c873712bcc4a2D",
-  "baseFeed1": "0x0000000000000000000000000000000000000000",
+  "baseFeed1": "0x27b4D31FFA07e1d259da13f51A47bfa0d4f874d3",
   "baseFeed2": "0x0000000000000000000000000000000000000000",
   "outputDecimals": 8
 }
