@@ -1,0 +1,8 @@
+{
+  "privateKeyEnvName": "DEPLOYER01",
+  "deploymentName": "LucidlyMorphoPriceAggregatorV3WrapperV1_sNUSD",
+  "name": "sNUSD/USD",
+  "sourceOracle": "0x28E82e7f25DbcD487af27C80DE4F62553260fecA",
+  "sourceDecimals": 24,
+  "outputDecimals": 8
+}
