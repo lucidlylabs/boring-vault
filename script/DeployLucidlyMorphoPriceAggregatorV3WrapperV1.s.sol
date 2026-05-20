@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 pragma solidity >=0.8.0;
 
-import {Deployer} from "src/helper/Deployer.sol";
 import {
     LucidlyMorphoPriceAggregatorV3WrapperV1
 } from "src/adapters/oracle/LucidlyMorphoPriceAggregatorV3WrapperV1.sol";
@@ -10,8 +9,6 @@ import "forge-std/StdJson.sol";
 
 contract DeployLucidlyMorphoPriceAggregatorV3WrapperV1Script is Script {
     using stdJson for string;
-
-    Deployer deployer = Deployer(0x771263e3Bc6aCDa5aE388A3F8A0c2dd7A17275FC);
 
     function run(string memory configFile) external {
         string memory root = vm.projectRoot();
@@ -22,18 +19,14 @@ contract DeployLucidlyMorphoPriceAggregatorV3WrapperV1Script is Script {
 
         vm.startBroadcast(vm.envUint(json.readString(".privateKeyEnvName")));
 
-        bytes memory creationCode = type(LucidlyMorphoPriceAggregatorV3WrapperV1).creationCode;
-        bytes memory constructorArgs = abi.encode(
+        LucidlyMorphoPriceAggregatorV3WrapperV1 wrapper = new LucidlyMorphoPriceAggregatorV3WrapperV1(
             json.readAddress(".sourceOracle"),
-            json.readUint(".sourceDecimals"),
+            uint8(json.readUint(".sourceDecimals")),
             uint8(json.readUint(".outputDecimals")),
             json.readString(".name")
         );
 
-        string memory deploymentName = json.readString(".deploymentName");
-        deployer.deployContract(deploymentName, creationCode, constructorArgs, 0);
-
-        console.log("Deployed:", deploymentName, deployer.getAddress(deploymentName));
+        console.log("Deployed:", json.readString(".deploymentName"), address(wrapper));
 
         vm.stopBroadcast();
     }
