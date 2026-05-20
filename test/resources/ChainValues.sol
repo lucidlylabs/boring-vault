@@ -1494,6 +1494,10 @@ contract ChainValues {
         values[mainnet]["roycoJrSyrupUSDC"] = 0x5f340B400F892bBFDed2e5c316369Dcbf05C282A.toBytes32();
         // Junior tranche of the stcUSD market.
         values[mainnet]["roycoJrStcUSD"] = 0xe4060E83ad26618c7Ed56A02ce099beBA4f73b29.toBytes32();
+        // Junior tranche of the sNUSD (Staked Neutrl USD) market.
+        values[mainnet]["roycoJrSNUSD"] = 0x3821eBea3BBbE23F3dea74f24082BD0f0b67f6c5.toBytes32();
+        // Junior tranche of the apyUSD (Apyx) market.
+        values[mainnet]["roycoJrApyUSD"] = 0xAB2ab53E1e2E2c5D7202918EC8c873712bcc4a2D.toBytes32();
 
         // Usual
         values[mainnet]["usualSwapperEngine"] = 0xB969B0d14F7682bAF37ba7c364b351B830a812B2.toBytes32();
@@ -1612,6 +1616,9 @@ contract ChainValues {
         values[mainnet]["sUSDat_USD_oracle"] = 0x6E64Ca5aae0A55B431e6116B3Aa996FA32f5DCFc.toBytes32(); // considers USDat and USDC at 1:1
         values[mainnet]["royco-jr-syrupUSDC_USD_oracle"] = 0xf0AE373FA07D9DCA03F2A084042Fd8132016cBE5.toBytes32();
         values[mainnet]["roycoJrUsdcClusterUSDC_USD_oracle"] = 0x8082e7Bbe282f8b4399686E4E0e10Ca64Cb916aD.toBytes32();
+        // TODO: replace with deployed oracle addresses after running DeployLucidlyChainlinkRoycoVaultTrancheOracleV1
+        values[mainnet]["royco-jr-sNUSD_USD_oracle"] = 0x0000000000000000000000000000000000000000.toBytes32();
+        values[mainnet]["royco-jr-apyUSD_USD_oracle"] = 0x0000000000000000000000000000000000000000.toBytes32();
 
         // chainlink feeds
         values[mainnet]["USDC_USD_oracle"] = 0x8fFfFfd4AfB6115b954Bd326cbe7B4BA576818f6.toBytes32();
