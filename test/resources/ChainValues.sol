@@ -1616,9 +1616,8 @@ contract ChainValues {
         values[mainnet]["sUSDat_USD_oracle"] = 0x6E64Ca5aae0A55B431e6116B3Aa996FA32f5DCFc.toBytes32(); // considers USDat and USDC at 1:1
         values[mainnet]["royco-jr-syrupUSDC_USD_oracle"] = 0xf0AE373FA07D9DCA03F2A084042Fd8132016cBE5.toBytes32();
         values[mainnet]["roycoJrUsdcClusterUSDC_USD_oracle"] = 0x8082e7Bbe282f8b4399686E4E0e10Ca64Cb916aD.toBytes32();
-        // TODO: replace with deployed oracle addresses after running DeployLucidlyChainlinkRoycoVaultTrancheOracleV1
-        values[mainnet]["royco-jr-sNUSD_USD_oracle"] = 0x0000000000000000000000000000000000000000.toBytes32();
-        values[mainnet]["royco-jr-apyUSD_USD_oracle"] = 0x0000000000000000000000000000000000000000.toBytes32();
+        values[mainnet]["royco-jr-sNUSD_USD_oracle"] = 0x649F3BC9AE0D2350c33dD0829FeAB33c5D1c5826.toBytes32();
+        values[mainnet]["royco-jr-apyUSD_USD_oracle"] = 0xCEaEc7c4b2E27263389071364173b5111d9E41af.toBytes32();
 
         // chainlink feeds
         values[mainnet]["USDC_USD_oracle"] = 0x8fFfFfd4AfB6115b954Bd326cbe7B4BA576818f6.toBytes32();
