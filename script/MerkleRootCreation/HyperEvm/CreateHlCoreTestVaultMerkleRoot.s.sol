@@ -77,7 +77,7 @@ contract CreateHlCoreTestVaultMerkleRootScript is Script, MerkleTreeHelper {
         perpAssets[19] = 122; // ENA
         perpAssets[20] = 10206; // SPOT ENA
         perpAssets[21] = 200; // PUMP
-        perpAssets[22] = 10020; // SPOT PUMP
+        perpAssets[22] = 10188; // SPOT PUMP
 
         address[] memory spotSendRecipients = new address[](1);
         spotSendRecipients[0] = boringVault; // Allow sending back to self
