@@ -4,7 +4,7 @@
         "privateKeyEnvName": "DEPLOYER01",
         "chainName": "base",
         "evmVersion": "cancun",
-        "desiredNumberOfDeploymentTxs": 1,
+        "desiredNumberOfDeploymentTxs": 15,
         "txBundlerAddressOrName": {
             "address": "0x0000000000000000000000000000000000000000",
             "name": "txBundlerAddress"
@@ -68,7 +68,7 @@
                     "address": "0x0000000000000000000000000000000000000000",
                     "name": "cbBTC"
                 },
-                "minimumUpateDelayInSeconds": 600,
+                "minimumUpateDelayInSeconds": 3600,
                 "performanceFee": 3000,
                 "platformFee": 0,
                 "startingExchangeRate": 100000000
