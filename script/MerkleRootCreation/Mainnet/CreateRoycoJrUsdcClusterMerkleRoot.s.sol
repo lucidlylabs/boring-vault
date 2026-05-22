@@ -102,7 +102,7 @@ contract CreateRoycoJrUsdcClusterLeafs is Script, MerkleTreeHelper {
         _addAllSyrupLeafs(leafs);
 
         // fly.trade
-        address[] memory oneInchAssets = new address[](8);
+        address[] memory oneInchAssets = new address[](10);
         oneInchAssets[0] = getAddress(sourceChain, "USDC");
         oneInchAssets[1] = getAddress(sourceChain, "syrupUSDC");
         oneInchAssets[2] = getAddress(sourceChain, "USDS");
@@ -111,7 +111,9 @@ contract CreateRoycoJrUsdcClusterLeafs is Script, MerkleTreeHelper {
         oneInchAssets[5] = getAddress(sourceChain, "sUSDS");
         oneInchAssets[6] = getAddress(sourceChain, "RLUSD");
         oneInchAssets[7] = getAddress(sourceChain, "PYUSD");
-        SwapKind[] memory kind = new SwapKind[](8);
+        oneInchAssets[8] = getAddress(sourceChain, "sNUSD");
+        oneInchAssets[9] = getAddress(sourceChain, "apyUSD");
+        SwapKind[] memory kind = new SwapKind[](10);
         kind[0] = SwapKind.BuyAndSell;
         kind[1] = SwapKind.BuyAndSell;
         kind[2] = SwapKind.BuyAndSell;
@@ -120,6 +122,8 @@ contract CreateRoycoJrUsdcClusterLeafs is Script, MerkleTreeHelper {
         kind[5] = SwapKind.BuyAndSell;
         kind[6] = SwapKind.BuyAndSell;
         kind[7] = SwapKind.BuyAndSell;
+        kind[8] = SwapKind.BuyAndSell;
+        kind[9] = SwapKind.BuyAndSell;
         _addMagpieSwapLeafs(leafs, oneInchAssets, kind);
 
         _addRoycoDawnLeafs(leafs, getAddress(sourceChain, "roycoJrSyrupUSDC"), getAddress(sourceChain, "syrupUSDC"));
@@ -131,5 +135,11 @@ contract CreateRoycoJrUsdcClusterLeafs is Script, MerkleTreeHelper {
 
         // Royco Dawn: async deposit/redeem on the stcUSD JR tranche
         _addRoycoDawnLeafs(leafs, getAddress(sourceChain, "roycoJrStcUSD"), getAddress(sourceChain, "stcUSD"));
+
+        // Royco Dawn: async deposit/redeem on the sNUSD (Staked Neutrl USD) JR tranche
+        _addRoycoDawnLeafs(leafs, getAddress(sourceChain, "roycoJrSNUSD"), getAddress(sourceChain, "sNUSD"));
+
+        // Royco Dawn: async deposit/redeem on the apyUSD (Apyx) JR tranche
+        _addRoycoDawnLeafs(leafs, getAddress(sourceChain, "roycoJrApyUSD"), getAddress(sourceChain, "apyUSD"));
     }
 }
