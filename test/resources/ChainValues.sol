@@ -1598,8 +1598,14 @@ contract ChainValues {
         values[mainnet]["royco-jr-syrupusdc-strategy-tvl-adapter"] =
             0xcA0e962F4c848BF01B6CE73F496533b03E194B46.toBytes32();
 
+        // rate provider
+        values[mainnet]["syrupUsdcUsdcRateProvider"] = 0xe5a39E4E636B874006087f50cAF2E1c4D5823fb3.toBytes32();
+
         // tvl adapters
-        values[mainnet]["morpho_sUSDat_AUSD_86_lending"] = 0x89824d1ce9359518dC298b2B6eF7EAA08ec14e78.toBytes32();
+        values[mainnet]["morpho_sUSDat_AUSD_86_lending_usdc"] = 0x89824d1ce9359518dC298b2B6eF7EAA08ec14e78.toBytes32();
+        values[mainnet]["royco_JrSyrupUsdc_usdc"] = 0xcA0e962F4c848BF01B6CE73F496533b03E194B46.toBytes32();
+        values[mainnet]["royco_JrApyUsd_usdc"] = 0x30192E25619C21e0B8F26B31EB25093F529643B8.toBytes32();
+        values[mainnet]["royco_JrSnusd_usdc"] = 0xfEC174520cc10C21C88D10CEAf3b668e91522E1C.toBytes32();
 
         // LucidlyChainlinkOracleV1 deployments
         values[mainnet]["sUSDE_USD_oracle"] = 0xC8bd9086a40bBD9acbd855B50931F3b46f048525.toBytes32();

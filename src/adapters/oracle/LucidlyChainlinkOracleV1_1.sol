@@ -1,15 +1,16 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 pragma solidity >=0.8.0;
 
-import {ERC20} from "../../../lib/solmate/src/tokens/ERC20.sol";
 import {ERC4626} from "../../../lib/solmate/src/tokens/ERC4626.sol";
 import {ILucidlyChainlinkOracleV1} from "./ILucidlyChainlinkOracleV1.sol";
 import {ChainlinkDataFeedLib, AggregatorV3Interface} from "../libraries/ChainlinkDataFeedLib.sol";
 
-/// @title LucidlyChainlinkOracleV1
+/// @title LucidlyChainlinkOracleV1_1
 /// @author Lucidly Labs
-/// @notice Lucidly Strategies oracle using Chainlink-compliant feeds.
-contract LucidlyChainlinkOracleV1 is ILucidlyChainlinkOracleV1 {
+/// @notice Same as LucidlyChainlinkOracleV1, plus a Chainlink style `latestAnswer()`
+///         so consumers expecting a single-`int256` return (e.g. IRateProvider adapters)
+///         can read the price without decoding the `latestRoundData()` tuple.
+contract LucidlyChainlinkOracleV1_1 is ILucidlyChainlinkOracleV1 {
     using ChainlinkDataFeedLib for AggregatorV3Interface;
 
     ERC4626 public immutable BASE_VAULT;
@@ -45,10 +46,6 @@ contract LucidlyChainlinkOracleV1 is ILucidlyChainlinkOracleV1 {
         OUTPUT_DECIMALS = outputDecimals;
         _description = _oracleDescription;
 
-        // We need to scale from input decimals to outputDecimals:
-        // When vault is set: SCALE_FACTOR = 10^(baseTokenDecimals + feed1Decimals + feed2Decimals - outputDecimals)
-        // When no vault: SCALE_FACTOR = 10^(feed1Decimals + feed2Decimals - outputDecimals)
-        // Then: answer = (vaultAssets * feed1 * feed2) / SCALE_FACTOR
         uint256 vaultOutputDecimals = address(baseVault) != address(0) ? baseTokenDecimals : 0;
         SCALE_FACTOR = 10 ** (vaultOutputDecimals + baseFeed1.getDecimals() + baseFeed2.getDecimals() - outputDecimals);
     }
@@ -70,12 +67,20 @@ contract LucidlyChainlinkOracleV1 is ILucidlyChainlinkOracleV1 {
     }
 
     function latestRoundData() external view returns (uint80, int256, uint256, uint256, uint80) {
+        return (0, _latestAnswer(), 0, block.timestamp, 0);
+    }
+
+    function latestAnswer() external view returns (int256) {
+        return _latestAnswer();
+    }
+
+    function _latestAnswer() internal view returns (int256) {
         uint256 vaultAssets =
             address(BASE_VAULT) != address(0) ? BASE_VAULT.convertToAssets(BASE_VAULT_CONVERSION_SAMPLE) : 1;
 
         uint256 priceRaw = vaultAssets * BASE_FEED_1.getPrice() * BASE_FEED_2.getPrice();
-        int256 answer = int256(priceRaw / SCALE_FACTOR);
-
-        return (0, answer, 0, block.timestamp, 0);
+        uint256 answerRaw = priceRaw / SCALE_FACTOR;
+        require(answerRaw <= uint256(type(int256).max), "answer overflow");
+        return int256(answerRaw);
     }
 }

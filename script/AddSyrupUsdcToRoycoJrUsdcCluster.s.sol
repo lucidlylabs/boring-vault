@@ -17,13 +17,12 @@ contract AddSyrupUsdcToRoycoJrUsdcClusterScript is Script {
         TellerWithMultiAssetSupport(0x8C87d801B6CA569a73D9428351415afAeC293E28);
 
     ERC20 public constant SYRUP_USDC = ERC20(0x80ac24aA929eaF5013f6436cdA2a7ba190f5Cc0b);
-
-    address public constant SYRUP_USDC_RATE_PROVIDER = address(0);
+    address public constant SYRUP_USDC_RATE_PROVIDER = 0xe5a39E4E636B874006087f50cAF2E1c4D5823fb3;
 
     function run() external {
         require(SYRUP_USDC_RATE_PROVIDER != address(0), "rate provider not set");
 
-        uint256 pk = vm.envUint("BORING_DEVELOPER");
+        uint256 pk = vm.envUint("DEPLOYER01");
         vm.startBroadcast(pk);
 
         accountant.setRateProviderData({
