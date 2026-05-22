@@ -42,6 +42,9 @@ import {
     HyperliquidCoreWriterDecoderAndSanitizer
 } from "src/base/DecodersAndSanitizers/Protocols/HyperliquidCoreWriterDecoderAndSanitizer.sol";
 import {BaseDecoderAndSanitizer} from "src/base/DecodersAndSanitizers/BaseDecoderAndSanitizer.sol";
+import {
+    LpHedgeStrategyDecoderAndSanitizer
+} from "src/base/DecodersAndSanitizers/LpHedgeStrategyDecoderAndSanitizer.sol";
 import {BoringDrone} from "src/base/Drones/BoringDrone.sol";
 
 import "forge-std/Script.sol";
@@ -291,6 +294,27 @@ contract DeploySyHlpDecoderAndSanitizer is Script, ContractNames, MainnetAddress
         creationCode = type(SyHlpBaseDecoderAndSanitizer).creationCode;
         constructorArgs = abi.encode(getAddress(sourceChain, "uniswapV3NonFungiblePositionManager"));
         deployer.deployContract("SyUsd Base DecodersAndSanitizers Batch 1", creationCode, constructorArgs, 0);
+        vm.stopBroadcast();
+    }
+}
+
+contract DeployLpHedgeStrategyDecoderAndSanitizer is Script, ContractNames, MainnetAddresses, MerkleTreeHelper {
+    Deployer public deployer = Deployer(0x771263e3Bc6aCDa5aE388A3F8A0c2dd7A17275FC);
+
+    function run() external {
+        bytes memory creationCode;
+        bytes memory constructorArgs;
+
+        vm.createSelectFork("base");
+        setSourceChainName("base");
+
+        uint256[] memory allowedTokenIds = new uint256[](1);
+        allowedTokenIds[0] = vm.envUint("LP_HEDGE_TOKEN_ID");
+
+        vm.startBroadcast(vm.envUint("PK"));
+        creationCode = type(LpHedgeStrategyDecoderAndSanitizer).creationCode;
+        constructorArgs = abi.encode(getAddress(sourceChain, "aerodromeNonFungiblePositionManager"), allowedTokenIds);
+        deployer.deployContract("LpHedgeStrategyDecoderAndSanitizerV0.1", creationCode, constructorArgs, 0);
         vm.stopBroadcast();
     }
 }

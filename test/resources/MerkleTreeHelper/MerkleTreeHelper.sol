@@ -7644,19 +7644,21 @@ contract MerkleTreeHelper is CommonBase, ChainValues, Test {
             leafs[leafIndex].argumentAddresses[2] = token1[i];
             leafs[leafIndex].argumentAddresses[3] = getAddress(sourceChain, "boringVault");
 
-            // Approve gauge to spend NFT.
-            unchecked {
-                leafIndex++;
+            if (gauges[i] != address(0)) {
+                // Approve gauge to spend NFT.
+                unchecked {
+                    leafIndex++;
+                }
+                leafs[leafIndex] = ManageLeaf(
+                    nonfungiblePositionManager,
+                    false,
+                    "approve(address,uint256)",
+                    new address[](1),
+                    "Approve gauge to spend VelodromeV3 position",
+                    getAddress(sourceChain, "rawDataDecoderAndSanitizer")
+                );
+                leafs[leafIndex].argumentAddresses[0] = gauges[i];
             }
-            leafs[leafIndex] = ManageLeaf(
-                nonfungiblePositionManager,
-                false,
-                "approve(address,uint256)",
-                new address[](1),
-                "Approve gauge to spend VelodromeV3 position",
-                getAddress(sourceChain, "rawDataDecoderAndSanitizer")
-            );
-            leafs[leafIndex].argumentAddresses[0] = gauges[i];
         }
 
         // Decrease liquidity
@@ -7701,6 +7703,7 @@ contract MerkleTreeHelper is CommonBase, ChainValues, Test {
         );
 
         for (uint256 i; i < gauges.length; ++i) {
+            if (gauges[i] == address(0)) continue;
             // Deposit into Gauge
             unchecked {
                 leafIndex++;
@@ -7750,6 +7753,81 @@ contract MerkleTreeHelper is CommonBase, ChainValues, Test {
             );
             leafs[leafIndex].argumentAddresses[0] = getAddress(sourceChain, "boringVault");
         }
+    }
+
+    function _addAerodromeSlipstreamSwapLeafs(
+        ManageLeaf[] memory leafs,
+        address tokenA,
+        address tokenB,
+        int24 tickSpacing,
+        address swapRouter
+    ) internal {
+        address boringVault = getAddress(sourceChain, "boringVault");
+
+        if (!ownerToTokenToSpenderToApprovalInTree[boringVault][tokenA][swapRouter]) {
+            unchecked {
+                leafIndex++;
+            }
+            leafs[leafIndex] = ManageLeaf(
+                tokenA,
+                false,
+                "approve(address,uint256)",
+                new address[](1),
+                string.concat("Approve Aerodrome Slipstream SwapRouter to spend ", ERC20(tokenA).symbol()),
+                getAddress(sourceChain, "rawDataDecoderAndSanitizer")
+            );
+            leafs[leafIndex].argumentAddresses[0] = swapRouter;
+            ownerToTokenToSpenderToApprovalInTree[boringVault][tokenA][swapRouter] = true;
+        }
+
+        if (!ownerToTokenToSpenderToApprovalInTree[boringVault][tokenB][swapRouter]) {
+            unchecked {
+                leafIndex++;
+            }
+            leafs[leafIndex] = ManageLeaf(
+                tokenB,
+                false,
+                "approve(address,uint256)",
+                new address[](1),
+                string.concat("Approve Aerodrome Slipstream SwapRouter to spend ", ERC20(tokenB).symbol()),
+                getAddress(sourceChain, "rawDataDecoderAndSanitizer")
+            );
+            leafs[leafIndex].argumentAddresses[0] = swapRouter;
+            ownerToTokenToSpenderToApprovalInTree[boringVault][tokenB][swapRouter] = true;
+        }
+
+        unchecked {
+            leafIndex++;
+        }
+        leafs[leafIndex] = ManageLeaf(
+            swapRouter,
+            false,
+            "exactInput((bytes,address,uint256,uint256,uint256))",
+            new address[](3),
+            string.concat("Swap ", ERC20(tokenA).symbol(), " to ", ERC20(tokenB).symbol(), " on Aerodrome Slipstream"),
+            getAddress(sourceChain, "rawDataDecoderAndSanitizer")
+        );
+        leafs[leafIndex].argumentAddresses[0] = tokenA;
+        leafs[leafIndex].argumentAddresses[1] = tokenB;
+        leafs[leafIndex].argumentAddresses[2] = boringVault;
+
+        unchecked {
+            leafIndex++;
+        }
+        leafs[leafIndex] = ManageLeaf(
+            swapRouter,
+            false,
+            "exactInput((bytes,address,uint256,uint256,uint256))",
+            new address[](3),
+            string.concat("Swap ", ERC20(tokenB).symbol(), " to ", ERC20(tokenA).symbol(), " on Aerodrome Slipstream"),
+            getAddress(sourceChain, "rawDataDecoderAndSanitizer")
+        );
+        leafs[leafIndex].argumentAddresses[0] = tokenB;
+        leafs[leafIndex].argumentAddresses[1] = tokenA;
+        leafs[leafIndex].argumentAddresses[2] = boringVault;
+
+        // Keep tickSpacing in the helper signature so callers document the only intended route encoding.
+        tickSpacing;
     }
 
     function _addVelodromeV2Leafs(
