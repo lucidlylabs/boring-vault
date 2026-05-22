@@ -54,7 +54,7 @@ contract CreateHlCoreTestVaultMerkleRootScript is Script, MerkleTreeHelper {
         _addLeafsForFeeClaiming(leafs, getAddress(sourceChain, "accountantAddress"), feeAssets, false);
 
         // BTC=0, ETH=1 (see HyperliquidAssetIds.sol for full list)
-        uint32[] memory perpAssets = new uint32[](16);
+        uint32[] memory perpAssets = new uint32[](23);
         perpAssets[0] = 0; // BTC
         perpAssets[1] = 1; // ETH
         perpAssets[2] = 5; // SOL
@@ -71,7 +71,13 @@ contract CreateHlCoreTestVaultMerkleRootScript is Script, MerkleTreeHelper {
         perpAssets[13] = 100000 + (4 * 10000) + 5; // hyna:ZECUSDE
         perpAssets[14] = 100000 + (4 * 10000) + 6; // hyna:XRPUSDE
         perpAssets[15] = 100000 + (4 * 10000) + 8; // hyna:BNBUSDE
-        perpAssets[15] = 100000 + (4 * 10000) + 11; // hyna:PUMPUSDE
+        perpAssets[16] = 100000 + (4 * 10000) + 11; // hyna:PUMPUSDE
+        perpAssets[17] = 214; // ZEC
+        perpAssets[18] = 10272; // SPOT ZEC
+        perpAssets[19] = 122; // ENA
+        perpAssets[20] = 10206; // SPOT ENA
+        perpAssets[21] = 200; // PUMP
+        perpAssets[22] = 10020; // SPOT PUMP
 
         address[] memory spotSendRecipients = new address[](1);
         spotSendRecipients[0] = boringVault; // Allow sending back to self
@@ -94,10 +100,9 @@ contract CreateHlCoreTestVaultMerkleRootScript is Script, MerkleTreeHelper {
         bridgeSubAccounts[0] = address(0); // Main account
         _addCoreWriterSendAssetLeafs(leafs, bridgeDestinations, bridgeSubAccounts);
 
-        address[] memory apiWallets = new address[](3);
-        apiWallets[0] = 0x0307AD25281C99F22A8F3Af9e272fE3968810239;
-        apiWallets[1] = 0xe5C7cbAA926eAdf27d04A2e6CB4D2d192b8CBF65;
-        apiWallets[2] = 0x1c9923509bcE34509B0A0f68d7Af52b69D690D49;
+        address[] memory apiWallets = new address[](2);
+        apiWallets[0] = 0xe5C7cbAA926eAdf27d04A2e6CB4D2d192b8CBF65;
+        apiWallets[1] = 0x1c9923509bcE34509B0A0f68d7Af52b69D690D49;
         _addCoreWriterAddApiWalletLeafs(leafs, apiWallets);
 
         bytes32[][] memory manageTree = _generateMerkleTree(leafs);
