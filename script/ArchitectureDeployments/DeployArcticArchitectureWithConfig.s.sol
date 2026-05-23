@@ -1362,7 +1362,13 @@ contract DeployArcticArchitectureWithConfigScript is Script, ChainValues {
 
     function _finalizeSetup() internal {
         _log("Finalizing setup...", 3);
+        // Final owner of the deployed contracts. New vaults should set
+        // `finalOwnerAddressOrName` in the config to their timelock; configs
+        // that omit it keep the legacy owner for backwards compatibility.
         address ownerAddress = 0x1b514df3413DA9931eB31f2Ab72e32c0A507Cad5;
+        if (vm.keyExists(rawJson, ".deploymentParameters.finalOwnerAddressOrName")) {
+            ownerAddress = _handleAddressOrName(".deploymentParameters.finalOwnerAddressOrName");
+        }
         _log(string.concat("Transferring ownership to ", vm.toString(ownerAddress)), 3);
         uint256 shareLockPeriod = vm.parseJsonUint(rawJson, ".tellerConfiguration.tellerParameters.shareLockPeriod");
         if (tellerExists) {
