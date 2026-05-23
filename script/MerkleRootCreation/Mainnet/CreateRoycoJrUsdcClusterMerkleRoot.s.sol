@@ -102,15 +102,15 @@ contract CreateRoycoJrUsdcClusterLeafs is Script, MerkleTreeHelper {
         _addAllSyrupLeafs(leafs);
 
         // fly.trade
-        address[] memory oneInchAssets = new address[](8);
-        oneInchAssets[0] = getAddress(sourceChain, "USDC");
-        oneInchAssets[1] = getAddress(sourceChain, "syrupUSDC");
-        oneInchAssets[2] = getAddress(sourceChain, "USDS");
-        oneInchAssets[3] = getAddress(sourceChain, "USDT");
-        oneInchAssets[4] = getAddress(sourceChain, "USDE");
-        oneInchAssets[5] = getAddress(sourceChain, "sUSDS");
-        oneInchAssets[6] = getAddress(sourceChain, "RLUSD");
-        oneInchAssets[7] = getAddress(sourceChain, "PYUSD");
+        address[] memory swapAssets = new address[](8);
+        swapAssets[0] = getAddress(sourceChain, "USDC");
+        swapAssets[1] = getAddress(sourceChain, "syrupUSDC");
+        swapAssets[2] = getAddress(sourceChain, "USDS");
+        swapAssets[3] = getAddress(sourceChain, "USDT");
+        swapAssets[4] = getAddress(sourceChain, "sUSDS");
+        swapAssets[5] = getAddress(sourceChain, "sNUSD");
+        swapAssets[6] = getAddress(sourceChain, "apxUSD");
+        swapAssets[7] = getAddress(sourceChain, "apyUSD");
         SwapKind[] memory kind = new SwapKind[](8);
         kind[0] = SwapKind.BuyAndSell;
         kind[1] = SwapKind.BuyAndSell;
@@ -120,16 +120,17 @@ contract CreateRoycoJrUsdcClusterLeafs is Script, MerkleTreeHelper {
         kind[5] = SwapKind.BuyAndSell;
         kind[6] = SwapKind.BuyAndSell;
         kind[7] = SwapKind.BuyAndSell;
-        _addMagpieSwapLeafs(leafs, oneInchAssets, kind);
+        _addMagpieSwapLeafs(leafs, swapAssets, kind);
 
-        _addRoycoDawnLeafs(leafs, getAddress(sourceChain, "roycoJrSyrupUSDC"), getAddress(sourceChain, "syrupUSDC"));
-
-        // Cap protocol: USDC <-> cUSD <-> stcUSD
+        // cap protocol: usdc <-> cusd <-> stcusd
         address[] memory capInputAssets = new address[](1);
         capInputAssets[0] = getAddress(sourceChain, "USDC");
         _addCapLeafs(leafs, capInputAssets);
 
-        // Royco Dawn: async deposit/redeem on the stcUSD JR tranche
-        _addRoycoDawnLeafs(leafs, getAddress(sourceChain, "roycoJrStcUSD"), getAddress(sourceChain, "stcUSD"));
+        // royco dawn: async deposit/redeem on the stcusd jr tranche
+        _addRoycoDawnLeafs(leafs, getAddress(sourceChain, "royco-jr-stcusd"), getAddress(sourceChain, "stcUSD"));
+        _addRoycoDawnLeafs(leafs, getAddress(sourceChain, "royco-jr-syrupusdc"), getAddress(sourceChain, "syrupUSDC"));
+        _addRoycoDawnLeafs(leafs, getAddress(sourceChain, "royco-jr-snusd"), getAddress(sourceChain, "sNUSD"));
+        _addRoycoDawnLeafs(leafs, getAddress(sourceChain, "royco-jr-apyusd"), getAddress(sourceChain, "apyUSD"));
     }
 }

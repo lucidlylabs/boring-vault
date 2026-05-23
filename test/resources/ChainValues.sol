@@ -456,6 +456,10 @@ contract ChainValues {
         values[mainnet]["cUSD"] = 0xcCcc62962d17b8914c62D74FfB843d73B2a3cccC.toBytes32();
         values[mainnet]["stcUSD"] = 0x88887bE419578051FF9F4eb6C858A951921D8888.toBytes32();
         values[mainnet]["roycoJrUsdcCluster"] = 0x71861827Aa95cA48148bdA0b40BC740d1c421070.toBytes32();
+        values[mainnet]["apyUSD"] = 0x38EEb52F0771140d10c4E9A9a72349A329Fe8a6A.toBytes32();
+        values[mainnet]["apxUSD"] = 0x98A878b1Cd98131B271883B390f68D2c90674665.toBytes32();
+        values[mainnet]["sNUSD"] = 0x08EFCC2F3e61185D0EA7F8830B3FEc9Bfa2EE313.toBytes32();
+        values[mainnet]["NUSD"] = 0xE556ABa6fe6036275Ec1f87eda296BE72C811BCE.toBytes32();
 
         // Magpie Router v3
         values[mainnet]["magpieRouterV3"] = 0xA6E941eaB67569ca4522f70d343714fF51d571c4.toBytes32();
@@ -1595,8 +1599,12 @@ contract ChainValues {
         // Royco Dawn
         values[mainnet]["royco-sr-syrupusdc"] = 0x66182442522D3049A941035190C315379c959250.toBytes32();
         values[mainnet]["royco-jr-syrupusdc"] = 0x5f340B400F892bBFDed2e5c316369Dcbf05C282A.toBytes32();
-        values[mainnet]["royco-jr-syrupusdc-strategy-tvl-adapter"] =
-            0xcA0e962F4c848BF01B6CE73F496533b03E194B46.toBytes32();
+        values[mainnet]["royco-sr-apyusd"] = 0xBd373c9D3D8976a4FECC504a93c768BBE8C3227C.toBytes32();
+        values[mainnet]["royco-jr-apyusd"] = 0xAB2ab53E1e2E2c5D7202918EC8c873712bcc4a2D.toBytes32();
+        values[mainnet]["royco-sr-snusd"] = 0x2070Af1C865f5d764F673Baf5654822947e71243.toBytes32();
+        values[mainnet]["royco-jr-snusd"] = 0x3821eBea3BBbE23F3dea74f24082BD0f0b67f6c5.toBytes32();
+        values[mainnet]["royco-sr-stcusd"] = 0xa7Da92685ea436276B2e87aE12E5eE6DABaD5bB5.toBytes32();
+        values[mainnet]["royco-jr-stcusd"] = 0xe4060E83ad26618c7Ed56A02ce099beBA4f73b29.toBytes32();
 
         // rate provider
         values[mainnet]["syrupUsdcUsdcRateProvider"] = 0xe5a39E4E636B874006087f50cAF2E1c4D5823fb3.toBytes32();
@@ -1606,6 +1614,7 @@ contract ChainValues {
         values[mainnet]["royco_JrSyrupUsdc_usdc"] = 0xcA0e962F4c848BF01B6CE73F496533b03E194B46.toBytes32();
         values[mainnet]["royco_JrApyUsd_usdc"] = 0x30192E25619C21e0B8F26B31EB25093F529643B8.toBytes32();
         values[mainnet]["royco_JrSnusd_usdc"] = 0xfEC174520cc10C21C88D10CEAf3b668e91522E1C.toBytes32();
+        values[mainnet]["royco_JrStcUsd_usdc"] = address(0x50F5c1876d8b8886e2Cfe6E74DC12B08d97be831).toBytes32();
 
         // LucidlyChainlinkOracleV1 deployments
         values[mainnet]["sUSDE_USD_oracle"] = 0xC8bd9086a40bBD9acbd855B50931F3b46f048525.toBytes32();
@@ -1617,6 +1626,7 @@ contract ChainValues {
         values[mainnet]["syUSD_USD_oracle"] = 0x5aE0460096DBc858385a3b1D9D3f0840Fa40E3eB.toBytes32();
         values[mainnet]["sUSDat_USD_oracle"] = 0x6E64Ca5aae0A55B431e6116B3Aa996FA32f5DCFc.toBytes32(); // considers USDat and USDC at 1:1
         values[mainnet]["royco-jr-syrupUSDC_USD_oracle"] = 0xf0AE373FA07D9DCA03F2A084042Fd8132016cBE5.toBytes32();
+        values[mainnet]["royco-jr-stcUSD_USD_oracle"] = 0x9019e0f52beA0b49bE66FA0D26aD2B8b8C254585.toBytes32();
         values[mainnet]["roycoJrUsdcClusterUSDC_USD_oracle"] = 0x8082e7Bbe282f8b4399686E4E0e10Ca64Cb916aD.toBytes32();
 
         // chainlink feeds

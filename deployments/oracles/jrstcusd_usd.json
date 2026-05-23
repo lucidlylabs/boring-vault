@@ -1,0 +1,9 @@
+{
+  "privateKeyEnvName": "DEPLOYER01",
+  "deploymentName": "LucidlyChainlinkRoycoTrancheOracleV1_jrStcUSD_USD",
+  "name": "jr-stcUSD/USD",
+  "tranche": "0xe4060E83ad26618c7Ed56A02ce099beBA4f73b29",
+  "baseFeed1": "0x0000000000000000000000000000000000000000",
+  "baseFeed2": "0x0000000000000000000000000000000000000000",
+  "outputDecimals": 8
+}

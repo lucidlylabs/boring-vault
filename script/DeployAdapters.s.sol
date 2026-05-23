@@ -70,10 +70,8 @@ contract DeploycbBtcAaveAdapter is Script, MerkleTreeHelper {
     uint256 public privateKey;
 
     address AAVE_V3_POOL = 0x87870Bca3F3fD6335C3F4ce8392D69350B4fA4E2;
-    address CBBTC_USD_CHAINLINK_FEED =
-        0xb41E773f507F7a7EA890b1afB7d2b660c30C8B0A;
-    address USDC_USD_CHAINLINK_FEED =
-        0x3f73F03aa83B2A48ed27E964eD0fDb590332095B;
+    address CBBTC_USD_CHAINLINK_FEED = 0xb41E773f507F7a7EA890b1afB7d2b660c30C8B0A;
+    address USDC_USD_CHAINLINK_FEED = 0x3f73F03aa83B2A48ed27E964eD0fDb590332095B;
     address SYUSD_VAULT = 0x279CAD277447965AF3d24a78197aad1B02a2c589;
     address SYUSD_ACCOUNTANT = 0x03D9a9cE13D16C7cFCE564f41bd7E85E5cde8Da6;
 
@@ -86,36 +84,26 @@ contract DeploycbBtcAaveAdapter is Script, MerkleTreeHelper {
         vm.startBroadcast(privateKey);
 
         CbBtcUsdcAaveV3BalanceAdapter adapter = new CbBtcUsdcAaveV3BalanceAdapter(
-                AAVE_V3_POOL,
-                CBBTC_USD_CHAINLINK_FEED,
-                USDC_USD_CHAINLINK_FEED,
-                SYUSD_VAULT,
-                SYUSD_ACCOUNTANT
-            );
+            AAVE_V3_POOL, CBBTC_USD_CHAINLINK_FEED, USDC_USD_CHAINLINK_FEED, SYUSD_VAULT, SYUSD_ACCOUNTANT
+        );
 
         vm.stopBroadcast();
 
-        (uint256 collat, uint256 debt, uint256 credit) = adapter
-            .getUserPosition(0x272BCD869CbDFcb32c335dB2f1F6C54Eb1A50aCc);
+        (uint256 collat, uint256 debt, uint256 credit) =
+            adapter.getUserPosition(0x272BCD869CbDFcb32c335dB2f1F6C54Eb1A50aCc);
         console.log("collateral", collat);
         console.log("debt", debt);
         console.log("credit", credit);
-        console.log(
-            "TVL in CBTC terms",
-            adapter.getUserTvl(0x272BCD869CbDFcb32c335dB2f1F6C54Eb1A50aCc)
-        );
+        console.log("TVL in CBTC terms", adapter.getUserTvl(0x272BCD869CbDFcb32c335dB2f1F6C54Eb1A50aCc));
     }
 }
 
 contract DeploycbBtcMorphoAdapter is Script, MerkleTreeHelper {
     uint256 public privateKey;
 
-    bytes32 MORPHO_MARKET_ID =
-        0x64d65c9a2d91c36d56fbc42d69e979335320169b3df63bf92789e2c8883fcc64;
-    address CBBTC_USD_CHAINLINK_FEED =
-        0xb41E773f507F7a7EA890b1afB7d2b660c30C8B0A;
-    address USDC_USD_CHAINLINK_FEED =
-        0x3f73F03aa83B2A48ed27E964eD0fDb590332095B;
+    bytes32 MORPHO_MARKET_ID = 0x64d65c9a2d91c36d56fbc42d69e979335320169b3df63bf92789e2c8883fcc64;
+    address CBBTC_USD_CHAINLINK_FEED = 0xb41E773f507F7a7EA890b1afB7d2b660c30C8B0A;
+    address USDC_USD_CHAINLINK_FEED = 0x3f73F03aa83B2A48ed27E964eD0fDb590332095B;
     address SYUSD_VAULT = 0x279CAD277447965AF3d24a78197aad1B02a2c589;
     address SYUSD_ACCOUNTANT = 0x03D9a9cE13D16C7cFCE564f41bd7E85E5cde8Da6;
 
@@ -128,38 +116,27 @@ contract DeploycbBtcMorphoAdapter is Script, MerkleTreeHelper {
         vm.startBroadcast(privateKey);
 
         CbBtcUsdcMorphoBalanceAdapter adapter = new CbBtcUsdcMorphoBalanceAdapter(
-                MORPHO_MARKET_ID,
-                CBBTC_USD_CHAINLINK_FEED,
-                USDC_USD_CHAINLINK_FEED,
-                SYUSD_VAULT,
-                SYUSD_ACCOUNTANT
-            );
+            MORPHO_MARKET_ID, CBBTC_USD_CHAINLINK_FEED, USDC_USD_CHAINLINK_FEED, SYUSD_VAULT, SYUSD_ACCOUNTANT
+        );
 
         vm.stopBroadcast();
 
-        (uint256 collat, uint256 debt, uint256 credit) = adapter
-            .getUserPosition(0xc0d3c06701C267C06629a9a09089A4c7E7c7aD08);
+        (uint256 collat, uint256 debt, uint256 credit) =
+            adapter.getUserPosition(0xc0d3c06701C267C06629a9a09089A4c7E7c7aD08);
         console.log("collateral", collat);
         console.log("debt", debt);
         console.log("credit", credit);
-        console.log(
-            "TVL in CBTC terms",
-            adapter.getUserTvl(0xc0d3c06701C267C06629a9a09089A4c7E7c7aD08)
-        );
+        console.log("TVL in CBTC terms", adapter.getUserTvl(0xc0d3c06701C267C06629a9a09089A4c7E7c7aD08));
     }
 }
 
 contract DeployWethMorphoAdapter is Script, MerkleTreeHelper {
     uint256 public privateKey;
 
-    bytes32 MORPHO_MARKET_ID =
-        0x7e585a933ffe8443c371b4f8cfeb4430f5f6a14c2f32a898c26662c67a1cb8b8;
-    address WETH_USD_CHAINLINK_FEED =
-        0x5f4eC3Df9cbd43714FE2740f5E3616155c5b8419;
-    address USDC_USD_CHAINLINK_FEED =
-        0x3f73F03aa83B2A48ed27E964eD0fDb590332095B;
-    address WSTETH_USD_CHAINLINK_FEED =
-        0xe1D97bF61901B075E9626c8A2340a7De385861Ef;
+    bytes32 MORPHO_MARKET_ID = 0x7e585a933ffe8443c371b4f8cfeb4430f5f6a14c2f32a898c26662c67a1cb8b8;
+    address WETH_USD_CHAINLINK_FEED = 0x5f4eC3Df9cbd43714FE2740f5E3616155c5b8419;
+    address USDC_USD_CHAINLINK_FEED = 0x3f73F03aa83B2A48ed27E964eD0fDb590332095B;
+    address WSTETH_USD_CHAINLINK_FEED = 0xe1D97bF61901B075E9626c8A2340a7De385861Ef;
     address SYUSD_VAULT = 0x279CAD277447965AF3d24a78197aad1B02a2c589;
     address SYUSD_ACCOUNTANT = 0x03D9a9cE13D16C7cFCE564f41bd7E85E5cde8Da6;
 
@@ -182,15 +159,12 @@ contract DeployWethMorphoAdapter is Script, MerkleTreeHelper {
 
         vm.stopBroadcast();
 
-        (uint256 collat, uint256 debt, uint256 credit) = adapter
-            .getUserPosition(0xaB4238AfB54497DB41Edd5601327eDE78A038ECE);
+        (uint256 collat, uint256 debt, uint256 credit) =
+            adapter.getUserPosition(0xaB4238AfB54497DB41Edd5601327eDE78A038ECE);
         console.log("collateral", collat);
         console.log("debt", debt);
         console.log("credit", credit);
-        console.log(
-            "TVL in WETH terms",
-            adapter.getUserTvl(0xaB4238AfB54497DB41Edd5601327eDE78A038ECE)
-        );
+        console.log("TVL in WETH terms", adapter.getUserTvl(0xaB4238AfB54497DB41Edd5601327eDE78A038ECE));
     }
 }
 
@@ -198,12 +172,9 @@ contract DeployWethAaveAdapter is Script, MerkleTreeHelper {
     uint256 public privateKey;
 
     address AAVE_V3_POOL = 0x87870Bca3F3fD6335C3F4ce8392D69350B4fA4E2;
-    address WETH_USD_CHAINLINK_FEED =
-        0x5f4eC3Df9cbd43714FE2740f5E3616155c5b8419;
-    address USDC_USD_CHAINLINK_FEED =
-        0x3f73F03aa83B2A48ed27E964eD0fDb590332095B;
-    address WSTETH_USD_CHAINLINK_FEED =
-        0xe1D97bF61901B075E9626c8A2340a7De385861Ef;
+    address WETH_USD_CHAINLINK_FEED = 0x5f4eC3Df9cbd43714FE2740f5E3616155c5b8419;
+    address USDC_USD_CHAINLINK_FEED = 0x3f73F03aa83B2A48ed27E964eD0fDb590332095B;
+    address WSTETH_USD_CHAINLINK_FEED = 0xe1D97bF61901B075E9626c8A2340a7De385861Ef;
     address SYUSD_VAULT = 0x279CAD277447965AF3d24a78197aad1B02a2c589;
     address SYUSD_ACCOUNTANT = 0x03D9a9cE13D16C7cFCE564f41bd7E85E5cde8Da6;
 
@@ -226,15 +197,12 @@ contract DeployWethAaveAdapter is Script, MerkleTreeHelper {
 
         vm.stopBroadcast();
 
-        (uint256 collat, uint256 debt, uint256 credit) = adapter
-            .getUserPosition(0xA32DA4FF6476143972CB7360Bf5C18C4a590F44E);
+        (uint256 collat, uint256 debt, uint256 credit) =
+            adapter.getUserPosition(0xA32DA4FF6476143972CB7360Bf5C18C4a590F44E);
         console.log("collateral", collat);
         console.log("debt", debt);
         console.log("credit", credit);
-        console.log(
-            "TVL in WETH terms",
-            adapter.getUserTvl(0xA32DA4FF6476143972CB7360Bf5C18C4a590F44E)
-        );
+        console.log("TVL in WETH terms", adapter.getUserTvl(0xA32DA4FF6476143972CB7360Bf5C18C4a590F44E));
     }
 }
 
@@ -247,10 +215,10 @@ contract DeployHedgedMmStrategyAdapter is Script, MerkleTreeHelper {
         vm.startBroadcast(vm.envUint("PK"));
 
         HedgedBtcEthMmStrategyAdapter adapter = new HedgedBtcEthMmStrategyAdapter(
-                0xc80E787e1c2A3841928F69e6a35e3F12c7b38a00,
-                0xA923d8C976388518D65528324A587E4700f8F40f,
-                0x2f2a2543B76A4166549F7aaB2e75Bef0aefC5B0f
-            );
+            0xc80E787e1c2A3841928F69e6a35e3F12c7b38a00,
+            0xA923d8C976388518D65528324A587E4700f8F40f,
+            0x2f2a2543B76A4166549F7aaB2e75Bef0aefC5B0f
+        );
 
         vm.stopBroadcast();
     }
@@ -266,9 +234,7 @@ contract DeploySiUsdBalanceAdapter is Script, MerkleTreeHelper {
     function run() external {
         vm.startBroadcast(vm.envUint("PK"));
 
-        SiUsdBalanceAdapter adapter = new SiUsdBalanceAdapter(
-            0xDBDC1Ef57537E34680B898E1FEBD3D68c7389bCB
-        );
+        SiUsdBalanceAdapter adapter = new SiUsdBalanceAdapter(0xDBDC1Ef57537E34680B898E1FEBD3D68c7389bCB);
 
         vm.stopBroadcast();
     }
@@ -297,8 +263,7 @@ contract DeployMorphoBlueTvlAdapter is Script, MerkleTreeHelper {
 }
 
 contract DeployErc20TvlAdapter is Script, MerkleTreeHelper {
-    Deployer private deployer =
-        Deployer(0x771263e3Bc6aCDa5aE388A3F8A0c2dd7A17275FC);
+    Deployer private deployer = Deployer(0x771263e3Bc6aCDa5aE388A3F8A0c2dd7A17275FC);
 
     function run() external {
         setSourceChainName("mainnet");
@@ -306,33 +271,26 @@ contract DeployErc20TvlAdapter is Script, MerkleTreeHelper {
 
         bytes memory creationCode = type(Erc20TvlAdapter).creationCode;
         bytes memory constructorArgs = abi.encode(
-            getAddress(sourceChain, "roycoJrUsdcCluster"),
-            getAddress(sourceChain, "roycoJrUsdcClusterUSDC_USD_oracle"),
+            getAddress(sourceChain, "royco-jr-stcusd"),
+            getAddress(sourceChain, "royco-jr-stcUSD_USD_oracle"),
             getAddress(sourceChain, "USDC"),
             getAddress(sourceChain, "USDC_USD_oracle")
         );
 
-        deployer.deployContract(
-            "roycoJrUSDC/USDC Erc20TvlAdapter",
-            creationCode,
-            constructorArgs,
-            0
-        );
+        deployer.deployContract("RoycoJrStcUSD/USDC Erc20TvlAdapter", creationCode, constructorArgs, 0);
 
         vm.stopBroadcast();
     }
 }
 
 contract DeployUniswapV3PositionTvlAdapterScript is Script, MerkleTreeHelper {
-    Deployer private deployer =
-        Deployer(0x771263e3Bc6aCDa5aE388A3F8A0c2dd7A17275FC);
+    Deployer private deployer = Deployer(0x771263e3Bc6aCDa5aE388A3F8A0c2dd7A17275FC);
 
     function run() external {
         setSourceChainName("mainnet");
         vm.startBroadcast(vm.envUint("DEPLOYER01"));
 
-        bytes memory creationCode = type(UniswapV3PositionTvlAdapter)
-            .creationCode;
+        bytes memory creationCode = type(UniswapV3PositionTvlAdapter).creationCode;
         bytes memory constructorArgs = abi.encode(
             getAddress(sourceChain, "uniswapV3NonFungiblePositionManager"),
             getAddress(sourceChain, "RLUSD_USDC_100"),
@@ -343,12 +301,7 @@ contract DeployUniswapV3PositionTvlAdapterScript is Script, MerkleTreeHelper {
             getAddress(sourceChain, "USDC_USD_oracle")
         );
 
-        deployer.deployContract(
-            "RLUSD_USDC_100 UniswapV3PositionTvlAdapter Example",
-            creationCode,
-            constructorArgs,
-            0
-        );
+        deployer.deployContract("RLUSD_USDC_100 UniswapV3PositionTvlAdapter Example", creationCode, constructorArgs, 0);
 
         vm.stopBroadcast();
     }
