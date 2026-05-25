@@ -4,11 +4,8 @@ pragma solidity 0.8.21;
 import {Deployer} from "src/helper/Deployer.sol";
 import {RolesAuthority, Authority} from "@solmate/auth/authorities/RolesAuthority.sol";
 import {ContractNames} from "resources/ContractNames.sol";
-import {MainnetAddresses} from "test/resources/MainnetAddresses.sol";
-import {MockERC20} from "src/helper/MockERC20.sol";
-import "forge-std/Script.sol";
-import "forge-std/StdJson.sol";
-import "forge-std/Test.sol";
+import {console, Script} from "forge-std/Script.sol";
+import {Test} from "forge-std/Test.sol";
 
 /**
  *  forge script script/DeployDeployer.s.sol:DeployDeployerScript --broadcast --verify
@@ -16,7 +13,7 @@ import "forge-std/Test.sol";
  * @dev Optionally can change `--with-gas-price` to something more reasonable
  */
 contract DeployDeployerScript is Script, ContractNames, Test {
-    uint256 public privateKey;
+    uint256 private privateKey;
 
     // Contracts to deploy
     RolesAuthority public rolesAuthority;
@@ -28,7 +25,7 @@ contract DeployDeployerScript is Script, ContractNames, Test {
     address public dev0Address = 0x3Dd95962fC01EcEC5f867189A929d036D5aC12A6;
     address public dev1Address = 0x1b514df3413DA9931eB31f2Ab72e32c0A507Cad5;
 
-    uint8 public DEPLOYER_ROLE = 1;
+    uint8 public deployerRole = 1;
 
     function setUp() external {
         //privateKey = vm.envUint("BORING_DEVELOPER");
@@ -54,23 +51,11 @@ contract DeployDeployerScript is Script, ContractNames, Test {
 
         deployer.setAuthority(rolesAuthority);
 
-        //rolesAuthority.setRoleCapability(DEPLOYER_ROLE, address(deployer), Deployer.deployContract.selector, true);
-        //rolesAuthority.setRoleCapability(DEPLOYER_ROLE, address(deployer), Deployer.bundleTxs.selector, true);
-        //rolesAuthority.setUserRole(dev0Address, DEPLOYER_ROLE, true);
-        //rolesAuthority.setUserRole(dev1Address, DEPLOYER_ROLE, true);
-        //rolesAuthority.setUserRole(address(deployer), DEPLOYER_ROLE, true);
-
-        rolesAuthority.setRoleCapability(DEPLOYER_ROLE, address(deployer), Deployer.deployContract.selector, true);
-        rolesAuthority.setRoleCapability(DEPLOYER_ROLE, address(deployer), Deployer.bundleTxs.selector, true);
-        rolesAuthority.setUserRole(dev0Address, DEPLOYER_ROLE, true);
-        rolesAuthority.setUserRole(dev1Address, DEPLOYER_ROLE, true);
-        rolesAuthority.setUserRole(address(deployer), DEPLOYER_ROLE, true);
-
-        // deployer = Deployer(deployerAddress);
-
-        // constructorArgs = abi.encode("Crispy Coin", "CC", 18);
-        // creationCode = type(MockERC20).creationCode;
-        // MockERC20(deployer.deployContract("CrispyCoin V0.0", creationCode, constructorArgs, 0));
+        rolesAuthority.setRoleCapability(deployerRole, address(deployer), Deployer.deployContract.selector, true);
+        rolesAuthority.setRoleCapability(deployerRole, address(deployer), Deployer.bundleTxs.selector, true);
+        rolesAuthority.setUserRole(dev0Address, deployerRole, true);
+        rolesAuthority.setUserRole(dev1Address, deployerRole, true);
+        rolesAuthority.setUserRole(address(deployer), deployerRole, true);
 
         vm.stopBroadcast();
     }
@@ -82,7 +67,7 @@ contract DeployDeployerScriptV2 is Script {
     error DeploymentFailed(bytes reason);
 
     Deployer public deployer;
-    uint8 public DEPLOYER_ROLE = 1;
+    uint8 public deployerRole = 1;
     address public admin = 0x1b514df3413DA9931eB31f2Ab72e32c0A507Cad5;
 
     function setUp() external {
@@ -113,7 +98,7 @@ contract DeployRolesAuthority is Script {
     error DeploymentFailed(bytes reason);
 
     Deployer public deployer;
-    uint8 public DEPLOYER_ROLE = 1;
+    uint8 public deployerRole = 1;
     address public admin = 0x1b514df3413DA9931eB31f2Ab72e32c0A507Cad5;
     address public create2Deployer = 0x4e59b44847b379578588920cA78FbF26c0B4956C;
 
@@ -133,5 +118,127 @@ contract DeployRolesAuthority is Script {
         rolesAuthority.setUserRole(0x771263e3Bc6aCDa5aE388A3F8A0c2dd7A17275FC, 1, true);
 
         vm.stopBroadcast();
+    }
+}
+
+contract DeployNewDeployerScript is Script {
+    uint256 private privateKey;
+    RolesAuthority private newRolesAuthority;
+    RolesAuthority private rolesAuthority;
+    Deployer private newDeployer;
+    Deployer private deployer = Deployer(0x771263e3Bc6aCDa5aE388A3F8A0c2dd7A17275FC);
+    Deployer.Tx[] private txs;
+    address private owner;
+    uint8 private constant DEPLOYER_ROLE = 1;
+
+    function getTxs() public view returns (Deployer.Tx[] memory) {
+        return txs;
+    }
+
+    function _addTx(address target, bytes memory data, uint256 value) internal {
+        txs.push(Deployer.Tx(target, data, value));
+    }
+
+    function _getAddressAndIfDeployed(string memory name) internal view returns (address, bool) {
+        address deployedAt = deployer.getAddress(name);
+        uint256 size;
+        assembly {
+            size := extcodesize(deployedAt)
+        }
+        return (deployedAt, size > 0);
+    }
+
+    function _bundleTxs(uint256 desiredNumberOfDeploymentTxs) internal {
+        Deployer.Tx[] memory txsToSend = getTxs();
+        uint256 txsLength = txsToSend.length;
+
+        if (txsLength == 0) {
+            console.log("no txs to bundle");
+            return;
+        }
+
+        if (desiredNumberOfDeploymentTxs == 0) {
+            console.log("desired number of deployment txs is 0");
+        }
+        desiredNumberOfDeploymentTxs =
+            desiredNumberOfDeploymentTxs > txsLength ? txsLength : desiredNumberOfDeploymentTxs;
+        uint256 txsPerBundle = txsLength / desiredNumberOfDeploymentTxs;
+        uint256 lastIndexDeployed;
+        Deployer.Tx[][] memory txBundles = new Deployer.Tx[][](desiredNumberOfDeploymentTxs);
+
+        console.log(string.concat("tx bundles to send: ", vm.toString(desiredNumberOfDeploymentTxs)));
+        console.log(string.concat("Total txs: ", vm.toString(txsLength)));
+
+        for (uint256 i; i < desiredNumberOfDeploymentTxs; i++) {
+            uint256 txsInBundle;
+            if (i == desiredNumberOfDeploymentTxs - 1 && txsLength % txsPerBundle != 0) {
+                txsInBundle = txsLength - lastIndexDeployed;
+            } else {
+                txsInBundle = txsPerBundle;
+            }
+            txBundles[i] = new Deployer.Tx[](txsInBundle);
+            for (uint256 j; j < txBundles[i].length; j++) {
+                txBundles[i][j] = txsToSend[lastIndexDeployed + j];
+            }
+            lastIndexDeployed += txsInBundle;
+        }
+
+        vm.startBroadcast(privateKey);
+        for (uint256 i; i < desiredNumberOfDeploymentTxs; i++) {
+            console.log(string.concat("sending bundle: ", vm.toString(i)));
+            deployer.bundleTxs(txBundles[i]);
+        }
+        vm.stopBroadcast();
+    }
+
+    function _deployNewRolesAuthority(string memory name) internal {
+        bytes memory constructorArgs;
+        bytes memory creationCode;
+
+        (address deployedAddress, bool isDeployed) = _getAddressAndIfDeployed(name);
+        newRolesAuthority = RolesAuthority(deployedAddress);
+        if (!isDeployed) {
+            creationCode = type(RolesAuthority).creationCode;
+            constructorArgs = abi.encode(owner, Authority(address(0)));
+        }
+
+        _addTx(
+            address(deployer),
+            abi.encodeWithSelector(deployer.deployContract.selector, name, creationCode, constructorArgs, 0),
+            uint256(0)
+        );
+
+        console.log("deployed new rolesAuthority:", vm.toString(address(newRolesAuthority)));
+    }
+
+    function _deployNewDeployer(string memory name) internal {
+        bytes memory constructorArgs;
+        bytes memory creationCode;
+
+        (address deployedAddress, bool isDeployed) = _getAddressAndIfDeployed(name);
+        newDeployer = Deployer(deployedAddress);
+        if (!isDeployed) {
+            creationCode = type(Deployer).creationCode;
+            constructorArgs = abi.encode(owner, newRolesAuthority);
+        }
+
+        _addTx(
+            address(deployer),
+            abi.encodeWithSelector(newDeployer.deployContract.selector, name, creationCode, constructorArgs, 0),
+            uint256(0)
+        );
+
+        console.log("deployed new deployer: ", vm.toString(address(newDeployer)));
+    }
+
+    function setUp() external {
+        privateKey = vm.envUint("DEPLOYER01");
+        owner = vm.addr(privateKey);
+    }
+
+    function run() external {
+        _deployNewRolesAuthority("nav updater rolesAuthority 1.1.0");
+        _deployNewDeployer("nav updater deployer 1.1.0");
+        _bundleTxs(1);
     }
 }
