@@ -1936,6 +1936,8 @@ contract ChainValues {
 
         // Magpie Router v3
         values[arbitrum]["magpieRouterV3"] = 0xfB1B08BA6BA284934D817Ea3C9D18f592cc59a50.toBytes32();
+        values[arbitrum]["magpieDexAggregatorCore"] = 0x09AD820aaC5779683B481c4674208A4e1B024Afa.toBytes32();
+        values[arbitrum]["magpieDexAggregator"] = 0x20F6ee51340aDEed01A59B0e65cB3703f3dc860c.toBytes32();
     }
 
     function _addOptimismValues() private {

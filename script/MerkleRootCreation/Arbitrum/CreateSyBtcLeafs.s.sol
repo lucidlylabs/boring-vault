@@ -18,7 +18,7 @@ contract SyBtcMerkleRootScript is Script, MerkleTreeHelper {
 
     //standard
     address public boringVault = 0xC0D48269f8d6E427B0637F5e0695De11C8E75F6c;
-    address public rawDataDecoderAndSanitizer = 0xA902f4dADE492e44c455F1D8A848D835d70b4854;
+    address public rawDataDecoderAndSanitizer = 0xCe5E215F91082c3f94dec3E70bbC4c8a2efC4496;
     ManagerWithMerkleVerification internal manager =
         ManagerWithMerkleVerification(0x0dE47e4c2A0de8833e7bC8285eecb17c296fBB8A);
     address public accountant = 0xDda6274D69F464172CC7F52194d16FF27ec0D5A6;
@@ -29,7 +29,6 @@ contract SyBtcMerkleRootScript is Script, MerkleTreeHelper {
     //itb
     address public itbDecoderAndSanitizer = 0xEEb53299Cb894968109dfa420D69f0C97c835211;
     address public itbGearboxProtocolPositionManager = 0xad5dB17b44506785931dbc49c8857482c3b4F622;
-    address agent = 0x0307AD25281C99F22A8F3Af9e272fE3968810239;
     address agent1 = 0xa86b3Bf249478488B4304B50726c7D4689aD6320;
 
     function setUp() external {
@@ -53,7 +52,6 @@ contract SyBtcMerkleRootScript is Script, MerkleTreeHelper {
 
         vm.startBroadcast(privateKey);
         manager.setManageRoot(agent1, manageTree[manageTree.length - 1][0]);
-        manager.setManageRoot(agent, manageTree[manageTree.length - 1][0]);
         manager.setManageRoot(getAddress(sourceChain, "managerAddress"), manageTree[manageTree.length - 1][0]);
         vm.stopBroadcast();
     }

@@ -356,11 +356,11 @@ contract DeploySyBtcArbitrumDecoderAndSanitizer is Script, ContractNames, Mainne
         vm.startBroadcast(vm.envUint("BORING_DEVELOPER"));
 
         deployer.deployContract(
-            "SyBtc Arbitrum DecodersAndSanitizers Batch 3",
+            "SyBtc Arbitrum DecodersAndSanitizers Batch 4",
             type(SyBtcArbitrumDecoderAndSanitizer).creationCode,
             abi.encode(
                 getAddress(sourceChain, "uniswapV3NonFungiblePositionManager"),
-                getAddress(sourceChain, "magpieRouterV3")
+                getAddress(sourceChain, "magpieDexAggregator")
             ),
             0
         );
