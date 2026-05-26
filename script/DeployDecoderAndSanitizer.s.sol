@@ -129,7 +129,7 @@ contract DeployRoycoJrUsdcClusterDecoderAndSanitizer is Script, ContractNames, M
 
         constructorArgs = abi.encode(getAddress(sourceChain, "magpieDexAggregator"));
         creationCode = type(RoycoJrUsdcDecoderAndSanitizer).creationCode;
-        deployer.deployContract("RoycoJrUsdcClusterDecoderAndSanitizerV0.2", creationCode, constructorArgs, 0);
+        deployer.deployContract("RoycoJrUsdcClusterDecoderAndSanitizerV0.3", creationCode, constructorArgs, 0);
 
         vm.stopBroadcast();
     }
