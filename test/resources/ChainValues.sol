@@ -1611,10 +1611,15 @@ contract ChainValues {
 
         // tvl adapters
         values[mainnet]["morpho_sUSDat_AUSD_86_lending_usdc"] = 0x89824d1ce9359518dC298b2B6eF7EAA08ec14e78.toBytes32();
-        values[mainnet]["royco_JrSyrupUsdc_usdc"] = 0xcA0e962F4c848BF01B6CE73F496533b03E194B46.toBytes32();
-        values[mainnet]["royco_JrApyUsd_usdc"] = 0x30192E25619C21e0B8F26B31EB25093F529643B8.toBytes32();
-        values[mainnet]["royco_JrSnusd_usdc"] = 0xfEC174520cc10C21C88D10CEAf3b668e91522E1C.toBytes32();
-        values[mainnet]["royco_JrStcUsd_usdc"] = address(0x50F5c1876d8b8886e2Cfe6E74DC12B08d97be831).toBytes32();
+        values[mainnet]["royco_JrSyrupUsdc_usdc"] = 0xf5cF3Ec2D36104268CCAd319b3Cb1FC3D3833a93.toBytes32();
+        values[mainnet]["royco_JrApyUsd_usdc"] = 0xF9f1BAE94934f5c76A16f2944ed5Fc6eD31708b8.toBytes32();
+        values[mainnet]["royco_JrSnusd_usdc"] = 0x30183434145a351A9ab4a86608f3b54A1390a33D.toBytes32();
+        values[mainnet]["royco_JrStcUsd_usdc"] = address(0xC8A07dE816850268933E0dd0335E079d4913dc88).toBytes32();
+        // spot-token tvl adapters
+        values[mainnet]["syrupUsdcSpot_usdc"] = 0xedA8C40761A2bb623CF62c58a191c4A17cD9a8d3.toBytes32();
+        values[mainnet]["apyUsdSpot_usdc"] = 0xC3F3778Aaa713f7D83e728d5EA966F9d6A75d91F.toBytes32();
+        values[mainnet]["sNusdSpot_usdc"] = 0xA617f8Cc3825B16E9d592527491816217A2BcE5C.toBytes32();
+        values[mainnet]["stcUsdSpot_usdc"] = 0x9aBE2CA92E1eFd3541085cAbE5EA3E1b96D4Fce4.toBytes32();
 
         // LucidlyChainlinkOracleV1 deployments
         values[mainnet]["sUSDE_USD_oracle"] = 0xC8bd9086a40bBD9acbd855B50931F3b46f048525.toBytes32();
@@ -1625,9 +1630,13 @@ contract ChainValues {
         values[mainnet]["stcUSD_USD_oracle"] = 0xaCEd1A8d71F5e15e47A1547B9C9C9716e5325056.toBytes32();
         values[mainnet]["syUSD_USD_oracle"] = 0x5aE0460096DBc858385a3b1D9D3f0840Fa40E3eB.toBytes32();
         values[mainnet]["sUSDat_USD_oracle"] = 0x6E64Ca5aae0A55B431e6116B3Aa996FA32f5DCFc.toBytes32(); // considers USDat and USDC at 1:1
-        values[mainnet]["royco-jr-syrupUSDC_USD_oracle"] = 0xf0AE373FA07D9DCA03F2A084042Fd8132016cBE5.toBytes32();
-        values[mainnet]["royco-jr-stcUSD_USD_oracle"] = 0x9019e0f52beA0b49bE66FA0D26aD2B8b8C254585.toBytes32();
+        values[mainnet]["royco-jr-syrupUSDC_USD_oracle"] = 0x31D389CE1446D9370e8D7101ceD92931938dddab.toBytes32();
+        values[mainnet]["royco-jr-stcUSD_USD_oracle"] = 0x5a23efdb9D8DEe908A4E2F37C1606F39442B4347.toBytes32();
+        values[mainnet]["royco-jr-apyUSD_USD_oracle"] = 0x97119Bc5862C5Af64AA7108b6A6Dc36Bf3a18cdC.toBytes32();
+        values[mainnet]["royco-jr-sNUSD_USD_oracle"] = 0x0619f991C70F3c7f10f1364Ff0d4d8d57206F66c.toBytes32();
         values[mainnet]["roycoJrUsdcClusterUSDC_USD_oracle"] = 0x8082e7Bbe282f8b4399686E4E0e10Ca64Cb916aD.toBytes32();
+        values[mainnet]["apyUSD_USD_oracle"] = 0x27b4D31FFA07e1d259da13f51A47bfa0d4f874d3.toBytes32();
+        values[mainnet]["sNUSD_USD_oracle"] = 0x9540f351Df1C83E8928dDb15333984953A97fC95.toBytes32();
 
         // chainlink feeds
         values[mainnet]["USDC_USD_oracle"] = 0x8fFfFfd4AfB6115b954Bd326cbe7B4BA576818f6.toBytes32();
