@@ -5446,6 +5446,98 @@ contract MerkleTreeHelper is CommonBase, ChainValues, Test {
         leafs[leafIndex].argumentAddresses[5] = getAddress(sourceChain, "boringVault");
     }
 
+    // Midnight (Morpho fixed-rate credit) — lender (taker) path: take to buy credit, withdraw to redeem.
+    // Addresses are passed explicitly (rather than read from chain like Morpho) because Midnight is not
+    // yet deployed; once it launches this can read the Market via Midnight.toMarket(id). The argument
+    // address order must exactly match MidnightDecoderAndSanitizer: loanToken, (token, oracle) per
+    // collateral, enterGate, liquidatorGate, then taker/onBehalf, receiver.
+    function _addMidnightLendLeafs(
+        ManageLeaf[] memory leafs,
+        address loanToken,
+        address[] memory collateralTokens,
+        address[] memory collateralOracles,
+        address enterGate,
+        address liquidatorGate
+    ) internal {
+        require(collateralTokens.length == collateralOracles.length, "Midnight: collateral length mismatch");
+        address midnight = getAddress(sourceChain, "midnight");
+        address boringVault = getAddress(sourceChain, "boringVault");
+        ERC20 lt = ERC20(loanToken);
+
+        // Approve Midnight to spend the loan token (lender pays loan tokens to buy credit).
+        if (!ownerToTokenToSpenderToApprovalInTree[boringVault][loanToken][midnight]) {
+            unchecked {
+                leafIndex++;
+            }
+            leafs[leafIndex] = ManageLeaf(
+                loanToken,
+                false,
+                "approve(address,uint256)",
+                new address[](1),
+                string.concat("Approve Midnight to spend ", lt.symbol()),
+                getAddress(sourceChain, "rawDataDecoderAndSanitizer")
+            );
+            leafs[leafIndex].argumentAddresses[0] = midnight;
+            ownerToTokenToSpenderToApprovalInTree[boringVault][loanToken][midnight] = true;
+        }
+
+        uint256 marketAddrCount = 1 + 2 * collateralTokens.length + 2; // loanToken + (token,oracle)* + 2 gates
+
+        // take (lend): pin market + taker + receiverIfTakerIsSeller (all to the vault).
+        unchecked {
+            leafIndex++;
+        }
+        leafs[leafIndex] = ManageLeaf(
+            midnight,
+            false,
+            "take(((address,(address,uint256,uint256,address)[],uint256,uint256,address,address),bool,address,uint256,uint256,uint256,bytes32,address,bytes,address,address,bool,uint256,uint256),bytes,uint256,address,address,address,bytes)",
+            new address[](marketAddrCount + 2),
+            string.concat("Take a Midnight offer (lend) in the ", lt.symbol(), " market"),
+            getAddress(sourceChain, "rawDataDecoderAndSanitizer")
+        );
+        _fillMidnightMarketAddrs(
+            leafs[leafIndex].argumentAddresses, loanToken, collateralTokens, collateralOracles, enterGate, liquidatorGate
+        );
+        leafs[leafIndex].argumentAddresses[marketAddrCount] = boringVault; // taker
+        leafs[leafIndex].argumentAddresses[marketAddrCount + 1] = boringVault; // receiverIfTakerIsSeller
+
+        // withdraw (redeem credit at/after maturity): pin market + onBehalf + receiver.
+        unchecked {
+            leafIndex++;
+        }
+        leafs[leafIndex] = ManageLeaf(
+            midnight,
+            false,
+            "withdraw((address,(address,uint256,uint256,address)[],uint256,uint256,address,address),uint256,address,address)",
+            new address[](marketAddrCount + 2),
+            string.concat("Withdraw (redeem) ", lt.symbol(), " from the Midnight market"),
+            getAddress(sourceChain, "rawDataDecoderAndSanitizer")
+        );
+        _fillMidnightMarketAddrs(
+            leafs[leafIndex].argumentAddresses, loanToken, collateralTokens, collateralOracles, enterGate, liquidatorGate
+        );
+        leafs[leafIndex].argumentAddresses[marketAddrCount] = boringVault; // onBehalf
+        leafs[leafIndex].argumentAddresses[marketAddrCount + 1] = boringVault; // receiver
+    }
+
+    function _fillMidnightMarketAddrs(
+        address[] memory arr,
+        address loanToken,
+        address[] memory collateralTokens,
+        address[] memory collateralOracles,
+        address enterGate,
+        address liquidatorGate
+    ) internal pure {
+        arr[0] = loanToken;
+        uint256 j = 1;
+        for (uint256 i; i < collateralTokens.length; ++i) {
+            arr[j++] = collateralTokens[i];
+            arr[j++] = collateralOracles[i];
+        }
+        arr[j++] = enterGate;
+        arr[j] = liquidatorGate;
+    }
+
     function _addMorphoBlueCollateralLeafs(ManageLeaf[] memory leafs, bytes32 marketId) internal {
         IMB.MarketParams memory marketParams = IMB(getAddress(sourceChain, "morphoBlue")).idToMarketParams(marketId);
         ERC20 loanToken = ERC20(marketParams.loanToken);

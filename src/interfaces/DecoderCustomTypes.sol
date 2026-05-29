@@ -737,4 +737,39 @@ contract DecoderCustomTypes {
         TokenAmount[] toBridge;
         NFTAmount[] toBridgeNFT;
     }
+
+    // Midnight (Morpho fixed-rate credit). Field layout must match
+    // lib/midnight/src/interfaces/IMidnight.sol exactly so the ABI tuple encoding lines up.
+    struct MidnightCollateralParams {
+        address token;
+        uint256 lltv;
+        uint256 maxLif;
+        address oracle;
+    }
+
+    struct MidnightMarket {
+        address loanToken;
+        MidnightCollateralParams[] collateralParams;
+        uint256 maturity;
+        uint256 rcfThreshold;
+        address enterGate;
+        address liquidatorGate;
+    }
+
+    struct MidnightOffer {
+        MidnightMarket market;
+        bool buy;
+        address maker;
+        uint256 start;
+        uint256 expiry;
+        uint256 tick;
+        bytes32 group;
+        address callback;
+        bytes callbackData;
+        address receiverIfMakerIsSeller;
+        address ratifier;
+        bool reduceOnly;
+        uint256 maxUnits;
+        uint256 maxAssets;
+    }
 }

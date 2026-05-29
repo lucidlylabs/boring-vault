@@ -27,3 +27,6 @@
 	path = lib/v3-core
 	url = https://github.com/Uniswap/v3-core
 	branch = 0.8
+[submodule "lib/midnight"]
+	path = lib/midnight
+	url = https://github.com/morpho-org/midnight
