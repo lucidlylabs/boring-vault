@@ -42,6 +42,7 @@ contract WethUsdcAaveV3BalanceAdapter {
         require(price >= 0, "negative answer");
         return price;
     }
+
     function wethUsdPrice() public view returns (uint256) {
         (bool success, bytes memory data) =
             WETH_USD_CHAINLINK_FEED.staticcall(abi.encodeWithSignature("latestAnswer()"));

@@ -83,8 +83,7 @@ contract CbBtcUsdcMorphoBalanceAdapter {
         (,, uint256 totalBorrowAssets, uint256 totalBorrowShares) = morpho.expectedMarketBalances(marketParams);
 
         Position memory userPosition = morpho.position(MORPHO_MARKET_ID, user);
-        uint256 usdcDebtBalance =
-            uint256(userPosition.borrowShares).toAssetsUp(totalBorrowAssets, totalBorrowShares); // [6 dec]
+        uint256 usdcDebtBalance = uint256(userPosition.borrowShares).toAssetsUp(totalBorrowAssets, totalBorrowShares); // [6 dec]
 
         uint256 debtInUsd = (usdcDebtBalance * usdcPrice) / 1e6;
         return (debtInUsd * 1e8) / btcPrice;
