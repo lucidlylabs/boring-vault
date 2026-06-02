@@ -1,0 +1,8 @@
+{
+  "privateKeyEnvName": "DEPLOYER01",
+  "deploymentName": "LucidlyMorphoPriceAggregatorV3WrapperV1_apyUSD",
+  "name": "apyUSD/USD",
+  "sourceOracle": "0xff1487BDa8049a536F912e41E27B82a8A3845862",
+  "sourceDecimals": 24,
+  "outputDecimals": 8
+}
