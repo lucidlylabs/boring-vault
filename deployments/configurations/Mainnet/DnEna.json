@@ -1,0 +1,217 @@
+{
+    "deploymentParameters": {
+        "logLevel": 4,
+        "privateKeyEnvName": "DEPLOYER",
+        "chainName": "mainnet",
+        "evmVersion": "cancun",
+        "desiredNumberOfDeploymentTxs": 20,
+        "txBundlerAddressOrName": {
+            "address": "0x0000000000000000000000000000000000000000",
+            "name": "txBundlerAddress"
+        },
+        "setupRoles": true,
+        "setupTestUser": false,
+        "saveDeploymentDetails": true,
+        "testUserAddressOrName": {
+            "address": "0x0000000000000000000000000000000000000000",
+            "name": "dev1Address"
+        },
+        "deployerContractAddressOrName": {
+            "address": "0x0000000000000000000000000000000000000000",
+            "name": "deployerAddress"
+        },
+        "nativeWrapperAddressOrName": {
+            "address": "0x0000000000000000000000000000000000000000",
+            "name": "WETH"
+        },
+        "deploymentOwnerAddressOrName": {
+            "address": "0x0000000000000000000000000000000000000000",
+            "name": "deployerAddress"
+        },
+        "deploymentFileName": "addresses/Mainnet/DeltaNeutralEnaDeployment.json"
+    },
+    "rolesAuthorityConfiguration": {
+        "rolesAuthorityDeploymentName": "DeltaNeutralEna rolesAuthorityV1.0"
+    },
+    "lensConfiguration": {
+        "lensDeploymentName": "DeltaNeutralEna lensV1.0"
+    },
+    "boringVaultConfiguration": {
+        "boringVaultDeploymentName": "DeltaNeutralEna boringVaultV1.0",
+        "boringVaultName": "DeltaNeutralEna",
+        "boringVaultSymbol": "dnENA",
+        "boringVaultDecimals": 6
+    },
+    "managerConfiguration": {
+        "managerDeploymentName": "DeltaNeutralEna managerV1.0",
+        "balancerVaultAddressOrName": {
+            "address": "0x0000000000000000000000000000000000000000",
+            "name": "balancerVault"
+        }
+    },
+    "accountantConfiguration": {
+        "accountantDeploymentName": "DeltaNeutralEna accountantV1.0",
+        "accountantParameters": {
+            "kind": {
+                "variableRate": true,
+                "fixedRate": false
+            },
+            "payoutConfiguration": {
+                "payoutTo": "0xce1BF18D049638B3ee9dF934aeE5e5fC42BBFDb3",
+                "optionalPaymentSplitterName": "Payment Splitter",
+                "splits": []
+            },
+            "accountantDeploymentParameters": {
+                "allowedExchangeRateChangeLower": 9900,
+                "allowedExchangeRateChangeUpper": 10100,
+                "baseAddressOrName": {
+                    "address": "0x0000000000000000000000000000000000000000",
+                    "name": "USDC"
+                },
+                "minimumUpateDelayInSeconds": 3600,
+                "performanceFee": 1000,
+                "platformFee": 0,
+                "startingExchangeRate": 1000000
+            }
+        }
+    },
+    "tellerConfiguration": {
+        "tellerDeploymentName": "DeltaNeutralEna TellerV1.0",
+        "tellerParameters": {
+            "allowPublicDeposits": true,
+            "shareLockPeriod": 3600,
+            "kind": {
+                "teller": false,
+                "tellerWithRemediation": false,
+                "tellerWithCcip": false,
+                "tellerWithLayerZero": true
+            },
+            "ccip": {
+                "routerAddressOrName": {
+                    "address": "0x0000000000000000000000000000000000000000",
+                    "name": "ccipRouter"
+                },
+                "ccipChains": [
+                    {
+                        "chainSelector": 1,
+                        "allowMessagesFrom": true,
+                        "allowMessagesTo": true,
+                        "targetTellerOrSelf": {
+                            "address": "0x0000000000000000000000000000000000000000",
+                            "self": true
+                        },
+                        "messageGasLimit": 100000
+                    }
+                ]
+            },
+            "layerZero": {
+                "endpointAddressOrName": {
+                    "address": "0x0000000000000000000000000000000000000000",
+                    "name": "LayerZeroEndPoint"
+                },
+                "lzTokenAddressOrName": {
+                    "address": "0x0000000000000000000000000000000000000000",
+                    "name": "ZRO"
+                },
+                "lzChains": [
+                    {
+                        "chainId": 30367,
+                        "allowMessagesFrom": false,
+                        "allowMessagesTo": false,
+                        "targetTellerOrSelf": {
+                            "address": "0x0000000000000000000000000000000000000000",
+                            "self": true
+                        },
+                        "messageGasLimit": 100000
+                    }
+                ]
+            }
+        }
+    },
+    "boringQueueConfiguration": {
+        "boringQueueDeploymentName": "DeltaNeutralEna BoringOnChainQueueV1.0",
+        "boringQueueSolverName": "DeltaNeutralEna BoringSolverV1.0",
+        "queueParameters": {
+            "allowPublicWithdrawals": false,
+            "allowPublicSelfWithdrawals": false,
+            "kind": {
+                "boringQueue": true,
+                "boringQueueWithTracking": false
+            }
+        }
+    },
+    "droneConfiguration": {
+        "droneDeploymentBaseName": "DeltaNeutralEna Boring Drone",
+        "droneCount": 1,
+        "safeGasToForwardNative": 21000
+    },
+    "pauserConfiguration": {
+        "shouldDeploy": true,
+        "pauserDeploymentName": "DeltaNeutralEna Pauser",
+        "makeGenericPauser": [
+            "0x0000000000000000000000000000000000000000"
+        ],
+        "makeGenericUnpauser": [
+            "0x0000000000000000000000000000000000000000"
+        ],
+        "makePauseAll": [
+            "0x0000000000000000000000000000000000000000"
+        ],
+        "makeUnpauseAll": [
+            "0x0000000000000000000000000000000000000000"
+        ],
+        "senderToPausable": [
+            {
+                "sender": "0x0000000000000000000000000000000000000000",
+                "pausable": "0x0000000000000000000000000000000000000000"
+            }
+        ]
+    },
+    "timelockConfiguration": {
+        "shouldDeploy": true,
+        "timelockDeploymentName": "DeltaNeutralEna timelockV1.0",
+        "timelockParameters": {
+            "minDelay": 86400,
+            "proposers": [
+                "0x0000000000000000000000000000000000000000"
+            ],
+            "executors": [
+                "0x0000000000000000000000000000000000000000"
+            ]
+        }
+    },
+    "accountantAssets": [
+        {
+            "addressOrName": {
+                "address": "0x0000000000000000000000000000000000000000",
+                "name": "USDC"
+            },
+            "isPeggedToBase": true,
+            "rateProvider": "0x0000000000000000000000000000000000000000"
+        }
+    ],
+    "depositAssets": [
+        {
+            "addressOrName": {
+                "address": "0x0000000000000000000000000000000000000000",
+                "name": "USDC"
+            },
+            "allowDeposits": true,
+            "allowWithdraws": true,
+            "sharePremium": 0
+        }
+    ],
+    "withdrawAssets": [
+        {
+            "addressOrName": {
+                "address": "0x0000000000000000000000000000000000000000",
+                "name": "USDC"
+            },
+            "maxDiscount": 100,
+            "minDiscount": 0,
+            "minimumSecondsToDeadline": 2592000,
+            "minimumShares": 0,
+            "secondsToMaturity": 60
+        }
+    ]
+}

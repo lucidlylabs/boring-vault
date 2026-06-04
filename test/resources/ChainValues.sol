@@ -275,10 +275,10 @@ contract ChainValues {
         // Liquid Ecosystem
         values[mainnet]["deployerAddress"] = 0x771263e3Bc6aCDa5aE388A3F8A0c2dd7A17275FC.toBytes32();
         values[mainnet]["deployerAddress2"] = 0x771263e3Bc6aCDa5aE388A3F8A0c2dd7A17275FC.toBytes32();
-        values[mainnet]["dev0Address"] = 0x1b514df3413DA9931eB31f2Ab72e32c0A507Cad5.toBytes32();
-        values[mainnet]["dev1Address"] = 0x1b514df3413DA9931eB31f2Ab72e32c0A507Cad5.toBytes32();
-        values[mainnet]["dev3Address"] = 0x1b514df3413DA9931eB31f2Ab72e32c0A507Cad5.toBytes32();
-        values[mainnet]["dev4Address"] = 0x1b514df3413DA9931eB31f2Ab72e32c0A507Cad5.toBytes32();
+        values[mainnet]["dev0Address"] = 0x90760A784953829095969204f87d6DFEc29a6ca9.toBytes32();
+        values[mainnet]["dev1Address"] = 0x90760A784953829095969204f87d6DFEc29a6ca9.toBytes32();
+        values[mainnet]["dev3Address"] = 0x90760A784953829095969204f87d6DFEc29a6ca9.toBytes32();
+        values[mainnet]["dev4Address"] = 0x90760A784953829095969204f87d6DFEc29a6ca9.toBytes32();
         values[mainnet]["liquidV1PriceRouter"] = 0x693799805B502264f9365440B93C113D86a4fFF5.toBytes32();
         values[mainnet]["liquidPayoutAddress"] = 0xA9962a5BfBea6918E958DeE0647E99fD7863b95A.toBytes32();
         values[mainnet]["liquidMultisig"] = 0xCEA8039076E35a825854c5C2f85659430b06ec96.toBytes32();
@@ -1641,8 +1641,8 @@ contract ChainValues {
     function _addBaseValues() private {
         values[base]["deployerAddress"] = 0x771263e3Bc6aCDa5aE388A3F8A0c2dd7A17275FC.toBytes32();
         values[base]["txBundlerAddress"] = 0x771263e3Bc6aCDa5aE388A3F8A0c2dd7A17275FC.toBytes32();
-        values[base]["dev0Address"] = 0x1b514df3413DA9931eB31f2Ab72e32c0A507Cad5.toBytes32();
-        values[base]["dev1Address"] = 0x1b514df3413DA9931eB31f2Ab72e32c0A507Cad5.toBytes32();
+        values[base]["dev0Address"] = 0x90760A784953829095969204f87d6DFEc29a6ca9.toBytes32();
+        values[base]["dev1Address"] = 0x90760A784953829095969204f87d6DFEc29a6ca9.toBytes32();
         values[base]["feeAddress"] = 0xce1BF18D049638B3ee9dF934aeE5e5fC42BBFDb3.toBytes32();
         values[base]["liquidPayoutAddress"] = 0xce1BF18D049638B3ee9dF934aeE5e5fC42BBFDb3.toBytes32();
 
@@ -1773,9 +1773,9 @@ contract ChainValues {
     function _addArbitrumValues() private {
         // Liquid Ecosystem
         values[arbitrum]["deployerAddress"] = 0x5BD97A73333B6EC2e38B687bcED159566A14C5BA.toBytes32();
-        values[arbitrum]["dev0Address"] = 0x1b514df3413DA9931eB31f2Ab72e32c0A507Cad5.toBytes32();
-        values[arbitrum]["dev1Address"] = 0x1b514df3413DA9931eB31f2Ab72e32c0A507Cad5.toBytes32();
-        values[arbitrum]["liquidPayoutAddress"] = 0x1b514df3413DA9931eB31f2Ab72e32c0A507Cad5.toBytes32();
+        values[arbitrum]["dev0Address"] = 0x90760A784953829095969204f87d6DFEc29a6ca9.toBytes32();
+        values[arbitrum]["dev1Address"] = 0x90760A784953829095969204f87d6DFEc29a6ca9.toBytes32();
+        values[arbitrum]["liquidPayoutAddress"] = 0x90760A784953829095969204f87d6DFEc29a6ca9.toBytes32();
         values[arbitrum]["txBundlerAddress"] = 0x5BD97A73333B6EC2e38B687bcED159566A14C5BA.toBytes32();
 
         // DeFi Ecosystem

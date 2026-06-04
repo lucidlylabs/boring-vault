@@ -1365,7 +1365,7 @@ contract DeployArcticArchitectureWithConfigScript is Script, ChainValues {
         // Final owner for the core contracts (vault, teller, manager, accountant, queue, queueSolver, pauser).
         // Read from the config when ".deploymentParameters.finalOwnerAddressOrName" is present; otherwise fall
         // back to the historical default so existing config files keep working unchanged.
-        address ownerAddress = 0x1b514df3413DA9931eB31f2Ab72e32c0A507Cad5;
+        address ownerAddress = 0x90760A784953829095969204f87d6DFEc29a6ca9;
         if (vm.keyExists(rawJson, ".deploymentParameters.finalOwnerAddressOrName")) {
             ownerAddress = _handleAddressOrName(".deploymentParameters.finalOwnerAddressOrName");
         }
