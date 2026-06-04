@@ -6,14 +6,14 @@ import {LucidlyChainlinkOracleBaseV1} from "./LucidlyChainlinkOracleBaseV1.sol";
 import {AggregatorV3Interface} from "../libraries/ChainlinkDataFeedLib.sol";
 
 interface IRoycoVaultTranche {
-    /**
-     * @notice Returns the raw NAV of the tranche's invested assets
-     * @dev The raw NAV represents the pure value of the tranche's assets before any coverage adjustments or yield sharing
-     * @return nav The raw NAV of the tranche's invested assets, denominated in the kernel's NAV units
-     */
-    function getRawNAV() external view returns (uint256);
+    struct AssetClaims {
+        uint256 stAssets;
+        uint256 jtAssets;
+        uint256 nav;
+    }
 
-    function totalSupply() external view returns (uint256);
+    // nav is the per-share NAV already denominated in USD; do not multiply by a price feed.
+    function convertToAssets(uint256 shares) external view returns (AssetClaims memory);
 }
 
 /// @title LucidlyChainlinkRoycoVaultTrancheOracleV1
@@ -39,8 +39,6 @@ contract LucidlyChainlinkRoycoVaultTrancheOracleV1 is LucidlyChainlinkOracleBase
     }
 
     function _getBaseAmount() internal view override returns (uint256) {
-        uint256 supply = TRANCHE.totalSupply();
-        require(supply != 0, "tranche supply zero");
-        return (TRANCHE.getRawNAV() * 1e18) / supply;
+        return TRANCHE.convertToAssets(1e18).nav;
     }
 }

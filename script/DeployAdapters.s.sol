@@ -283,6 +283,153 @@ contract DeployErc20TvlAdapter is Script, MerkleTreeHelper {
     }
 }
 
+contract DeployErc20TvlAdapterApyUSD is Script, MerkleTreeHelper {
+    Deployer private deployer = Deployer(0x771263e3Bc6aCDa5aE388A3F8A0c2dd7A17275FC);
+
+    function run() external {
+        setSourceChainName("mainnet");
+        vm.startBroadcast(vm.envUint("DEPLOYER01"));
+
+        bytes memory creationCode = type(Erc20TvlAdapter).creationCode;
+        bytes memory constructorArgs = abi.encode(
+            getAddress(sourceChain, "royco-jr-apyusd"),
+            getAddress(sourceChain, "royco-jr-apyUSD_USD_oracle"),
+            getAddress(sourceChain, "USDC"),
+            getAddress(sourceChain, "USDC_USD_oracle")
+        );
+
+        deployer.deployContract("RoycoJrApyUSD/USDC Erc20TvlAdapter", creationCode, constructorArgs, 0);
+
+        vm.stopBroadcast();
+    }
+}
+
+contract DeployErc20TvlAdapterSNUSD is Script, MerkleTreeHelper {
+    Deployer private deployer = Deployer(0x771263e3Bc6aCDa5aE388A3F8A0c2dd7A17275FC);
+
+    function run() external {
+        setSourceChainName("mainnet");
+        vm.startBroadcast(vm.envUint("DEPLOYER01"));
+
+        bytes memory creationCode = type(Erc20TvlAdapter).creationCode;
+        bytes memory constructorArgs = abi.encode(
+            getAddress(sourceChain, "royco-jr-snusd"),
+            getAddress(sourceChain, "royco-jr-sNUSD_USD_oracle"),
+            getAddress(sourceChain, "USDC"),
+            getAddress(sourceChain, "USDC_USD_oracle")
+        );
+
+        deployer.deployContract("RoycoJrSNUSD/USDC Erc20TvlAdapter", creationCode, constructorArgs, 0);
+
+        vm.stopBroadcast();
+    }
+}
+
+contract DeployErc20TvlAdapterSyrupUSDC is Script, MerkleTreeHelper {
+    Deployer private deployer = Deployer(0x771263e3Bc6aCDa5aE388A3F8A0c2dd7A17275FC);
+
+    function run() external {
+        setSourceChainName("mainnet");
+        vm.startBroadcast(vm.envUint("DEPLOYER01"));
+
+        bytes memory creationCode = type(Erc20TvlAdapter).creationCode;
+        bytes memory constructorArgs = abi.encode(
+            getAddress(sourceChain, "royco-jr-syrupusdc"),
+            getAddress(sourceChain, "royco-jr-syrupUSDC_USD_oracle"),
+            getAddress(sourceChain, "USDC"),
+            getAddress(sourceChain, "USDC_USD_oracle")
+        );
+
+        deployer.deployContract("RoycoJrSyrupUSDC/USDC Erc20TvlAdapter", creationCode, constructorArgs, 0);
+
+        vm.stopBroadcast();
+    }
+}
+
+contract DeployErc20TvlAdapterSyrupUSDCSpot is Script, MerkleTreeHelper {
+    Deployer private deployer = Deployer(0x771263e3Bc6aCDa5aE388A3F8A0c2dd7A17275FC);
+
+    function run() external {
+        setSourceChainName("mainnet");
+        vm.startBroadcast(vm.envUint("DEPLOYER01"));
+
+        bytes memory creationCode = type(Erc20TvlAdapter).creationCode;
+        bytes memory constructorArgs = abi.encode(
+            getAddress(sourceChain, "syrupUSDC"),
+            getAddress(sourceChain, "syrupUSDC_USD_oracle"),
+            getAddress(sourceChain, "USDC"),
+            getAddress(sourceChain, "USDC_USD_oracle")
+        );
+
+        deployer.deployContract("SyrupUSDC Spot Erc20TvlAdapter", creationCode, constructorArgs, 0);
+
+        vm.stopBroadcast();
+    }
+}
+
+contract DeployErc20TvlAdapterApyUSDSpot is Script, MerkleTreeHelper {
+    Deployer private deployer = Deployer(0x771263e3Bc6aCDa5aE388A3F8A0c2dd7A17275FC);
+
+    function run() external {
+        setSourceChainName("mainnet");
+        vm.startBroadcast(vm.envUint("DEPLOYER01"));
+
+        bytes memory creationCode = type(Erc20TvlAdapter).creationCode;
+        bytes memory constructorArgs = abi.encode(
+            getAddress(sourceChain, "apyUSD"),
+            getAddress(sourceChain, "apyUSD_USD_oracle"),
+            getAddress(sourceChain, "USDC"),
+            getAddress(sourceChain, "USDC_USD_oracle")
+        );
+
+        deployer.deployContract("ApyUSD Spot Erc20TvlAdapter", creationCode, constructorArgs, 0);
+
+        vm.stopBroadcast();
+    }
+}
+
+contract DeployErc20TvlAdapterSNUSDSpot is Script, MerkleTreeHelper {
+    Deployer private deployer = Deployer(0x771263e3Bc6aCDa5aE388A3F8A0c2dd7A17275FC);
+
+    function run() external {
+        setSourceChainName("mainnet");
+        vm.startBroadcast(vm.envUint("DEPLOYER01"));
+
+        bytes memory creationCode = type(Erc20TvlAdapter).creationCode;
+        bytes memory constructorArgs = abi.encode(
+            getAddress(sourceChain, "sNUSD"),
+            getAddress(sourceChain, "sNUSD_USD_oracle"),
+            getAddress(sourceChain, "USDC"),
+            getAddress(sourceChain, "USDC_USD_oracle")
+        );
+
+        deployer.deployContract("SNUSD Spot Erc20TvlAdapter", creationCode, constructorArgs, 0);
+
+        vm.stopBroadcast();
+    }
+}
+
+contract DeployErc20TvlAdapterStcUSDSpot is Script, MerkleTreeHelper {
+    Deployer private deployer = Deployer(0x771263e3Bc6aCDa5aE388A3F8A0c2dd7A17275FC);
+
+    function run() external {
+        setSourceChainName("mainnet");
+        vm.startBroadcast(vm.envUint("DEPLOYER01"));
+
+        bytes memory creationCode = type(Erc20TvlAdapter).creationCode;
+        bytes memory constructorArgs = abi.encode(
+            getAddress(sourceChain, "stcUSD"),
+            getAddress(sourceChain, "stcUSD_USD_oracle"),
+            getAddress(sourceChain, "USDC"),
+            getAddress(sourceChain, "USDC_USD_oracle")
+        );
+
+        deployer.deployContract("StcUSD Spot Erc20TvlAdapter", creationCode, constructorArgs, 0);
+
+        vm.stopBroadcast();
+    }
+}
+
 contract DeployUniswapV3PositionTvlAdapterScript is Script, MerkleTreeHelper {
     Deployer private deployer = Deployer(0x771263e3Bc6aCDa5aE388A3F8A0c2dd7A17275FC);
 
