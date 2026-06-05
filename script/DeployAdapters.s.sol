@@ -262,6 +262,12 @@ contract DeployMorphoBlueTvlAdapter is Script, MerkleTreeHelper {
     }
 }
 
+/*
+* @dev deploy using `MAINNET_RPC_URL=$MAINNET_RPC_URL DEPLOYER01=$DEPLOYER01 \
+*        forge script script/DeployAdapters.s.sol:DeployErc20TvlAdapter \
+*        --broadcast --verify --chain 1 --etherscan-api-key $ETHERSCAN_API_KEY` \
+*        --rpc-url $MAINNET_RPC_URL
+*/
 contract DeployErc20TvlAdapter is Script, MerkleTreeHelper {
     Deployer private deployer = Deployer(0x771263e3Bc6aCDa5aE388A3F8A0c2dd7A17275FC);
 
@@ -271,13 +277,13 @@ contract DeployErc20TvlAdapter is Script, MerkleTreeHelper {
 
         bytes memory creationCode = type(Erc20TvlAdapter).creationCode;
         bytes memory constructorArgs = abi.encode(
-            getAddress(sourceChain, "stcUSD"),
-            getAddress(sourceChain, "stcUSD_USD_oracle"),
+            getAddress(sourceChain, "gauntletUSDCfrontierV2"),
+            getAddress(sourceChain, "GauntletUsdcFrontierV2_USD_oracle"),
             getAddress(sourceChain, "USDC"),
             getAddress(sourceChain, "USDC_USD_oracle")
         );
 
-        deployer.deployContract("stcUSD/USDC V1 Erc20TvlAdapter", creationCode, constructorArgs, 0);
+        deployer.deployContract("GauntletUsdcFrontierV2/USDC Erc20TvlAdapter", creationCode, constructorArgs, 0);
 
         vm.stopBroadcast();
     }

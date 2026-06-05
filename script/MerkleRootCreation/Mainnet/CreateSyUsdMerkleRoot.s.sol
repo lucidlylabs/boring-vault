@@ -29,8 +29,11 @@ import "forge-std/Script.sol";
 import "forge-std/StdJson.sol";
 
 /**
- *  source .env && forge script script/DeployDecoderAndSanitizer.s.sol:DeployDecoderAndSanitizerScript --broadcast --etherscan-api-key $ETHERSCAN_KEY --verify --with-gas-price 30000000000
- * @dev Optionally can change `--with-gas-price` to something more reasonable
+ *
+ * DEPLOYER=$DEPLOYER MAINNET_RPC_URL=$MAINNET_RPC_URL forge script  \
+ *  script/MerkleRootCreation/Mainnet/CreateSyUsdMerkleRoot.s.sol --chain 1 \
+ *  -vvvvv --broadcast --rpc-url $MAINNET_RPC_URL
+ *
  */
 contract CreateSyUsdEthereumLeafs is Script, MerkleTreeHelper {
     uint256 public privateKey;
@@ -75,7 +78,7 @@ contract CreateSyUsdEthereumLeafs is Script, MerkleTreeHelper {
     uint8 public constant SOLVER_ORIGIN_ROLE = 33;
 
     function setUp() external {
-        privateKey = vm.envUint("DEPLOYER01");
+        privateKey = vm.envUint("DEPLOYER");
         vm.createSelectFork("mainnet");
         setSourceChainName("mainnet");
 
@@ -207,5 +210,8 @@ contract CreateSyUsdEthereumLeafs is Script, MerkleTreeHelper {
         _addTellerLeafs(leafs, address(roycoJrUsdcTeller), assets, false, true);
         _addWithdrawQueueLeafs(leafs, roycoJrUsdcWithdrawQueue, roycoJrUsdcVault, assets);
         _addSelfSolveLeafs(leafs, assets, roycoJrUsdcQueueSolver, address(boringVault), roycoJrUsdcTeller);
+
+        // erc4626 vaults
+        _addERC4626Leafs(leafs, ERC4626(getAddress(sourceChain, "gauntletUSDCfrontierV2")));
     }
 }

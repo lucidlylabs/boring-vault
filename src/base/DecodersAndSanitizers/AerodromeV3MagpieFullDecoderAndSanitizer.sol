@@ -12,7 +12,7 @@ import {
     MorphoV1FlashLoanAdapterDecoderAndSanitizer
 } from "src/base/DecodersAndSanitizers/Protocols/MorphoV1FlashLoanAdapterDecoderAndSanitizer.sol";
 
-contract AerodromeV3MagpieDecoderAndSanitizer is
+contract AerodromeV3MagpieFullDecoderAndSanitizer is
     AerodromeDecoderAndSanitizer,
     MagpieDecoderAndSanitizer,
     NativeWrapperDecoderAndSanitizer,

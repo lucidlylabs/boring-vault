@@ -991,6 +991,7 @@ contract ChainValues {
         values[mainnet]["gauntletUSDCcore"] = 0x8eB67A509616cd6A7c1B3c8C21D48FF57df3d458.toBytes32();
         values[mainnet]["gauntletUSDCprime"] = 0xdd0f28e19C1780eb6396170735D45153D261490d.toBytes32();
         values[mainnet]["gauntletUSDCfrontier"] = 0xc582F04d8a82795aa2Ff9c8bb4c1c889fe7b754e.toBytes32();
+        values[mainnet]["gauntletUSDCfrontierV2"] = 0x9a1D6bd5b8642C41F25e0958129B85f8E1176F3e.toBytes32();
         values[mainnet]["steakhouseUSDC"] = 0xBEEF01735c132Ada46AA9aA4c54623cAA92A64CB.toBytes32();
         values[mainnet]["smokehouseUSDC"] = 0xBEeFFF209270748ddd194831b3fa287a5386f5bC.toBytes32();
         values[mainnet]["steakhouseUSDT"] = 0xbEef047a543E45807105E51A8BBEFCc5950fcfBa.toBytes32();
@@ -1628,6 +1629,7 @@ contract ChainValues {
         values[mainnet]["royco-jr-syrupUSDC_USD_oracle"] = 0xf0AE373FA07D9DCA03F2A084042Fd8132016cBE5.toBytes32();
         values[mainnet]["royco-jr-stcUSD_USD_oracle"] = 0x9019e0f52beA0b49bE66FA0D26aD2B8b8C254585.toBytes32();
         values[mainnet]["roycoJrUsdcClusterUSDC_USD_oracle"] = 0x8082e7Bbe282f8b4399686E4E0e10Ca64Cb916aD.toBytes32();
+        values[mainnet]["GauntletUsdcFrontierV2_USD_oracle"] = 0x5D64E2228e60d6F919c9C233bA052EDeB25A9713.toBytes32();
 
         // chainlink feeds
         values[mainnet]["USDC_USD_oracle"] = 0x8fFfFfd4AfB6115b954Bd326cbe7B4BA576818f6.toBytes32();
@@ -1694,6 +1696,7 @@ contract ChainValues {
 
         // Aave V3
         values[base]["v3Pool"] = 0xA238Dd80C259a72e81d7e4664a9801593F98d1c5.toBytes32();
+        values[base]["v3RewardsController"] = 0xf9cc4F0D883F1a1eb2c253bdb46c254Ca51E1F44.toBytes32();
 
         // Merkl
         values[base]["merklDistributor"] = 0x3Ef3D8bA38EBe18DB133cEc108f4D14CE00Dd9Ae.toBytes32();
@@ -1710,6 +1713,7 @@ contract ChainValues {
         values[base]["aerodrome_Weth_Reth_v2_05_gauge"] = 0xAa3D51d36BfE7C5C63299AF71bc19988BdBa0A06.toBytes32();
         values[base]["aerodrome_Sfrxeth_Wsteth_v2_30_gauge"] = 0xCe7Cb6260fCBf17485cd2439B89FdDf8B0Eb39cC.toBytes32();
         values[base]["aerodrome_Eurc_Usdc_v3_07_gauge"] = 0x85af8D930cB738954d307D6E62F04dd05D839C37.toBytes32();
+        values[base]["aerodrome_Weth_CbBtc_v3_0125_gauge"] = 0x61E0B10423a0009C3f83ab4313813d29437d0817.toBytes32();
 
         // MorphoBlue
         values[base]["morphoBlue"] = 0xBBBBBbbBBb9cC5e90e3b3Af64bdAF62C37EEFFCb.toBytes32();
@@ -1765,9 +1769,14 @@ contract ChainValues {
 
         // fly.trade
         values[base]["magpieRouterV3"] = 0x5E766616AaBFB588E23a8EA854e9dbd1042afFD3.toBytes32();
+        values[base]["magpieDexAggregatorCore"] = 0x09AD820aaC5779683B481c4674208A4e1B024Afa.toBytes32();
+        values[base]["magpieDexAggregator"] = 0x20F6ee51340aDEed01A59B0e65cB3703f3dc860c.toBytes32();
 
         // layerzero
         values[base]["LayerZeroEndPoint"] = 0x1a44076050125825900e736c501f859c50fE728c.toBytes32();
+
+        // hedgedBtcMmStrategy
+        values[base]["morphoBlueFlashLoanAdapterAddress"] = 0x2c8e905169298454226bC2A5eF13416E8B057737.toBytes32();
     }
 
     function _addArbitrumValues() private {
