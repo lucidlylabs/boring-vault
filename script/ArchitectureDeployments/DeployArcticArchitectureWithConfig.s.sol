@@ -196,7 +196,6 @@ contract DeployArcticArchitectureWithConfigScript is Script, ChainValues {
     bool internal setupDepositAssets;
     bool internal setupWithdrawAssets;
     bool internal finishSetup;
-    bool internal setupTestUser;
     bool internal saveDeploymentDetails;
 
     address internal baseAsset;
@@ -380,7 +379,7 @@ contract DeployArcticArchitectureWithConfigScript is Script, ChainValues {
         _setupCrossChainTeller();
         _setupPausers();
         _finalizeSetup();
-        _setupTestUser();
+        _finalizeAuthority();
         _saveContractAddresses();
         _bundleTxs();
 
@@ -743,6 +742,12 @@ contract DeployArcticArchitectureWithConfigScript is Script, ChainValues {
                 _log(string.concat("Native wrapper address: ", vm.toString(nativeWrapperAddress)), 4);
                 _log(string.concat("LayerZero endpoint address: ", vm.toString(layerZeroEndpointAddress)), 4);
                 _log(string.concat("LayerZero token address: ", vm.toString(layerZeroTokenAddress)), 4);
+            }
+
+            if (!tellerKindSet) {
+                // Symmetric with the accountant-kind guard: refuse to deploy a teller with empty
+                // creation code (which is what happens when no kind is selected in the config).
+                _log("Teller kind not set in configuration file", 1);
             }
 
             _addTx(
@@ -1362,38 +1367,22 @@ contract DeployArcticArchitectureWithConfigScript is Script, ChainValues {
 
     function _finalizeSetup() internal {
         _log("Finalizing setup...", 3);
-        // Final owner for the core contracts (vault, teller, manager, accountant, queue, queueSolver, pauser).
-        // Read from the config when ".deploymentParameters.finalOwnerAddressOrName" is present; otherwise fall
-        // back to the historical default so existing config files keep working unchanged.
-        address ownerAddress = 0x90760A784953829095969204f87d6DFEc29a6ca9;
-        if (vm.keyExists(rawJson, ".deploymentParameters.finalOwnerAddressOrName")) {
-            ownerAddress = _handleAddressOrName(".deploymentParameters.finalOwnerAddressOrName");
-        }
+        // Final owner for the whole stack (core contracts + rolesAuthority). Single source of truth in
+        // `_finalOwner()`; `_finalizeAuthority()` reuses it for the rolesAuthority handoff.
+        address ownerAddress = _finalOwner();
         _log(string.concat("Transferring ownership to ", vm.toString(ownerAddress)), 3);
+        // teller: share lock period (teller-specific), then the standard authority/ownership handoff.
+        // `!tellerExists ||` short-circuits the state read for a not-yet-deployed teller.
         uint256 shareLockPeriod = vm.parseJsonUint(rawJson, ".tellerConfiguration.tellerParameters.shareLockPeriod");
-        if (tellerExists) {
-            // Get sharelock period from configuration file.
-            if (teller.shareLockPeriod() != shareLockPeriod) {
-                _addTx(
-                    address(teller),
-                    abi.encodeWithSelector(teller.setShareLockPeriod.selector, uint64(shareLockPeriod)),
-                    0
-                );
-            }
-            if (teller.authority() != rolesAuthority) {
-                _addTx(address(teller), abi.encodeWithSelector(teller.setAuthority.selector, rolesAuthority), 0);
-            }
-            if (teller.owner() != address(0) && teller.owner() != ownerAddress) {
-                _addTx(address(teller), abi.encodeWithSelector(teller.transferOwnership.selector, ownerAddress), 0);
-            }
-        } else {
+        if (!tellerExists || teller.shareLockPeriod() != shareLockPeriod) {
             _addTx(
                 address(teller), abi.encodeWithSelector(teller.setShareLockPeriod.selector, uint64(shareLockPeriod)), 0
             );
-            _addTx(address(teller), abi.encodeWithSelector(teller.setAuthority.selector, rolesAuthority), 0);
-            _addTx(address(teller), abi.encodeWithSelector(teller.transferOwnership.selector, ownerAddress), 0);
         }
+        _finalizeOwnable(address(teller), tellerExists, ownerAddress);
 
+        // boringVault: authority, before-transfer hook (must precede the ownership transfer), then ownership.
+        // Kept inline because the hook tx is interleaved between setAuthority and transferOwnership.
         if (boringVaultExists) {
             if (boringVault.authority() != rolesAuthority) {
                 _addTx(
@@ -1426,78 +1415,14 @@ contract DeployArcticArchitectureWithConfigScript is Script, ChainValues {
             );
         }
 
-        if (managerExists) {
-            if (manager.authority() != rolesAuthority) {
-                _addTx(address(manager), abi.encodeWithSelector(manager.setAuthority.selector, rolesAuthority), 0);
-            }
-            if (manager.owner() != address(0) && manager.owner() != ownerAddress) {
-                _addTx(address(manager), abi.encodeWithSelector(manager.transferOwnership.selector, ownerAddress), 0);
-            }
-        } else {
-            _addTx(address(manager), abi.encodeWithSelector(manager.setAuthority.selector, rolesAuthority), 0);
-            _addTx(address(manager), abi.encodeWithSelector(manager.transferOwnership.selector, ownerAddress), 0);
-        }
-
-        if (accountantExists) {
-            if (accountant.authority() != rolesAuthority) {
-                _addTx(address(accountant), abi.encodeWithSelector(accountant.setAuthority.selector, rolesAuthority), 0);
-            }
-            if (accountant.owner() != address(0) && accountant.owner() != ownerAddress) {
-                _addTx(
-                    address(accountant), abi.encodeWithSelector(accountant.transferOwnership.selector, ownerAddress), 0
-                );
-            }
-        } else {
-            _addTx(address(accountant), abi.encodeWithSelector(accountant.setAuthority.selector, rolesAuthority), 0);
-            _addTx(address(accountant), abi.encodeWithSelector(accountant.transferOwnership.selector, ownerAddress), 0);
-        }
-
-        if (queueExists) {
-            if (queue.authority() != rolesAuthority) {
-                _addTx(address(queue), abi.encodeWithSelector(queue.setAuthority.selector, rolesAuthority), 0);
-            }
-            if (queue.owner() != address(0) && queue.owner() != ownerAddress) {
-                _addTx(address(queue), abi.encodeWithSelector(queue.transferOwnership.selector, ownerAddress), 0);
-            }
-        } else {
-            _addTx(address(queue), abi.encodeWithSelector(queue.setAuthority.selector, rolesAuthority), 0);
-            _addTx(address(queue), abi.encodeWithSelector(queue.transferOwnership.selector, ownerAddress), 0);
-        }
-
-        if (queueSolverExists) {
-            if (queueSolver.authority() != rolesAuthority) {
-                _addTx(
-                    address(queueSolver), abi.encodeWithSelector(queueSolver.setAuthority.selector, rolesAuthority), 0
-                );
-            }
-            if (queueSolver.owner() != address(0) && queueSolver.owner() != ownerAddress) {
-                _addTx(
-                    address(queueSolver),
-                    abi.encodeWithSelector(queueSolver.transferOwnership.selector, ownerAddress),
-                    0
-                );
-            }
-        } else {
-            _addTx(address(queueSolver), abi.encodeWithSelector(queueSolver.setAuthority.selector, rolesAuthority), 0);
-            _addTx(
-                address(queueSolver), abi.encodeWithSelector(queueSolver.transferOwnership.selector, ownerAddress), 0
-            );
-        }
+        _finalizeOwnable(address(manager), managerExists, ownerAddress);
+        _finalizeOwnable(address(accountant), accountantExists, ownerAddress);
+        _finalizeOwnable(address(queue), queueExists, ownerAddress);
+        _finalizeOwnable(address(queueSolver), queueSolverExists, ownerAddress);
 
         bool shouldDeployPauser = vm.parseJsonBool(rawJson, ".pauserConfiguration.shouldDeploy");
-
         if (shouldDeployPauser) {
-            if (pauserExists) {
-                if (pauser.authority() != rolesAuthority) {
-                    _addTx(address(pauser), abi.encodeWithSelector(pauser.setAuthority.selector, rolesAuthority), 0);
-                }
-                if (pauser.owner() != address(0) && pauser.owner() != ownerAddress) {
-                    _addTx(address(pauser), abi.encodeWithSelector(pauser.transferOwnership.selector, ownerAddress), 0);
-                }
-            } else {
-                _addTx(address(pauser), abi.encodeWithSelector(pauser.setAuthority.selector, rolesAuthority), 0);
-                _addTx(address(pauser), abi.encodeWithSelector(pauser.transferOwnership.selector, ownerAddress), 0);
-            }
+            _finalizeOwnable(address(pauser), pauserExists, ownerAddress);
         }
 
         // Setup roles.
@@ -1509,24 +1434,61 @@ contract DeployArcticArchitectureWithConfigScript is Script, ChainValues {
         _grantRoleIfNotGranted(CAN_SOLVE_ROLE, address(queueSolver));
     }
 
-    function _setupTestUser() internal {
-        // Setup test user.
-        _log("Setting up test user...", 3);
-        address testUser = _handleAddressOrName(".deploymentParameters.testUserAddressOrName");
-        _grantRoleIfNotGranted(OWNER_ROLE, testUser);
-        _grantRoleIfNotGranted(STRATEGIST_ROLE, testUser);
+    /// @dev Idempotently queues setAuthority(rolesAuthority) + transferOwnership(ownerAddress) for an
+    ///      Auth-based core contract. When `exists` is false the contract is not deployed yet (its deploy
+    ///      tx is only queued, not executed), so its state cannot be read -> queue both unconditionally;
+    ///      when it exists (re-run) read state and skip already-correct ops. setAuthority/transferOwnership
+    ///      are Auth selectors, identical across every core contract, so the queued calldata is byte-for-byte
+    ///      what the previous per-contract blocks produced.
+    function _finalizeOwnable(address target, bool exists, address ownerAddress) internal {
+        if (exists) {
+            if (address(Auth(target).authority()) != address(rolesAuthority)) {
+                _addTx(target, abi.encodeWithSelector(Auth.setAuthority.selector, rolesAuthority), 0);
+            }
+            if (Auth(target).owner() != address(0) && Auth(target).owner() != ownerAddress) {
+                _addTx(target, abi.encodeWithSelector(Auth.transferOwnership.selector, ownerAddress), 0);
+            }
+        } else {
+            _addTx(target, abi.encodeWithSelector(Auth.setAuthority.selector, rolesAuthority), 0);
+            _addTx(target, abi.encodeWithSelector(Auth.transferOwnership.selector, ownerAddress), 0);
+        }
+    }
+
+    /// @notice Resolves the final owner of the deployed stack (core contracts + rolesAuthority).
+    /// @dev Required key, no hardcoded fallback owner: reverts if `.deploymentParameters.finalOwnerAddressOrName`
+    ///      is absent. Non-zero is enforced by `_handleAddressOrName` -> `ChainValues.getAddress`, which reverts
+    ///      on a zero resolution. The address may still be given by ChainValues name (address_ == 0) rather than
+    ///      inlined, so no owner address is hardcoded in this script.
+    function _finalOwner() internal view returns (address) {
+        if (!vm.keyExists(rawJson, ".deploymentParameters.finalOwnerAddressOrName")) {
+            revert KeyNotFound(".deploymentParameters.finalOwnerAddressOrName");
+        }
+        return _handleAddressOrName(".deploymentParameters.finalOwnerAddressOrName");
+    }
+
+    /// @notice Final authority handoff: transfers rolesAuthority ownership to the configured finalOwner.
+    /// @dev Must run after every queued setUserRole / setRoleCapability tx, since those execute under the
+    ///      Deployer's ownership of rolesAuthority; this transfer is therefore the last rolesAuthority tx.
+    ///      finalOwner already becomes owner() of every core contract in `_finalizeSetup`, so it gains full
+    ///      admin of the stack without a separate OWNER_ROLE grant. Replaces the former `_setupTestUser`,
+    ///      which granted OWNER_ROLE/STRATEGIST_ROLE and rolesAuthority ownership to a dev EOA on every
+    ///      deploy regardless of the `setupTestUser` config flag.
+    function _finalizeAuthority() internal {
+        address finalOwner = _finalOwner();
+        _log(string.concat("Transferring rolesAuthority ownership to finalOwner: ", vm.toString(finalOwner)), 3);
         if (rolesAuthorityExists) {
-            address currentOwner = rolesAuthority.owner();
-            if (currentOwner != testUser) {
+            if (rolesAuthority.owner() != finalOwner) {
                 _addTx(
                     address(rolesAuthority),
-                    abi.encodeWithSelector(rolesAuthority.transferOwnership.selector, testUser),
+                    abi.encodeWithSelector(rolesAuthority.transferOwnership.selector, finalOwner),
                     0
                 );
             }
         } else {
             _addTx(
-                address(rolesAuthority), abi.encodeWithSelector(rolesAuthority.transferOwnership.selector, testUser), 0
+                address(rolesAuthority),
+                abi.encodeWithSelector(rolesAuthority.transferOwnership.selector, finalOwner),
+                0
             );
         }
     }

@@ -9,12 +9,7 @@
       "name": "txBundlerAddress"
     },
     "setupRoles": true,
-    "setupTestUser": false,
     "saveDeploymentDetails": true,
-    "testUserAddressOrName": {
-      "address": "0x0000000000000000000000000000000000000000",
-      "name": "dev1Address"
-    },
     "deployerContractAddressOrName": {
       "address": "0x0000000000000000000000000000000000000000",
       "name": "deployerAddress"
@@ -26,6 +21,10 @@
     "deploymentOwnerAddressOrName": {
       "address": "0x0000000000000000000000000000000000000000",
       "name": "dev0Address"
+    },
+    "finalOwnerAddressOrName": {
+      "address": "0x0000000000000000000000000000000000000000",
+      "name": "finalOwner"
     },
     "deploymentFileName": "deployment.json"
   },
