@@ -949,6 +949,11 @@ contract ChainValues {
         values[mainnet]["PTcUSD29Jan2026_USDC_915"] = 0x802ec6e878dc9fe6905b8a0a18962dcca10440a87fa2242fbf4a0461c7b0c789;
         values[mainnet]["PTstcUSD29Jan2026_USDC_915"] =
         0x03f715ef1ae508ab3e1faf4dffdbf2a077d1f0ad10c5aad42cf4438d5e3328af;
+        values[mainnet]["cbBTC_USDC_86"] = 0x64d65c9a2d91c36d56fbc42d69e979335320169b3df63bf92789e2c8883fcc64;
+        values[mainnet]["AA_FalconXUSDC_USDC_77"] = 0xe83d72fa5b00dcd46d9e0e860d95aa540d5ec106da5833108a9f826f21f36f52;
+        values[mainnet]["mF_ONE_USDC_915"] = 0xef2c308b5abecf5c8750a1aa82b47c558005feb7a03f4f8e1ad682d71ac8d0ba;
+        values[mainnet]["srRoyUSDC_USDC_915"] = 0xacc49fbf58feb1ac971acce68f8adc177c43682d6a7087bbd4991a05cb7a2c67;
+        values[mainnet]["fxSAVE_USDC_86"] = 0x43e925e52d7873fa8acac90dd5f246087d55b3a34c344b71884a6352491ff459;
 
         values[mainnet]["WBTC_USDC_86"] = 0x3a85e619751152991742810df6ec69ce473daef99e28a64ab2340d7b7ccfee49;
         values[mainnet]["WBTC_USDT_86"] = 0xa921ef34e2fc7a27ccc50ae7e4b154e16c9799d3387076c421423ef52ac4df99;

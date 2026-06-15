@@ -9,6 +9,7 @@ import {UniV3PositionTvlAdapter} from "src/adapters/Univ3TvlAdapter.sol";
 import {UniswapV3PositionTvlAdapter} from "src/adapters/UniswapV3PositionTvlAdapter.sol";
 import {UniV4PositionTvlAdapter} from "src/adapters/Univ4TvlAdapter.sol";
 import {MorphoBlueTvlAdapter} from "src/adapters/MorphoBlueTvlAdapter.sol";
+import {MorphoLendingClusterTvlAdapter} from "src/adapters/MorphoLendingClusterTvlAdapter.sol";
 import {Erc20TvlAdapter} from "src/adapters/Erc20TvlAdapter.sol";
 import {CapCusdBalanceAdapter} from "src/adapters/CapCusdBalanceAdapter.sol";
 import {CbBtcUsdcAaveV3BalanceAdapter} from "src/adapters/cbBtcUsdcAaveV3BalanceAdapter.sol";
@@ -259,6 +260,45 @@ contract DeployMorphoBlueTvlAdapter is Script, MerkleTreeHelper {
         deployer.deployContract("sUSDat_AUSD_86 MorphoBlueTvlAdapter", creationCode, constructorArgs, 0);
 
         vm.stopBroadcast();
+    }
+}
+
+/*
+* @dev deploy using `MAINNET_RPC_URL=$MAINNET_RPC_URL DEPLOYER01=$DEPLOYER01 \
+*        forge script script/DeployAdapters.s.sol:DeployMorphoLendingClusterTvlAdapters \
+*        --broadcast --verify --chain 1 --etherscan-api-key $ETHERSCAN_API_KEY \
+*        --rpc-url $MAINNET_RPC_URL`
+*/
+contract DeployMorphoLendingClusterTvlAdapters is Script, MerkleTreeHelper {
+    function run() external {
+        setSourceChainName("mainnet");
+        vm.startBroadcast(vm.envUint("DEPLOYER01"));
+
+        address usdcUsdFeed = getAddress(sourceChain, "USDC_USD_oracle");
+        address usdc = getAddress(sourceChain, "USDC");
+        uint256 maxFeedAge = 1 days;
+
+        _deployAdapter(
+            0x64d65c9a2d91c36d56fbc42d69e979335320169b3df63bf92789e2c8883fcc64, usdcUsdFeed, usdc, maxFeedAge
+        );
+        _deployAdapter(
+            0xe83d72fa5b00dcd46d9e0e860d95aa540d5ec106da5833108a9f826f21f36f52, usdcUsdFeed, usdc, maxFeedAge
+        );
+        _deployAdapter(
+            0xef2c308b5abecf5c8750a1aa82b47c558005feb7a03f4f8e1ad682d71ac8d0ba, usdcUsdFeed, usdc, maxFeedAge
+        );
+        _deployAdapter(
+            0xacc49fbf58feb1ac971acce68f8adc177c43682d6a7087bbd4991a05cb7a2c67, usdcUsdFeed, usdc, maxFeedAge
+        );
+        _deployAdapter(
+            0x43e925e52d7873fa8acac90dd5f246087d55b3a34c344b71884a6352491ff459, usdcUsdFeed, usdc, maxFeedAge
+        );
+
+        vm.stopBroadcast();
+    }
+
+    function _deployAdapter(bytes32 marketId, address usdcUsdFeed, address usdc, uint256 maxFeedAge) internal {
+        new MorphoLendingClusterTvlAdapter(marketId, usdcUsdFeed, usdcUsdFeed, usdc, maxFeedAge);
     }
 }
 
