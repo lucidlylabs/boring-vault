@@ -34,6 +34,9 @@ import {
     InfiniFiUsdcClusterDecoderAndSanitizer
 } from "src/base/DecodersAndSanitizers/InfiniFiUsdcClusterDecoderAndSanitizer.sol";
 import {
+    LoopOptimiserClusterDecoderAndSanitizer
+} from "src/base/DecodersAndSanitizers/LoopOptimiserClusterDecoderAndSanitizer.sol";
+import {
     MonadStablecoinStrategyDecoderAndSanitizer
 } from "src/base/DecodersAndSanitizers/MonStablecoinStrategyDecoderAndSanitizer.sol";
 import {HlCoreVaultDecoderAndSanitizer} from "src/base/DecodersAndSanitizers/HlCoreVaultDecoderAndSanitizer.sol";
@@ -152,6 +155,16 @@ contract DeployInfiniFiUsdcClusterDecoderAndSanitizer is Script, ContractNames, 
         constructorArgs = abi.encode(getAddress(sourceChain, "magpieRouterV3"));
         deployer.deployContract("InfiniFiUsdcClusterDecoderAndSanitizerV0.1", creationCode, constructorArgs, 0);
 
+        vm.stopBroadcast();
+    }
+}
+
+contract DeployLoopOptimiserClusterDecoderAndSanitizer is Script, ContractNames, MainnetAddresses, MerkleTreeHelper {
+    function run() external {
+        vm.createSelectFork("mainnet");
+        setSourceChainName("mainnet");
+        vm.startBroadcast(vm.envUint("LOOP_OPTIMISER_OWNER"));
+        new LoopOptimiserClusterDecoderAndSanitizer(getAddress(sourceChain, "magpieRouterV3"));
         vm.stopBroadcast();
     }
 }
