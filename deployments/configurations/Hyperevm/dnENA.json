@@ -2,9 +2,9 @@
     "deploymentParameters": {
         "logLevel": 4,
         "privateKeyEnvName": "DEPLOYER",
-        "chainName": "mainnet",
+        "chainName": "hyperevm",
         "evmVersion": "cancun",
-        "desiredNumberOfDeploymentTxs": 20,
+        "desiredNumberOfDeploymentTxs": 50,
         "txBundlerAddressOrName": {
             "address": "0x0000000000000000000000000000000000000000",
             "name": "txBundlerAddress"
@@ -22,7 +22,7 @@
         },
         "nativeWrapperAddressOrName": {
             "address": "0x0000000000000000000000000000000000000000",
-            "name": "WETH"
+            "name": "WHYPE"
         },
         "deploymentOwnerAddressOrName": {
             "address": "0x0000000000000000000000000000000000000000",
@@ -32,7 +32,7 @@
             "address": "0x941FD3d384745A088f8dA7d581cA6EEf85163509",
             "name": ""
         },
-        "deploymentFileName": "addresses/Mainnet/dnENADeployment.json"
+        "deploymentFileName": "addresses/HyperEVM/dnENADeployment.json"
     },
     "rolesAuthorityConfiguration": {
         "rolesAuthorityDeploymentName": "dnENA rolesAuthorityV1.0"
@@ -119,7 +119,7 @@
                 },
                 "lzChains": [
                     {
-                        "chainId": 30367,
+                        "chainId": 30101,
                         "allowMessagesFrom": false,
                         "allowMessagesTo": false,
                         "targetTellerOrSelf": {
