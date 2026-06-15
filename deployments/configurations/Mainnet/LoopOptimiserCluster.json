@@ -1,7 +1,7 @@
 {
     "deploymentParameters": {
         "logLevel": 4,
-        "privateKeyEnvName": "PRIVATE_KEY_1",
+        "privateKeyEnvName": "DEPLOYER",
         "chainName": "mainnet",
         "evmVersion": "cancun",
         "desiredNumberOfDeploymentTxs": 25,
@@ -13,8 +13,8 @@
         "setupTestUser": false,
         "saveDeploymentDetails": true,
         "testUserAddressOrName": {
-            "address": "0x0000000000000000000000000000000000000000",
-            "name": "dev1Address"
+            "address": "0x651D67e5Daf82C5E2c8e4159f6E2E9c6e2d99057",
+            "name": "loopOptimiserOwner"
         },
         "deployerContractAddressOrName": {
             "address": "0x0000000000000000000000000000000000000000",
@@ -25,6 +25,10 @@
             "name": "WETH"
         },
         "deploymentOwnerAddressOrName": {
+            "address": "0x0000000000000000000000000000000000000000",
+            "name": "deployerAddress"
+        },
+        "finalOwnerAddressOrName": {
             "address": "0x651D67e5Daf82C5E2c8e4159f6E2E9c6e2d99057",
             "name": "loopOptimiserOwner"
         },
@@ -38,8 +42,8 @@
     },
     "boringVaultConfiguration": {
         "boringVaultDeploymentName": "LoopOptimiserCluster boringVaultV1.0",
-        "boringVaultName": "LoopOptimiserCluster",
-        "boringVaultSymbol": "LoopOptimiserCluster",
+        "boringVaultName": "UsdcLoopOptimiserCluster",
+        "boringVaultSymbol": "UsdcLoopOptimiserCluster",
         "boringVaultDecimals": 6
     },
     "managerConfiguration": {
