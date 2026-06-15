@@ -5683,6 +5683,34 @@ contract MerkleTreeHelper is CommonBase, ChainValues, Test {
         leafs[leafIndex].argumentAddresses[0] = getAddress(sourceChain, "boringVault");
     }
 
+    // ===================================== MORPHO PUBLIC ALLOCATOR =====================================
+
+    function _addMorphoPublicAllocatorLeafs(ManageLeaf[] memory leafs, address supplierVault, bytes32 marketId)
+        internal
+    {
+        IMB.MarketParams memory marketParams = IMB(getAddress(sourceChain, "morphoBlue")).idToMarketParams(marketId);
+        ERC20 collateralToken = ERC20(marketParams.collateralToken);
+        ERC20 loanToken = ERC20(marketParams.loanToken);
+        unchecked {
+            leafIndex++;
+        }
+        leafs[leafIndex] = ManageLeaf(
+            getAddress(sourceChain, "publicAllocator"),
+            true, // reallocateTo is payable (optional ETH fee)
+            "reallocateTo(address,((address,address,address,address,uint256),uint128)[],(address,address,address,address,uint256))",
+            new address[](5),
+            string.concat(
+                "Public reallocate into MorphoBlue ", collateralToken.symbol(), "/", loanToken.symbol(), " market"
+            ),
+            getAddress(sourceChain, "rawDataDecoderAndSanitizer")
+        );
+        leafs[leafIndex].argumentAddresses[0] = supplierVault;
+        leafs[leafIndex].argumentAddresses[1] = marketParams.loanToken;
+        leafs[leafIndex].argumentAddresses[2] = marketParams.collateralToken;
+        leafs[leafIndex].argumentAddresses[3] = marketParams.oracle;
+        leafs[leafIndex].argumentAddresses[4] = marketParams.irm;
+    }
+
     // ========================================= ERC4626 =========================================
 
     function _addERC4626Leafs(ManageLeaf[] memory leafs, ERC4626 vault) internal {
