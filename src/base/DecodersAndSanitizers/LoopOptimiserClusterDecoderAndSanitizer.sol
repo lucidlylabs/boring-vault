@@ -10,9 +10,6 @@ import {MagpieDecoderAndSanitizer} from "./MagpieDecoderAndSanitizer.sol";
 import {MorphoV1FlashLoanAdapterDecoderAndSanitizer} from "./Protocols/MorphoV1FlashLoanAdapterDecoderAndSanitizer.sol";
 import {MorphoPublicAllocatorDecoderAndSanitizer} from "./Protocols/MorphoPublicAllocatorDecoderAndSanitizer.sol";
 
-// Covers a cluster of same-protocol leverage loops: Morpho collateral/borrow + flashloan, ERC4626 wrap
-// (USD3) + Infini gateway (siUSD), Magpie swaps, and Morpho PublicAllocator `reallocateTo` to deepen a
-// borrow market's supply (inert until a curator sets maxIn>0, but the leaf is ready).
 contract LoopOptimiserClusterDecoderAndSanitizer is
     MorphoBlueDecoderAndSanitizer,
     ERC4626DecoderAndSanitizer,
