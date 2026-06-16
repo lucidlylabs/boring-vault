@@ -17,7 +17,7 @@ contract CreateLoopOptimiserClusterLeafs is Script, MerkleTreeHelper {
     address internal constant ACCOUNTANT = 0xd050B8f3b1568dF89e1659a0812c7beDc626881c;
     address internal constant ROLES_AUTHORITY = 0xFbe001B540eA54cAbae89EF6D1C34ef8CcA7A837;
     address internal constant DECODER_AND_SANITIZER = 0x2953352655062b1D9f589fE60e9A247BEdcfcb21;
-    address internal constant FLASHLOAN_ADAPTER = 0x82baFd173334e9cd34eB746BA6b55ffcb4d06a4d;
+    address internal constant FLASHLOAN_ADAPTER = 0x3D4cC0b99ffcA3B373769834Ab8Dd5D5616a14Ed;
     address internal constant STRATEGIST = 0x651D67e5Daf82C5E2c8e4159f6E2E9c6e2d99057;
 
     uint8 public constant MANAGER_ROLE = 1;
