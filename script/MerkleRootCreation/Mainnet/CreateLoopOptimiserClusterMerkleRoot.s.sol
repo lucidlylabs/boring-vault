@@ -64,8 +64,11 @@ contract CreateLoopOptimiserClusterLeafs is Script, MerkleTreeHelper {
         _addLeafsForFeeClaiming(leafs, getAddress(sourceChain, "accountantAddress"), feeAssets, false);
         _addMorphoBlueFlashLoanLeafs(leafs, getAddress(sourceChain, "USDC"));
 
-        // siUSD loop: Infini gateway wrap + Morpho collateral
+        // siUSD loop: Infini gateway wrap + Morpho collateral.
+        // Supply leafs first: they add the approve(USDC -> MorphoBlue) the repay path needs
+        // (the collateral helper alone skips it). Mirrors the ETH/BTC carry cluster scripts.
         _addInfiniV1Leafs(leafs, getAddress(sourceChain, "USDC"));
+        _addMorphoBlueSupplyLeafs(leafs, getBytes32(sourceChain, "siUSD_USDC_915"));
         _addMorphoBlueCollateralLeafs(leafs, getBytes32(sourceChain, "siUSD_USDC_915"));
         // PublicAllocator suppliers of the siUSD market (one leaf per source vault)
         address[] memory siusdSuppliers = new address[](8);
@@ -81,8 +84,10 @@ contract CreateLoopOptimiserClusterLeafs is Script, MerkleTreeHelper {
             _addMorphoPublicAllocatorLeafs(leafs, siusdSuppliers[i], getBytes32(sourceChain, "siUSD_USDC_915"));
         }
 
-        // USD3 loop: ERC4626 wrap (USD3 is an ERC4626 over USDC) + Morpho collateral
+        // USD3 loop: ERC4626 wrap (USD3 is an ERC4626 over USDC) + Morpho collateral.
+        // Supply leafs first for the approve(USDC -> MorphoBlue) repay leaf (see siUSD note).
         _addERC4626Leafs(leafs, ERC4626(getAddress(sourceChain, "USD3")));
+        _addMorphoBlueSupplyLeafs(leafs, getBytes32(sourceChain, "USD3_USDC_915"));
         _addMorphoBlueCollateralLeafs(leafs, getBytes32(sourceChain, "USD3_USDC_915"));
         // PublicAllocator supplier of the USD3 market
         _addMorphoPublicAllocatorLeafs(
