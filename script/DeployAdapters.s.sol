@@ -329,6 +329,39 @@ contract DeployErc20TvlAdapter is Script, MerkleTreeHelper {
     }
 }
 
+/*
+* @dev deploy using `MAINNET_RPC_URL=$MAINNET_RPC_URL DEPLOYER01=$DEPLOYER01 \
+*        forge script script/DeployAdapters.s.sol:DeployHighYieldUsdcLendingClusterTvlAdapter \
+*        --broadcast --verify --chain 1 --etherscan-api-key $ETHERSCAN_API_KEY` \
+*        --rpc-url $MAINNET_RPC_URL
+*
+* Prerequisite: deploy the BoringVault oracle first
+* (deployments/oracles/highyieldusdclendingcluster_usd.json) and set
+* `HighYieldUsdcLendingCluster_USD_oracle` in ChainValues.sol to its address.
+*/
+contract DeployHighYieldUsdcLendingClusterTvlAdapter is Script, MerkleTreeHelper {
+    Deployer private deployer = Deployer(0x771263e3Bc6aCDa5aE388A3F8A0c2dd7A17275FC);
+
+    function run() external {
+        setSourceChainName("mainnet");
+        vm.startBroadcast(vm.envUint("DEPLOYER01"));
+
+        bytes memory creationCode = type(Erc20TvlAdapter).creationCode;
+        bytes memory constructorArgs = abi.encode(
+            getAddress(sourceChain, "highYieldUsdcLendingCluster"),
+            getAddress(sourceChain, "HighYieldUsdcLendingCluster_USD_oracle"),
+            getAddress(sourceChain, "USDC"),
+            getAddress(sourceChain, "USDC_USD_oracle")
+        );
+
+        deployer.deployContract(
+            "HighYieldUsdcLendingCluster/USDC Erc20TvlAdapter", creationCode, constructorArgs, 0
+        );
+
+        vm.stopBroadcast();
+    }
+}
+
 contract DeployUniswapV3PositionTvlAdapterScript is Script, MerkleTreeHelper {
     Deployer private deployer = Deployer(0x771263e3Bc6aCDa5aE388A3F8A0c2dd7A17275FC);
 

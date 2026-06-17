@@ -456,6 +456,7 @@ contract ChainValues {
         values[mainnet]["cUSD"] = 0xcCcc62962d17b8914c62D74FfB843d73B2a3cccC.toBytes32();
         values[mainnet]["stcUSD"] = 0x88887bE419578051FF9F4eb6C858A951921D8888.toBytes32();
         values[mainnet]["roycoJrUsdcCluster"] = 0x71861827Aa95cA48148bdA0b40BC740d1c421070.toBytes32();
+        values[mainnet]["highYieldUsdcLendingCluster"] = 0xA762361D505E33D08D5170DfcBf8254a2d58C2B8.toBytes32();
         values[mainnet]["apyUSD"] = 0x38EEb52F0771140d10c4E9A9a72349A329Fe8a6A.toBytes32();
         values[mainnet]["apxUSD"] = 0x98A878b1Cd98131B271883B390f68D2c90674665.toBytes32();
         values[mainnet]["sNUSD"] = 0x08EFCC2F3e61185D0EA7F8830B3FEc9Bfa2EE313.toBytes32();
@@ -1639,6 +1640,7 @@ contract ChainValues {
         values[mainnet]["royco-jr-stcUSD_USD_oracle"] = 0x9019e0f52beA0b49bE66FA0D26aD2B8b8C254585.toBytes32();
         values[mainnet]["roycoJrUsdcClusterUSDC_USD_oracle"] = 0x8082e7Bbe282f8b4399686E4E0e10Ca64Cb916aD.toBytes32();
         values[mainnet]["GauntletUsdcFrontierV2_USD_oracle"] = 0x5D64E2228e60d6F919c9C233bA052EDeB25A9713.toBytes32();
+        values[mainnet]["HighYieldUsdcLendingCluster_USD_oracle"] = 0x7Aa2149294aC2389536870080c3270c67Af3DEa1.toBytes32();
 
         // chainlink feeds
         values[mainnet]["USDC_USD_oracle"] = 0x8fFfFfd4AfB6115b954Bd326cbe7B4BA576818f6.toBytes32();
