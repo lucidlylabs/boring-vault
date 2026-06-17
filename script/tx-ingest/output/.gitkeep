@@ -1,0 +1,3 @@
+# Tx ingest output (gitignored)
+
+JSON artifacts from `./script/tx-ingest.sh` are written here.

@@ -20,4 +20,8 @@ broadcast/*
 
 .claude
 
+# Tx ingest artifacts
+script/tx-ingest/output/*.json
+script/tx-ingest/output/*.trace.txt
+
 lib/midnight/

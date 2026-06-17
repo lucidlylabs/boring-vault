@@ -160,6 +160,23 @@ contract CreateSyUsdEthereumLeafs is Script, MerkleTreeHelper {
         kind[8] = SwapKind.BuyAndSell;
         _addMagpieSwapLeafs(leafs, oneInchAssets, kind);
 
+        // jam settlement (bebop jam)
+        {
+            address[] memory jamSell = new address[](2);
+            jamSell[0] = getAddress(sourceChain, "ETH");
+            jamSell[1] = getAddress(sourceChain, "USDC");
+            address[] memory jamBuy = new address[](2);
+            jamBuy[0] = getAddress(sourceChain, "USDC");
+            jamBuy[1] = getAddress(sourceChain, "USDT");
+            _addJamSettlementLeafs(
+                leafs,
+                jamSell,
+                jamBuy,
+                getAddress(sourceChain, "dev4Address"),
+                getAddress(sourceChain, "jamInteractionRouter")
+            );
+        }
+
         // aave core
         ERC20[] memory supplyAssets = new ERC20[](4);
         supplyAssets[0] = getERC20(sourceChain, "SUSDE");

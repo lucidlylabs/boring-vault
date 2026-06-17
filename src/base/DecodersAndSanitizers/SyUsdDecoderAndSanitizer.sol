@@ -16,6 +16,7 @@ import {SiloDecoderAndSanitizer} from "./Protocols/SiloDecoderAndSanitizer.sol";
 import {OdosDecoderAndSanitizer} from "./Protocols/OdosDecoderAndSanitizer.sol";
 import {OneInchDecoderAndSanitizer} from "./Protocols/OneInchDecoderAndSanitizer.sol";
 import {OFTDecoderAndSanitizer} from "./Protocols/OFTDecoderAndSanitizer.sol";
+import {JamSettlementDecoderAndSanitizer} from "./Protocols/JamSettlementDecoderAndSanitizer.sol";
 
 contract SyUsdDecoderAndSanitizer is
     UniswapV3DecoderAndSanitizer,
@@ -31,7 +32,8 @@ contract SyUsdDecoderAndSanitizer is
     SiloDecoderAndSanitizer,
     OdosDecoderAndSanitizer,
     OneInchDecoderAndSanitizer,
-    OFTDecoderAndSanitizer
+    OFTDecoderAndSanitizer,
+    JamSettlementDecoderAndSanitizer
 {
     constructor(address _uniswapV3NonFungiblePositionManager, address _odosRouter)
         UniswapV3DecoderAndSanitizer(_uniswapV3NonFungiblePositionManager)

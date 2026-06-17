@@ -329,6 +329,8 @@ contract ChainValues {
         values[mainnet]["uniV4PoolManager"] = 0x000000000004444c5dc75cB358380D2e3dE08A90.toBytes32();
         values[mainnet]["uniV4PositionManager"] = 0xbD216513d74C8cf14cf4747E6AaA6420FF64ee9e.toBytes32();
         values[mainnet]["uniV4UniversalRouter"] = 0x66a9893cC07D91D95644AEDD05D03f95e1dBA8Af.toBytes32();
+        values[mainnet]["jamSettlement"] = 0xbeb0b0623f66bE8cE162EbDfA2ec543A522F4ea6.toBytes32();
+        values[mainnet]["jamInteractionRouter"] = 0xAC4c6e212A361c968F1725b4d055b47E63F80b75.toBytes32();
         values[mainnet]["permit2"] = 0x000000000022D473030F116dDEE9F6B43aC78BA3.toBytes32();
 
         // ERC20s

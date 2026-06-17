@@ -737,4 +737,27 @@ contract DecoderCustomTypes {
         TokenAmount[] toBridge;
         NFTAmount[] toBridgeNFT;
     }
+
+    // ========================================= Jam Settlement (Bebop Jam) ==================================
+    struct JamOrder {
+        address taker;
+        address receiver;
+        uint256 expiry;
+        uint256 exclusivityDeadline;
+        uint256 nonce;
+        address executor;
+        uint256 partnerInfo;
+        address[] sellTokens;
+        address[] buyTokens;
+        uint256[] sellAmounts;
+        uint256[] buyAmounts;
+        bool usingPermit2;
+    }
+
+    struct JamInteractionData {
+        bool result;
+        address to;
+        uint256 value;
+        bytes data;
+    }
 }

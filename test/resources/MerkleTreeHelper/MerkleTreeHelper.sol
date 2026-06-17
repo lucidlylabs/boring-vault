@@ -24,6 +24,7 @@ contract MerkleTreeHelper is CommonBase, ChainValues, Test {
     mapping(address => mapping(address => mapping(address => bool))) public ownerToOneInchSellTokenToBuyTokenToInTree;
     mapping(address => mapping(address => mapping(address => bool))) public ownerToOdosSellTokenToBuyTokenToInTree;
     mapping(address => mapping(address => mapping(address => bool))) public ownerToMagpieSellTokenToBuyTokenToInTree;
+    mapping(address => mapping(address => mapping(address => bool))) public ownerToJamSellTokenToBuyTokenToInTree;
     mapping(address => mapping(address => mapping(address => bool))) public ownerToOogaBoogaSellTokenToBuyTokenToInTree;
 
     function setSourceChainName(string memory _chain) internal {
@@ -12257,6 +12258,73 @@ contract MerkleTreeHelper is CommonBase, ChainValues, Test {
                         getAddress(sourceChain, "boringVault")
                     ][tokens[j]][tokens[i]] = true;
                 }
+            }
+        }
+    }
+
+    // ========================================= Jam Settlement (Bebop Jam) =========================================
+
+    function _addJamSettlementLeafs(
+        ManageLeaf[] memory leafs,
+        address[] memory sellTokens,
+        address[] memory buyTokens,
+        address executor,
+        address interactionTarget
+    ) internal {
+        require(sellTokens.length == buyTokens.length, "Jam: token arrays must match");
+        address jamSettlement = getAddress(sourceChain, "jamSettlement");
+        address boringVault = getAddress(sourceChain, "boringVault");
+
+        for (uint256 i; i < sellTokens.length; ++i) {
+            address sellToken = sellTokens[i];
+            address buyToken = buyTokens[i];
+            bool isNativeSell = sellToken == getAddress(sourceChain, "ETH");
+
+            if (
+                !isNativeSell
+                    && !ownerToTokenToSpenderToApprovalInTree[boringVault][sellToken][jamSettlement]
+            ) {
+                unchecked {
+                    leafIndex++;
+                }
+                leafs[leafIndex] = ManageLeaf(
+                    sellToken,
+                    false,
+                    "approve(address,uint256)",
+                    new address[](1),
+                    string.concat("Approve Jam Settlement to spend ", ERC20(sellToken).symbol()),
+                    getAddress(sourceChain, "rawDataDecoderAndSanitizer")
+                );
+                leafs[leafIndex].argumentAddresses[0] = jamSettlement;
+                ownerToTokenToSpenderToApprovalInTree[boringVault][sellToken][jamSettlement] = true;
+            }
+
+            if (!ownerToJamSellTokenToBuyTokenToInTree[boringVault][sellToken][buyToken]) {
+                unchecked {
+                    leafIndex++;
+                }
+                leafs[leafIndex] = ManageLeaf(
+                    jamSettlement,
+                    isNativeSell,
+                    "settle((address,address,uint256,uint256,uint256,address,uint256,address[],address[],uint256[],uint256[],bool),bytes,(bool,address,uint256,bytes)[],bytes,address)",
+                    new address[](7),
+                    string.concat(
+                        "Jam settle ",
+                        isNativeSell ? "ETH" : ERC20(sellToken).symbol(),
+                        " for ",
+                        ERC20(buyToken).symbol()
+                    ),
+                    getAddress(sourceChain, "rawDataDecoderAndSanitizer")
+                );
+                leafs[leafIndex].argumentAddresses[0] = boringVault;
+                leafs[leafIndex].argumentAddresses[1] = boringVault;
+                leafs[leafIndex].argumentAddresses[2] = executor;
+                leafs[leafIndex].argumentAddresses[3] = sellToken;
+                leafs[leafIndex].argumentAddresses[4] = buyToken;
+                leafs[leafIndex].argumentAddresses[5] = jamSettlement;
+                leafs[leafIndex].argumentAddresses[6] = interactionTarget;
+
+                ownerToJamSellTokenToBuyTokenToInTree[boringVault][sellToken][buyToken] = true;
             }
         }
     }
