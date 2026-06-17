@@ -945,6 +945,10 @@ contract ChainValues {
         values[mainnet]["PT-iUSD-4SEP2025_USDC_915"] =
         0x3a3b0aab54883f5b2561d8327fbe234142db4f50f87574cd07daf2ed3fbee01a;
         values[mainnet]["siUSD_USDC_915"] = 0xbbf7ce1b40d32d3e3048f5cf27eeaa6de8cb27b80194690aab191a63381d8c99;
+        // Loop Optimiser Cluster: USD3 (ERC4626 over USDC) loop + PublicAllocator suppliers
+        values[mainnet]["USD3"] = 0x056B269Eb1f75477a8666ae8C7fE01b64dD55eCc.toBytes32();
+        values[mainnet]["USD3_USDC_915"] = 0xe3df58f9d3011b7481ff36b939fa5f8da642f34ea5792d25d3958dbf1efa26d7;
+        values[mainnet]["publicAllocator"] = 0xfd32fA2ca22c76dD6E550706Ad913FC6CE91c75D.toBytes32();
         values[mainnet]["wstETH_USDC_90"] = 0x7e585a933ffe8443c371b4f8cfeb4430f5f6a14c2f32a898c26662c67a1cb8b8;
         values[mainnet]["PTcUSD29Jan2026_USDC_915"] = 0x802ec6e878dc9fe6905b8a0a18962dcca10440a87fa2242fbf4a0461c7b0c789;
         values[mainnet]["PTstcUSD29Jan2026_USDC_915"] =
