@@ -164,6 +164,30 @@ contract DecoderCustomTypes {
         uint256 flags;
     }
 
+    // ========================================= KYBERSWAP =========================================
+
+    struct SwapDescriptionV2 {
+        address srcToken;
+        address dstToken;
+        address[] srcReceivers;
+        uint256[] srcAmounts;
+        address[] feeReceivers;
+        uint256[] feeAmounts;
+        address dstReceiver;
+        uint256 amount;
+        uint256 minReturnAmount;
+        uint256 flags;
+        bytes permit;
+    }
+
+    struct SwapExecutionParams {
+        address callTarget;
+        address approveTarget;
+        bytes targetData;
+        SwapDescriptionV2 desc;
+        bytes clientData;
+    }
+
     // ========================================= PENDLE =========================================
     struct TokenInput {
         // TOKEN DATA
