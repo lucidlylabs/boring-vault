@@ -5356,6 +5356,107 @@ contract MerkleTreeHelper is CommonBase, ChainValues, Test {
         leafs[leafIndex].argumentAddresses[0] = token;
     }
 
+    /**
+     * @notice Leaves authorizing the BoringVault to move `collateralToken` (e.g. USDC) in and out
+     *         of RiseX's CollateralManager on RISE Chain (4153). Order placement is off-chain
+     *         (EIP-712 via the RiseX API) and is intentionally NOT covered here.
+     *
+     *         The `account` argument of every CollateralManager call is pinned to the BoringVault
+     *         so collateral cannot be credited to / withdrawn on behalf of another RiseX account;
+     *         `token` is pinned to `collateralToken`.
+     */
+    function _addRiseXCollateralLeafs(ManageLeaf[] memory leafs, address collateralToken) internal {
+        address collateralManager = getAddress(sourceChain, "riseXCollateralManager");
+        address boringVault = getAddress(sourceChain, "boringVault");
+        string memory tokenSymbol = ERC20(collateralToken).symbol();
+
+        // Approve CollateralManager to pull the collateral token (dedup across the tree).
+        if (!ownerToTokenToSpenderToApprovalInTree[boringVault][collateralToken][collateralManager]) {
+            unchecked {
+                leafIndex++;
+            }
+            leafs[leafIndex] = ManageLeaf(
+                collateralToken,
+                false,
+                "approve(address,uint256)",
+                new address[](1),
+                string.concat("Approve RiseX CollateralManager to spend ", tokenSymbol),
+                getAddress(sourceChain, "rawDataDecoderAndSanitizer")
+            );
+            leafs[leafIndex].argumentAddresses[0] = collateralManager;
+            ownerToTokenToSpenderToApprovalInTree[boringVault][collateralToken][collateralManager] = true;
+        }
+
+        // deposit(address account, address token, uint256 amount)
+        unchecked {
+            leafIndex++;
+        }
+        leafs[leafIndex] = ManageLeaf(
+            collateralManager,
+            false,
+            "deposit(address,address,uint256)",
+            new address[](2),
+            string.concat("Deposit ", tokenSymbol, " collateral into RiseX"),
+            getAddress(sourceChain, "rawDataDecoderAndSanitizer")
+        );
+        leafs[leafIndex].argumentAddresses[0] = boringVault;
+        leafs[leafIndex].argumentAddresses[1] = collateralToken;
+
+        // withdraw(address account, address token, uint256 amount) — requests a withdrawal.
+        unchecked {
+            leafIndex++;
+        }
+        leafs[leafIndex] = ManageLeaf(
+            collateralManager,
+            false,
+            "withdraw(address,address,uint256)",
+            new address[](2),
+            string.concat("Request withdrawal of ", tokenSymbol, " collateral from RiseX"),
+            getAddress(sourceChain, "rawDataDecoderAndSanitizer")
+        );
+        leafs[leafIndex].argumentAddresses[0] = boringVault;
+        leafs[leafIndex].argumentAddresses[1] = collateralToken;
+
+        // releasePendingWithdrawal(address account, address token) — settles the request.
+        unchecked {
+            leafIndex++;
+        }
+        leafs[leafIndex] = ManageLeaf(
+            collateralManager,
+            false,
+            "releasePendingWithdrawal(address,address)",
+            new address[](2),
+            string.concat("Release pending ", tokenSymbol, " withdrawal from RiseX"),
+            getAddress(sourceChain, "rawDataDecoderAndSanitizer")
+        );
+        leafs[leafIndex].argumentAddresses[0] = boringVault;
+        leafs[leafIndex].argumentAddresses[1] = collateralToken;
+        // NOTE: account registration (AccountRegistry.getOrRegister) is operator-gated / off-chain
+        // onboarding — not a vault on-chain action — so no leaf is added for it.
+    }
+
+    /**
+     * @notice Leaf authorizing the BoringVault to authorize `signer` (the strategist's RiseX API
+     *         signer key) on RISExAuthorization via `registerSenderSigner` — msg.sender is the
+     *         account, so the vault authorizes a signer for its own account with no off-chain
+     *         signature. `signer` is pinned. Trading then happens off-chain (signed by `signer`).
+     *         Re-registration on expiry reuses the same `signer`, so this single leaf is reused.
+     */
+    function _addRiseXRegisterSignerLeaf(ManageLeaf[] memory leafs, address signer) internal {
+        unchecked {
+            leafIndex++;
+        }
+        leafs[leafIndex] = ManageLeaf(
+            getAddress(sourceChain, "riseXAuthorization"),
+            false,
+            "registerSenderSigner(address,uint48,uint8,uint32)",
+            new address[](1),
+            "Authorize RiseX API signer for the BoringVault",
+            getAddress(sourceChain, "rawDataDecoderAndSanitizer")
+        );
+        leafs[leafIndex].argumentAddresses[0] = signer;
+    }
+
     function _addMorphoBlueSupplyLeafs(ManageLeaf[] memory leafs, bytes32 marketId) internal {
         IMB.MarketParams memory marketParams = IMB(getAddress(sourceChain, "morphoBlue")).idToMarketParams(marketId);
         ERC20 loanToken = ERC20(marketParams.loanToken);

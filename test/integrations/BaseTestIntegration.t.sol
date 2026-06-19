@@ -54,6 +54,7 @@ contract BaseTestIntegration is Test, MerkleTreeHelper {
         nameToRPC["swell"] = "SWELL_CHAIN_RPC_URL";
         nameToRPC["derive"] = "DERIVE_RPC_URL";
         nameToRPC["hyperevm"] = "HYPEREVM_RPC_URL";
+        nameToRPC["rise"] = "RISE_RPC_URL";
     }
 
     function _setupChain(string memory chain, uint256 blockNumber) internal {

@@ -38,6 +38,7 @@ contract ChainValues {
     string public constant plasma = "plasma";
     string public constant monad = "monad";
     string public constant tacBuild = "tacBuild";
+    string public constant rise = "rise";
 
     // Bridging constants.
     uint64 public constant ccipArbitrumChainSelector = 4949039107694359620;
@@ -66,6 +67,7 @@ contract ChainValues {
 
     uint32 public constant katanaChainId = 747474;
     uint32 public constant hyperevmChainId = 999;
+    uint32 public constant riseChainId = 4153;
 
     error ChainValues__ZeroAddress(string chainName, string valueName);
     error ChainValues__ZeroBytes32(string chainName, string valueName);
@@ -135,6 +137,7 @@ contract ChainValues {
         _addHyperEvmValues();
         _addMonadValues();
         _addTacBuildValues();
+        _addRiseValues();
     }
 
     function _addTacBuildValues() private {
@@ -264,6 +267,33 @@ contract ChainValues {
 
         // uniswap v3
         values[hyperevm]["uniswapV3NonFungiblePositionManager"] = address(1).toBytes32();
+    }
+
+    function _addRiseValues() private {
+        values[rise]["deployerAddress"] = 0x771263e3Bc6aCDa5aE388A3F8A0c2dd7A17275FC.toBytes32();
+        values[rise]["txBundlerAddress"] = 0x771263e3Bc6aCDa5aE388A3F8A0c2dd7A17275FC.toBytes32();
+        values[rise]["dev0Address"] = 0x90760A784953829095969204f87d6DFEc29a6ca9.toBytes32();
+        values[rise]["dev1Address"] = 0x90760A784953829095969204f87d6DFEc29a6ca9.toBytes32();
+
+        // RiseX exchange contracts on RISE Mainnet (chainId 4153).
+        // Source: https://docs.risechain.com/docs/risex/contracts/deployments
+        // CollateralManager is the only contract the vault touches on-chain (deposit/withdraw
+        // collateral). Order placement is off-chain (EIP-712 via the RiseX API).
+        values[rise]["riseXCollateralManager"] = 0x2C03C7d7e2974C6599b6B108879109281ef3F818.toBytes32();
+        values[rise]["riseXAccountRegistry"] = 0x1238991Cac4E65902C08213e79909A9c813Eebc3.toBytes32();
+        values[rise]["riseXAuthorization"] = 0x0D919DAA3f12AE715744Eb648c00066c5DBd66f0.toBytes32();
+        values[rise]["riseXOrdersManager"] = 0xE03C1D5081eb2d0E6bFd62A949C5b12eFa44F2cD.toBytes32();
+        values[rise]["riseXPerpsManager"] = 0x53f10fAcFC8965750494E6965F5d6dA39B41d852.toBytes32();
+        values[rise]["riseXFeeManager"] = 0x11541dc387b9C307043ea732127DF92b80bab52b.toBytes32();
+        values[rise]["riseXOracle"] = 0x8fC4D0Cf74cdF595254cB763d4C05D38Df0e9503.toBytes32();
+
+        // RISE-mainnet base collateral: Bridged USDC ("USDC.e", 6 decimals). Verified on-chain as
+        // the sole entry in CollateralManager.getSupportedCollateralTokens().
+        values[rise]["USDC.e"] = 0xe436820ba0C69702c1d3E601d421c0eF38262739.toBytes32();
+        values[rise]["USDC"] = 0xe436820ba0C69702c1d3E601d421c0eF38262739.toBytes32();
+
+        // balancer vault placeholder (no flashloans used by the RiseX collateral flow).
+        values[rise]["vault"] = address(1).toBytes32();
     }
 
     function _addMainnetValues() private {
@@ -946,9 +976,9 @@ contract ChainValues {
         values[mainnet]["PT-iUSD-4SEP2025_USDC_915"] =
         0x3a3b0aab54883f5b2561d8327fbe234142db4f50f87574cd07daf2ed3fbee01a;
         values[mainnet]["siUSD_USDC_915"] = 0xbbf7ce1b40d32d3e3048f5cf27eeaa6de8cb27b80194690aab191a63381d8c99;
-        // Loop Optimiser Cluster: USD3 (ERC4626 over USDC) loop + PublicAllocator suppliers
         values[mainnet]["USD3"] = 0x056B269Eb1f75477a8666ae8C7fE01b64dD55eCc.toBytes32();
         values[mainnet]["USD3_USDC_915"] = 0xe3df58f9d3011b7481ff36b939fa5f8da642f34ea5792d25d3958dbf1efa26d7;
+
         values[mainnet]["publicAllocator"] = 0xfd32fA2ca22c76dD6E550706Ad913FC6CE91c75D.toBytes32();
         values[mainnet]["wstETH_USDC_90"] = 0x7e585a933ffe8443c371b4f8cfeb4430f5f6a14c2f32a898c26662c67a1cb8b8;
         values[mainnet]["PTcUSD29Jan2026_USDC_915"] = 0x802ec6e878dc9fe6905b8a0a18962dcca10440a87fa2242fbf4a0461c7b0c789;
@@ -1628,6 +1658,8 @@ contract ChainValues {
         values[mainnet]["royco_JrStcUsd_usdc"] = address(0x50F5c1876d8b8886e2Cfe6E74DC12B08d97be831).toBytes32();
 
         // LucidlyChainlinkOracleV1 deployments
+        values[mainnet]["siUSD_USD_oracle"] = 0x08aa2d9da62C78B285B2CFc0ACB6f2418Aef0553.toBytes32();
+        values[mainnet]["USD3_USD_oracle"] = 0xaa83f8C59DCe694E78993245e85AD43Da03c0339.toBytes32();
         values[mainnet]["sUSDE_USD_oracle"] = 0xC8bd9086a40bBD9acbd855B50931F3b46f048525.toBytes32();
         values[mainnet]["sUSDS_USD_oracle"] = 0x84f4612e682091c30Fd2C108bb298C93BE961618.toBytes32();
         values[mainnet]["syrupUSDC_USD_oracle"] = 0xDADb97F5A30b39eB10268a0d83c29276F200EDeA.toBytes32();
@@ -1640,7 +1672,8 @@ contract ChainValues {
         values[mainnet]["royco-jr-stcUSD_USD_oracle"] = 0x9019e0f52beA0b49bE66FA0D26aD2B8b8C254585.toBytes32();
         values[mainnet]["roycoJrUsdcClusterUSDC_USD_oracle"] = 0x8082e7Bbe282f8b4399686E4E0e10Ca64Cb916aD.toBytes32();
         values[mainnet]["GauntletUsdcFrontierV2_USD_oracle"] = 0x5D64E2228e60d6F919c9C233bA052EDeB25A9713.toBytes32();
-        values[mainnet]["HighYieldUsdcLendingCluster_USD_oracle"] = 0x7Aa2149294aC2389536870080c3270c67Af3DEa1.toBytes32();
+        values[mainnet]["HighYieldUsdcLendingCluster_USD_oracle"] =
+            0x7Aa2149294aC2389536870080c3270c67Af3DEa1.toBytes32();
 
         // chainlink feeds
         values[mainnet]["USDC_USD_oracle"] = 0x8fFfFfd4AfB6115b954Bd326cbe7B4BA576818f6.toBytes32();

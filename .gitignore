@@ -21,3 +21,4 @@ broadcast/*
 .claude
 
 lib/midnight/
+.gstack/

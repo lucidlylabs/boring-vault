@@ -385,3 +385,64 @@ contract DeployUniswapV3PositionTvlAdapterScript is Script, MerkleTreeHelper {
         vm.stopBroadcast();
     }
 }
+
+/*
+* Loop Optimiser Cluster idle-collateral-dust TVL adapters.
+*
+* A lever's wrap mints the collateral, then supplies it to Morpho minus a ~1bps buffer, so a little
+* collateral token sits idle in the vault, never added to Morpho. The MorphoLoopTvlAdapter stays
+* Morpho-balances-only; these Erc20TvlAdapters value that idle dust (balanceOf the loops vault) in USDC
+* via the SAME exchange-rate feed the loop adapter marks the supplied collateral with -> consistent,
+* no double-count (supplied collateral lives in Morpho, not the vault's ERC20 balance). Register the two
+* deployed addresses as extra rows in the aum `strategies` table for vault 0x31aCffb26... (4 adapters total).
+*
+* @dev deploy using `MAINNET_RPC_URL=$MAINNET_RPC_URL DEPLOYER01=$DEPLOYER01 \
+*        forge script script/DeployAdapters.s.sol:DeploySiUsdLoopDustErc20TvlAdapter \
+*        --broadcast --verify --chain 1 --etherscan-api-key $ETHERSCAN_API_KEY --rpc-url $MAINNET_RPC_URL`
+*/
+contract DeploySiUsdLoopDustErc20TvlAdapter is Script, MerkleTreeHelper {
+    Deployer private deployer = Deployer(0x771263e3Bc6aCDa5aE388A3F8A0c2dd7A17275FC);
+
+    function run() external {
+        setSourceChainName("mainnet");
+        vm.startBroadcast(vm.envUint("DEPLOYER01"));
+
+        bytes memory creationCode = type(Erc20TvlAdapter).creationCode;
+        bytes memory constructorArgs = abi.encode(
+            getAddress(sourceChain, "siUSD"),
+            getAddress(sourceChain, "siUSD_USD_oracle"),
+            getAddress(sourceChain, "USDC"),
+            getAddress(sourceChain, "USDC_USD_oracle")
+        );
+
+        deployer.deployContract("siUSD-loop-dust/USDC Erc20TvlAdapter", creationCode, constructorArgs, 0);
+
+        vm.stopBroadcast();
+    }
+}
+
+/*
+* @dev deploy using `MAINNET_RPC_URL=$MAINNET_RPC_URL DEPLOYER01=$DEPLOYER01 \
+*        forge script script/DeployAdapters.s.sol:DeployUsd3LoopDustErc20TvlAdapter \
+*        --broadcast --verify --chain 1 --etherscan-api-key $ETHERSCAN_API_KEY --rpc-url $MAINNET_RPC_URL`
+*/
+contract DeployUsd3LoopDustErc20TvlAdapter is Script, MerkleTreeHelper {
+    Deployer private deployer = Deployer(0x771263e3Bc6aCDa5aE388A3F8A0c2dd7A17275FC);
+
+    function run() external {
+        setSourceChainName("mainnet");
+        vm.startBroadcast(vm.envUint("DEPLOYER01"));
+
+        bytes memory creationCode = type(Erc20TvlAdapter).creationCode;
+        bytes memory constructorArgs = abi.encode(
+            getAddress(sourceChain, "USD3"),
+            getAddress(sourceChain, "USD3_USD_oracle"),
+            getAddress(sourceChain, "USDC"),
+            getAddress(sourceChain, "USDC_USD_oracle")
+        );
+
+        deployer.deployContract("USD3-loop-dust/USDC Erc20TvlAdapter", creationCode, constructorArgs, 0);
+
+        vm.stopBroadcast();
+    }
+}
