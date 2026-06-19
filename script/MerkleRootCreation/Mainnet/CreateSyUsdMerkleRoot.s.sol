@@ -61,6 +61,11 @@ contract CreateSyUsdEthereumLeafs is Script, MerkleTreeHelper {
     address public highYieldUsdcTeller = 0x68c5dd7BF4c4cc61d35FbD86f80C71C1c7abcF3C;
     address public highYieldUsdcQueueSolver = 0x9FacB254E7659C692dC59Fb0F749D22a2b219644;
 
+    address public loopOptimiserVault = 0x31aCffb26E80A319018cbd049CeA3389635dFc41;
+    address public loopOptimiserWithdrawQueue = 0xFfe38B599c67682a69D84f0710505B7507eFBCA7;
+    address public loopOptimiserTeller = 0x88FC9d6815f2e02BB3738482D9285513469BFAD2;
+    address public loopOptimiserQueueSolver = 0x82FEFc28848B9006bd36488d8841982954516F49;
+
     uint8 public constant MANAGER_ROLE = 1;
     uint8 public constant MINTER_ROLE = 2;
     uint8 public constant BURNER_ROLE = 3;
@@ -220,6 +225,11 @@ contract CreateSyUsdEthereumLeafs is Script, MerkleTreeHelper {
         _addTellerLeafs(leafs, address(highYieldUsdcTeller), assets, false, true);
         _addWithdrawQueueLeafs(leafs, highYieldUsdcWithdrawQueue, highYieldUsdcVault, assets);
         _addSelfSolveLeafs(leafs, assets, highYieldUsdcQueueSolver, address(boringVault), highYieldUsdcTeller);
+
+        // usdc loop optimiser cluster vault
+        _addTellerLeafs(leafs, address(loopOptimiserTeller), assets, false, true);
+        _addWithdrawQueueLeafs(leafs, loopOptimiserWithdrawQueue, loopOptimiserVault, assets);
+        _addSelfSolveLeafs(leafs, assets, loopOptimiserQueueSolver, address(boringVault), loopOptimiserTeller);
 
         // erc4626 vaults
         _addERC4626Leafs(leafs, ERC4626(getAddress(sourceChain, "gauntletUSDCfrontierV2")));

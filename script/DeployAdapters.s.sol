@@ -362,6 +362,29 @@ contract DeployHighYieldUsdcLendingClusterTvlAdapter is Script, MerkleTreeHelper
     }
 }
 
+contract DeployLoopOptimiserClusterTvlAdapter is Script, MerkleTreeHelper {
+    Deployer private deployer = Deployer(0x771263e3Bc6aCDa5aE388A3F8A0c2dd7A17275FC);
+
+    function run() external {
+        setSourceChainName("mainnet");
+        vm.startBroadcast(vm.envUint("DEPLOYER01"));
+
+        bytes memory creationCode = type(Erc20TvlAdapter).creationCode;
+        bytes memory constructorArgs = abi.encode(
+            getAddress(sourceChain, "loopOptimiserCluster"),
+            getAddress(sourceChain, "LoopOptimiserCluster_USD_oracle"),
+            getAddress(sourceChain, "USDC"),
+            getAddress(sourceChain, "USDC_USD_oracle")
+        );
+
+        deployer.deployContract(
+            "LoopOptimiserCluster/USDC Erc20TvlAdapter", creationCode, constructorArgs, 0
+        );
+
+        vm.stopBroadcast();
+    }
+}
+
 contract DeployUniswapV3PositionTvlAdapterScript is Script, MerkleTreeHelper {
     Deployer private deployer = Deployer(0x771263e3Bc6aCDa5aE388A3F8A0c2dd7A17275FC);
 
