@@ -25,6 +25,7 @@ contract MerkleTreeHelper is CommonBase, ChainValues, Test {
     mapping(address => mapping(address => mapping(address => bool))) public ownerToOdosSellTokenToBuyTokenToInTree;
     mapping(address => mapping(address => mapping(address => bool))) public ownerToMagpieSellTokenToBuyTokenToInTree;
     mapping(address => mapping(address => mapping(address => bool))) public ownerToOogaBoogaSellTokenToBuyTokenToInTree;
+    mapping(address => mapping(address => mapping(address => bool))) public ownerToKyberSwapSellTokenToBuyTokenToInTree;
 
     function setSourceChainName(string memory _chain) internal {
         sourceChain = _chain;
@@ -12254,6 +12255,87 @@ contract MerkleTreeHelper is CommonBase, ChainValues, Test {
                     leafs[leafIndex].argumentAddresses[2] = getAddress(sourceChain, "boringVault");
 
                     ownerToMagpieSellTokenToBuyTokenToInTree[
+                        getAddress(sourceChain, "boringVault")
+                    ][tokens[j]][tokens[i]] = true;
+                }
+            }
+        }
+    }
+
+    // ========================================= KyberSwap =========================================
+
+    function _addKyberSwapLeafs(ManageLeaf[] memory leafs, address[] memory tokens, SwapKind[] memory kind) internal {
+        for (uint256 i = 0; i < tokens.length; i++) {
+            if (!ownerToTokenToSpenderToApprovalInTree[
+                    getAddress(sourceChain, "boringVault")
+                ][tokens[i]][getAddress(sourceChain, "kyberAggregationRouterV2")]) {
+                unchecked {
+                    leafIndex++;
+                }
+                leafs[leafIndex] = ManageLeaf(
+                    tokens[i],
+                    false,
+                    "approve(address,uint256)",
+                    new address[](1),
+                    string.concat("approve KyberSwap MetaAggregationRouterV2 to spend ", ERC20(tokens[i]).symbol()),
+                    getAddress(sourceChain, "rawDataDecoderAndSanitizer")
+                );
+                leafs[leafIndex].argumentAddresses[0] = getAddress(sourceChain, "kyberAggregationRouterV2");
+                ownerToTokenToSpenderToApprovalInTree[
+                    getAddress(sourceChain, "boringVault")
+                ][tokens[i]][getAddress(sourceChain, "kyberAggregationRouterV2")] = true;
+            }
+
+            for (uint256 j = 0; j < tokens.length; j++) {
+                if (i == j) continue;
+
+                if (
+                    !ownerToKyberSwapSellTokenToBuyTokenToInTree[
+                            getAddress(sourceChain, "boringVault")
+                        ][tokens[i]][tokens[j]] && kind[j] != SwapKind.Sell
+                ) {
+                    unchecked {
+                        leafIndex++;
+                    }
+                    leafs[leafIndex] = ManageLeaf(
+                        getAddress(sourceChain, "kyberAggregationRouterV2"),
+                        false,
+                        "swap((address,address,bytes,(address,address,address[],uint256[],address[],uint256[],address,uint256,uint256,uint256,bytes),bytes))",
+                        new address[](3),
+                        string.concat("Swap ", ERC20(tokens[i]).symbol(), " for ", ERC20(tokens[j]).symbol(), " using KyberSwap"),
+                        getAddress(sourceChain, "rawDataDecoderAndSanitizer")
+                    );
+                    leafs[leafIndex].argumentAddresses[0] = tokens[i];
+                    leafs[leafIndex].argumentAddresses[1] = tokens[j];
+                    leafs[leafIndex].argumentAddresses[2] = getAddress(sourceChain, "boringVault");
+
+                    ownerToKyberSwapSellTokenToBuyTokenToInTree[
+                        getAddress(sourceChain, "boringVault")
+                    ][tokens[i]][tokens[j]] = true;
+                }
+
+                if (
+                    kind[i] == SwapKind.BuyAndSell
+                        && !ownerToKyberSwapSellTokenToBuyTokenToInTree[
+                            getAddress(sourceChain, "boringVault")
+                        ][tokens[j]][tokens[i]]
+                ) {
+                    unchecked {
+                        leafIndex++;
+                    }
+                    leafs[leafIndex] = ManageLeaf(
+                        getAddress(sourceChain, "kyberAggregationRouterV2"),
+                        false,
+                        "swap((address,address,bytes,(address,address,address[],uint256[],address[],uint256[],address,uint256,uint256,uint256,bytes),bytes))",
+                        new address[](3),
+                        string.concat("Swap ", ERC20(tokens[j]).symbol(), " for ", ERC20(tokens[i]).symbol(), " using KyberSwap"),
+                        getAddress(sourceChain, "rawDataDecoderAndSanitizer")
+                    );
+                    leafs[leafIndex].argumentAddresses[0] = tokens[j];
+                    leafs[leafIndex].argumentAddresses[1] = tokens[i];
+                    leafs[leafIndex].argumentAddresses[2] = getAddress(sourceChain, "boringVault");
+
+                    ownerToKyberSwapSellTokenToBuyTokenToInTree[
                         getAddress(sourceChain, "boringVault")
                     ][tokens[j]][tokens[i]] = true;
                 }
