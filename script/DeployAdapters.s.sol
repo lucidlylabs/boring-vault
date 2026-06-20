@@ -16,6 +16,7 @@ import {CbBtcUsdcAaveV3BalanceAdapter} from "src/adapters/cbBtcUsdcAaveV3Balance
 import {CbBtcUsdcMorphoBalanceAdapter} from "src/adapters/cbBtcUsdcMorphoBalanceAdapter.sol";
 import {WethUsdcAaveV3BalanceAdapter} from "src/adapters/WethUsdcAaveV3BalanceAdapter.sol";
 import {WethUsdcMorphoBalanceAdapter} from "src/adapters/WethUsdcMorphoBalanceAdapter.sol";
+import {WstEthWethBalanceTvlAdapter} from "src/adapters/WstEthWethBalanceTvlAdapter.sol";
 import {SiUsdBalanceAdapter} from "src/adapters/SiUsdBalanceAdapter.sol";
 import {CapStcusdBalanceAdapter} from "src/adapters/CapStcusdBalanceAdapter.sol";
 import {PtCusd29Jan2026BalanceAdapter} from "src/adapters/PtCusd29Jan2026BalanceAdapter.sol";
@@ -406,5 +407,31 @@ contract DeployUniswapV3PositionTvlAdapterScript is Script, MerkleTreeHelper {
         deployer.deployContract("RLUSD_USDC_100 UniswapV3PositionTvlAdapter Example", creationCode, constructorArgs, 0);
 
         vm.stopBroadcast();
+    }
+}
+
+// ETH Carry idle-wstETH dust adapter: counts the un-supplied wstETH (Magpie
+// slippage-band leftover) in WETH 18-dec, priced off the SAME BGD wstETH/USD
+// price-cap feed + Chainlink ETH/USD that WethUsdcMorphoBalanceAdapter uses, so
+// the dust is valued identically to the Morpho-marked collateral. Registered as
+// an extra `strategies` AUM row on the ETH carry vault (no double-count: the
+// main adapter reads the Morpho position, this reads balanceOf).
+contract DeployEthCarryWstEthDustTvlAdapter is Script {
+    address WSTETH = 0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0;
+    address WSTETH_USD_CHAINLINK_FEED = 0xe1D97bF61901B075E9626c8A2340a7De385861Ef; // BGD WstETHPriceCapAdapter (latestAnswer, 8dec)
+    address WETH_USD_CHAINLINK_FEED = 0x5f4eC3Df9cbd43714FE2740f5E3616155c5b8419; // Chainlink ETH/USD
+    address ETH_CARRY_VAULT = 0x5373690c930553648f0aaA2e53B51f0C59290B7d;
+
+    function run() external {
+        vm.startBroadcast(vm.envUint("PK"));
+
+        WstEthWethBalanceTvlAdapter adapter =
+            new WstEthWethBalanceTvlAdapter(WSTETH, WSTETH_USD_CHAINLINK_FEED, WETH_USD_CHAINLINK_FEED);
+
+        vm.stopBroadcast();
+
+        console.log("WstEthWethBalanceTvlAdapter", address(adapter));
+        // sanity: idle wstETH on the ETH carry vault, valued in WETH (18 dec)
+        console.log("idle wstETH TVL (WETH 18dec)", adapter.getUserTvl(ETH_CARRY_VAULT));
     }
 }
