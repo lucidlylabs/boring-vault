@@ -35,7 +35,7 @@ import "forge-std/StdJson.sol";
 contract CreateRoycoJrUsdcClusterLeafs is Script, MerkleTreeHelper {
     uint256 public privateKey;
 
-    address public rawDataDecoderAndSanitizerEthereum = 0xb0936B136D776cd30F85dE79658541332a09539F;
+    address public rawDataDecoderAndSanitizerEthereum = 0x5619904B935B7051794c3dc7cF924FE74dE56F7D;
     RolesAuthority internal rolesAuthority = RolesAuthority(0xAAfcF903C9E898155fB891c4121F3Ee54E8d716D);
     BoringVault internal boringVault = BoringVault(payable(0x71861827Aa95cA48148bdA0b40BC740d1c421070));
     LayerZeroTeller internal teller = LayerZeroTeller(0x8C87d801B6CA569a73D9428351415afAeC293E28);
@@ -121,6 +121,7 @@ contract CreateRoycoJrUsdcClusterLeafs is Script, MerkleTreeHelper {
         kind[6] = SwapKind.BuyAndSell;
         kind[7] = SwapKind.BuyAndSell;
         _addMagpieSwapLeafs(leafs, swapAssets, kind);
+        _addKyberSwapLeafs(leafs, swapAssets, kind);
 
         // cap protocol: usdc <-> cusd <-> stcusd
         address[] memory capInputAssets = new address[](1);
