@@ -1362,7 +1362,13 @@ contract DeployArcticArchitectureWithConfigScript is Script, ChainValues {
 
     function _finalizeSetup() internal {
         _log("Finalizing setup...", 3);
-        address ownerAddress = 0x1b514df3413DA9931eB31f2Ab72e32c0A507Cad5;
+        // Final owner for the core contracts (vault, teller, manager, accountant, queue, queueSolver, pauser).
+        // Read from the config when ".deploymentParameters.finalOwnerAddressOrName" is present; otherwise fall
+        // back to the historical default so existing config files keep working unchanged.
+        address ownerAddress = 0x90760A784953829095969204f87d6DFEc29a6ca9;
+        if (vm.keyExists(rawJson, ".deploymentParameters.finalOwnerAddressOrName")) {
+            ownerAddress = _handleAddressOrName(".deploymentParameters.finalOwnerAddressOrName");
+        }
         _log(string.concat("Transferring ownership to ", vm.toString(ownerAddress)), 3);
         uint256 shareLockPeriod = vm.parseJsonUint(rawJson, ".tellerConfiguration.tellerParameters.shareLockPeriod");
         if (tellerExists) {
@@ -1377,7 +1383,7 @@ contract DeployArcticArchitectureWithConfigScript is Script, ChainValues {
             if (teller.authority() != rolesAuthority) {
                 _addTx(address(teller), abi.encodeWithSelector(teller.setAuthority.selector, rolesAuthority), 0);
             }
-            if (teller.owner() != address(0)) {
+            if (teller.owner() != address(0) && teller.owner() != ownerAddress) {
                 _addTx(address(teller), abi.encodeWithSelector(teller.transferOwnership.selector, ownerAddress), 0);
             }
         } else {
@@ -1401,7 +1407,7 @@ contract DeployArcticArchitectureWithConfigScript is Script, ChainValues {
                     0
                 );
             }
-            if (boringVault.owner() != address(0)) {
+            if (boringVault.owner() != address(0) && boringVault.owner() != ownerAddress) {
                 _addTx(
                     address(boringVault),
                     abi.encodeWithSelector(boringVault.transferOwnership.selector, ownerAddress),
@@ -1424,7 +1430,7 @@ contract DeployArcticArchitectureWithConfigScript is Script, ChainValues {
             if (manager.authority() != rolesAuthority) {
                 _addTx(address(manager), abi.encodeWithSelector(manager.setAuthority.selector, rolesAuthority), 0);
             }
-            if (manager.owner() != address(0)) {
+            if (manager.owner() != address(0) && manager.owner() != ownerAddress) {
                 _addTx(address(manager), abi.encodeWithSelector(manager.transferOwnership.selector, ownerAddress), 0);
             }
         } else {
@@ -1436,7 +1442,7 @@ contract DeployArcticArchitectureWithConfigScript is Script, ChainValues {
             if (accountant.authority() != rolesAuthority) {
                 _addTx(address(accountant), abi.encodeWithSelector(accountant.setAuthority.selector, rolesAuthority), 0);
             }
-            if (accountant.owner() != address(0)) {
+            if (accountant.owner() != address(0) && accountant.owner() != ownerAddress) {
                 _addTx(
                     address(accountant), abi.encodeWithSelector(accountant.transferOwnership.selector, ownerAddress), 0
                 );
@@ -1450,7 +1456,7 @@ contract DeployArcticArchitectureWithConfigScript is Script, ChainValues {
             if (queue.authority() != rolesAuthority) {
                 _addTx(address(queue), abi.encodeWithSelector(queue.setAuthority.selector, rolesAuthority), 0);
             }
-            if (queue.owner() != address(0)) {
+            if (queue.owner() != address(0) && queue.owner() != ownerAddress) {
                 _addTx(address(queue), abi.encodeWithSelector(queue.transferOwnership.selector, ownerAddress), 0);
             }
         } else {
@@ -1464,7 +1470,7 @@ contract DeployArcticArchitectureWithConfigScript is Script, ChainValues {
                     address(queueSolver), abi.encodeWithSelector(queueSolver.setAuthority.selector, rolesAuthority), 0
                 );
             }
-            if (queueSolver.owner() != address(0)) {
+            if (queueSolver.owner() != address(0) && queueSolver.owner() != ownerAddress) {
                 _addTx(
                     address(queueSolver),
                     abi.encodeWithSelector(queueSolver.transferOwnership.selector, ownerAddress),
@@ -1485,7 +1491,7 @@ contract DeployArcticArchitectureWithConfigScript is Script, ChainValues {
                 if (pauser.authority() != rolesAuthority) {
                     _addTx(address(pauser), abi.encodeWithSelector(pauser.setAuthority.selector, rolesAuthority), 0);
                 }
-                if (pauser.owner() != address(0)) {
+                if (pauser.owner() != address(0) && pauser.owner() != ownerAddress) {
                     _addTx(address(pauser), abi.encodeWithSelector(pauser.transferOwnership.selector, ownerAddress), 0);
                 }
             } else {
@@ -1604,7 +1610,9 @@ contract DeployArcticArchitectureWithConfigScript is Script, ChainValues {
 
         for (uint256 i; i < desiredNumberOfDeploymentTxs; i++) {
             uint256 txsInBundle;
-            if (i == desiredNumberOfDeploymentTxs - 1 && txsLength % txsPerBundle != 0) {
+            if (i == desiredNumberOfDeploymentTxs - 1) {
+                // Last bundle always absorbs the remainder so no trailing txs are dropped
+                // when txsLength is an exact multiple of txsPerBundle.
                 txsInBundle = txsLength - lastIndexDeployed;
             } else {
                 txsInBundle = txsPerBundle;

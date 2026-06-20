@@ -26,18 +26,34 @@ import {BalancerVault} from "src/interfaces/BalancerVault.sol";
 import {MorphoFlashLoanAdapter} from "src/base/Roles/MorphoFlashLoan/MorphoFlashLoanAdapter.sol";
 
 import "forge-std/Script.sol";
+import {console} from "forge-std/console.sol";
 import "forge-std/StdJson.sol";
 
 /**
+ * @notice Safe-multisig variant of CreateSyUsdMerkleRoot.
+ *         Builds the same leafs/merkle root as the EOA script, writes the leafs JSON, then — instead of
+ *         broadcasting — EMITS the privileged calls (setManageRoot x2 + setUserRole x3) as calldata for
+ *         execution by the syUSD Safe multisig, which is the sole authority on the manager + rolesAuthority.
+ *         This script does NOT broadcast and needs NO deployer key.
  *
- * DEPLOYER=$DEPLOYER MAINNET_RPC_URL=$MAINNET_RPC_URL forge script  \
- *  script/MerkleRootCreation/Mainnet/CreateSyUsdMerkleRoot.s.sol --chain 1 \
- *  -vvvvv --broadcast --rpc-url $MAINNET_RPC_URL
+ *  Run (note: no --broadcast):
+ *    MAINNET_RPC_URL=$MAINNET_RPC_URL forge script \
+ *      script/MerkleRootCreation/Mainnet/CreateSyUsdMerkleRootSafe.s.sol:CreateSyUsdEthereumLeafsSafe \
+ *      --rpc-url $MAINNET_RPC_URL -vvvv
  *
+ *  Outputs:
+ *    - ./leafs/Mainnet/SyUsdMainnetStrategist02Leafs.json  (leafs — identical to the EOA script)
+ *    - ./leafs/Mainnet/SyUsdMainnetSafeBatch.json          (Safe Transaction Builder import file)
+ *    - console: per-tx (to, data) for manual paste into the Safe Transaction Builder
+ *
+ *  Then in the Safe web app -> Apps -> Transaction Builder, import SyUsdMainnetSafeBatch.json
+ *  (or paste each (to, data) as a raw custom transaction with value 0), sign, and execute.
+ *
+ *  NOTE: txs 3-5 (setUserRole) are idempotent one-time setup and are almost certainly already granted
+ *        (the flashLoanAdapter + strategist are already live). They are included to mirror the EOA
+ *        script exactly; drop them from the batch if doesUserHaveRole already returns true.
  */
-contract CreateSyUsdEthereumLeafs is Script, MerkleTreeHelper {
-    uint256 public privateKey;
-
+contract CreateSyUsdEthereumLeafsSafe is Script, MerkleTreeHelper {
     address public rawDataDecoderAndSanitizerEthereum = 0x02649C96083c61C5419e3b3516fEDC0f5E8115C2;
     RolesAuthority internal rolesAuthority = RolesAuthority(0xf7F3ace7f6cA2Cb1E7ccbE3Bf2Da13D001D36fdF);
     BoringVault internal boringVault = BoringVault(payable(0x279CAD277447965AF3d24a78197aad1B02a2c589));
@@ -50,6 +66,9 @@ contract CreateSyUsdEthereumLeafs is Script, MerkleTreeHelper {
     BoringSolver internal solver = BoringSolver(0x1d82e9bCc8F325caBBca6E6A3B287fE586536805);
     MorphoFlashLoanAdapter internal flashLoanAdapter =
         MorphoFlashLoanAdapter(0x82baFd173334e9cd34eB746BA6b55ffcb4d06a4d);
+
+    // strategist address that holds the manage root (same value the EOA script grants STRATEGIST_ROLE to)
+    address internal constant STRATEGIST = 0x31Cf9D74d825E8BcF9608275B85dD9F1f4B3b429;
 
     address public roycoJrUsdcVault = 0x71861827Aa95cA48148bdA0b40BC740d1c421070;
     address public roycoJrUsdcWithdrawQueue = 0x6823Cf7f97970748A34407Acf6056562415b7237;
@@ -88,7 +107,6 @@ contract CreateSyUsdEthereumLeafs is Script, MerkleTreeHelper {
     uint8 public constant SOLVER_ORIGIN_ROLE = 33;
 
     function setUp() external {
-        privateKey = vm.envUint("DEPLOYER");
         vm.createSelectFork("mainnet");
         setSourceChainName("mainnet");
 
@@ -103,17 +121,79 @@ contract CreateSyUsdEthereumLeafs is Script, MerkleTreeHelper {
         ManageLeaf[] memory leafs = new ManageLeaf[](1024);
         _addLeafs(leafs);
         bytes32[][] memory manageTree = _generateMerkleTree(leafs);
+        bytes32 newRoot = manageTree[manageTree.length - 1][0];
+
         string memory filePath = "./leafs/Mainnet/SyUsdMainnetStrategist02Leafs.json";
-        _generateLeafs(filePath, leafs, manageTree[manageTree.length - 1][0], manageTree);
+        _generateLeafs(filePath, leafs, newRoot, manageTree);
 
-        vm.startBroadcast(privateKey);
-        manager.setManageRoot(0x31Cf9D74d825E8BcF9608275B85dD9F1f4B3b429, manageTree[manageTree.length - 1][0]);
-        manager.setManageRoot(address(flashLoanAdapter), manageTree[manageTree.length - 1][0]);
+        // Privileged calls the Safe multisig must execute (mirrors the EOA script's run()).
+        address[] memory tos = new address[](5);
+        bytes[] memory datas = new bytes[](5);
+        string[] memory labels = new string[](5);
 
-        rolesAuthority.setUserRole(address(flashLoanAdapter), MANAGER_ROLE, true);
-        rolesAuthority.setUserRole(address(flashLoanAdapter), STRATEGIST_ROLE, true);
-        rolesAuthority.setUserRole(0x31Cf9D74d825E8BcF9608275B85dD9F1f4B3b429, STRATEGIST_ROLE, true);
-        vm.stopBroadcast();
+        tos[0] = address(manager);
+        datas[0] = abi.encodeWithSelector(ManagerWithMerkleVerification.setManageRoot.selector, STRATEGIST, newRoot);
+        labels[0] = "manager.setManageRoot(strategist, newRoot)";
+
+        tos[1] = address(manager);
+        datas[1] = abi.encodeWithSelector(
+            ManagerWithMerkleVerification.setManageRoot.selector, address(flashLoanAdapter), newRoot
+        );
+        labels[1] = "manager.setManageRoot(flashLoanAdapter, newRoot)";
+
+        tos[2] = address(rolesAuthority);
+        datas[2] =
+            abi.encodeWithSelector(RolesAuthority.setUserRole.selector, address(flashLoanAdapter), MANAGER_ROLE, true);
+        labels[2] = "rolesAuthority.setUserRole(flashLoanAdapter, MANAGER_ROLE, true) [likely already set]";
+
+        tos[3] = address(rolesAuthority);
+        datas[3] =
+            abi.encodeWithSelector(RolesAuthority.setUserRole.selector, address(flashLoanAdapter), STRATEGIST_ROLE, true);
+        labels[3] = "rolesAuthority.setUserRole(flashLoanAdapter, STRATEGIST_ROLE, true) [likely already set]";
+
+        tos[4] = address(rolesAuthority);
+        datas[4] = abi.encodeWithSelector(RolesAuthority.setUserRole.selector, STRATEGIST, STRATEGIST_ROLE, true);
+        labels[4] = "rolesAuthority.setUserRole(strategist, STRATEGIST_ROLE, true) [likely already set]";
+
+        console.log("=== new manage root ===");
+        console.logBytes32(newRoot);
+        console.log("=== Safe transactions (chainId 1, value 0) ===");
+        for (uint256 i; i < tos.length; ++i) {
+            console.log(labels[i]);
+            console.log("  to:");
+            console.logAddress(tos[i]);
+            console.log("  data:");
+            console.logBytes(datas[i]);
+        }
+
+        _writeSafeBatch(tos, datas);
+    }
+
+    /// @dev Writes a Safe Transaction Builder import file (https://app.safe.global Transaction Builder).
+    function _writeSafeBatch(address[] memory tos, bytes[] memory datas) internal {
+        string memory txs = "";
+        for (uint256 i; i < tos.length; ++i) {
+            string memory one = string.concat(
+                '{"to":"',
+                vm.toString(tos[i]),
+                '","value":"0","data":"',
+                vm.toString(datas[i]),
+                '","contractMethod":null,"contractInputsValues":null}'
+            );
+            txs = i == 0 ? one : string.concat(txs, ",", one);
+        }
+        string memory batch = string.concat(
+            '{"version":"1.0","chainId":"1","createdAt":',
+            vm.toString(block.timestamp * 1000),
+            ',"meta":{"name":"syUSD: add UsdcLoopOptimiserCluster (setManageRoot + roles)",',
+            '"description":"Generated by CreateSyUsdMerkleRootSafe.s.sol"},"transactions":[',
+            txs,
+            "]}"
+        );
+        string memory outPath = "./leafs/Mainnet/SyUsdMainnetSafeBatch.json";
+        vm.writeFile(outPath, batch);
+        console.log("Wrote Safe Transaction Builder batch:");
+        console.log(outPath);
     }
 
     function _addLeafs(ManageLeaf[] memory leafs) internal {

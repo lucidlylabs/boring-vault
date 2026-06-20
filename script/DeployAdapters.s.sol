@@ -9,12 +9,14 @@ import {UniV3PositionTvlAdapter} from "src/adapters/Univ3TvlAdapter.sol";
 import {UniswapV3PositionTvlAdapter} from "src/adapters/UniswapV3PositionTvlAdapter.sol";
 import {UniV4PositionTvlAdapter} from "src/adapters/Univ4TvlAdapter.sol";
 import {MorphoBlueTvlAdapter} from "src/adapters/MorphoBlueTvlAdapter.sol";
+import {MorphoLendingClusterTvlAdapter} from "src/adapters/MorphoLendingClusterTvlAdapter.sol";
 import {Erc20TvlAdapter} from "src/adapters/Erc20TvlAdapter.sol";
 import {CapCusdBalanceAdapter} from "src/adapters/CapCusdBalanceAdapter.sol";
 import {CbBtcUsdcAaveV3BalanceAdapter} from "src/adapters/cbBtcUsdcAaveV3BalanceAdapter.sol";
 import {CbBtcUsdcMorphoBalanceAdapter} from "src/adapters/cbBtcUsdcMorphoBalanceAdapter.sol";
 import {WethUsdcAaveV3BalanceAdapter} from "src/adapters/WethUsdcAaveV3BalanceAdapter.sol";
 import {WethUsdcMorphoBalanceAdapter} from "src/adapters/WethUsdcMorphoBalanceAdapter.sol";
+import {WstEthWethBalanceTvlAdapter} from "src/adapters/WstEthWethBalanceTvlAdapter.sol";
 import {SiUsdBalanceAdapter} from "src/adapters/SiUsdBalanceAdapter.sol";
 import {CapStcusdBalanceAdapter} from "src/adapters/CapStcusdBalanceAdapter.sol";
 import {PtCusd29Jan2026BalanceAdapter} from "src/adapters/PtCusd29Jan2026BalanceAdapter.sol";
@@ -262,6 +264,51 @@ contract DeployMorphoBlueTvlAdapter is Script, MerkleTreeHelper {
     }
 }
 
+/*
+* @dev deploy using `MAINNET_RPC_URL=$MAINNET_RPC_URL DEPLOYER01=$DEPLOYER01 \
+*        forge script script/DeployAdapters.s.sol:DeployMorphoLendingClusterTvlAdapters \
+*        --broadcast --verify --chain 1 --etherscan-api-key $ETHERSCAN_API_KEY \
+*        --rpc-url $MAINNET_RPC_URL`
+*/
+contract DeployMorphoLendingClusterTvlAdapters is Script, MerkleTreeHelper {
+    function run() external {
+        setSourceChainName("mainnet");
+        vm.startBroadcast(vm.envUint("DEPLOYER01"));
+
+        address usdcUsdFeed = getAddress(sourceChain, "USDC_USD_oracle");
+        address usdc = getAddress(sourceChain, "USDC");
+        uint256 maxFeedAge = 1 days;
+
+        _deployAdapter(
+            0x64d65c9a2d91c36d56fbc42d69e979335320169b3df63bf92789e2c8883fcc64, usdcUsdFeed, usdc, maxFeedAge
+        );
+        _deployAdapter(
+            0xe83d72fa5b00dcd46d9e0e860d95aa540d5ec106da5833108a9f826f21f36f52, usdcUsdFeed, usdc, maxFeedAge
+        );
+        _deployAdapter(
+            0xef2c308b5abecf5c8750a1aa82b47c558005feb7a03f4f8e1ad682d71ac8d0ba, usdcUsdFeed, usdc, maxFeedAge
+        );
+        _deployAdapter(
+            0xacc49fbf58feb1ac971acce68f8adc177c43682d6a7087bbd4991a05cb7a2c67, usdcUsdFeed, usdc, maxFeedAge
+        );
+        _deployAdapter(
+            0x43e925e52d7873fa8acac90dd5f246087d55b3a34c344b71884a6352491ff459, usdcUsdFeed, usdc, maxFeedAge
+        );
+
+        vm.stopBroadcast();
+    }
+
+    function _deployAdapter(bytes32 marketId, address usdcUsdFeed, address usdc, uint256 maxFeedAge) internal {
+        new MorphoLendingClusterTvlAdapter(marketId, usdcUsdFeed, usdcUsdFeed, usdc, maxFeedAge);
+    }
+}
+
+/*
+* @dev deploy using `MAINNET_RPC_URL=$MAINNET_RPC_URL DEPLOYER01=$DEPLOYER01 \
+*        forge script script/DeployAdapters.s.sol:DeployErc20TvlAdapter \
+*        --broadcast --verify --chain 1 --etherscan-api-key $ETHERSCAN_API_KEY` \
+*        --rpc-url $MAINNET_RPC_URL
+*/
 contract DeployErc20TvlAdapter is Script, MerkleTreeHelper {
     Deployer private deployer = Deployer(0x771263e3Bc6aCDa5aE388A3F8A0c2dd7A17275FC);
 
@@ -271,13 +318,69 @@ contract DeployErc20TvlAdapter is Script, MerkleTreeHelper {
 
         bytes memory creationCode = type(Erc20TvlAdapter).creationCode;
         bytes memory constructorArgs = abi.encode(
-            getAddress(sourceChain, "royco-jr-stcusd"),
-            getAddress(sourceChain, "royco-jr-stcUSD_USD_oracle"),
+            getAddress(sourceChain, "gauntletUSDCfrontierV2"),
+            getAddress(sourceChain, "GauntletUsdcFrontierV2_USD_oracle"),
             getAddress(sourceChain, "USDC"),
             getAddress(sourceChain, "USDC_USD_oracle")
         );
 
-        deployer.deployContract("RoycoJrStcUSD/USDC Erc20TvlAdapter", creationCode, constructorArgs, 0);
+        deployer.deployContract("GauntletUsdcFrontierV2/USDC Erc20TvlAdapter", creationCode, constructorArgs, 0);
+
+        vm.stopBroadcast();
+    }
+}
+
+/*
+* @dev deploy using `MAINNET_RPC_URL=$MAINNET_RPC_URL DEPLOYER01=$DEPLOYER01 \
+*        forge script script/DeployAdapters.s.sol:DeployHighYieldUsdcLendingClusterTvlAdapter \
+*        --broadcast --verify --chain 1 --etherscan-api-key $ETHERSCAN_API_KEY` \
+*        --rpc-url $MAINNET_RPC_URL
+*
+* Prerequisite: deploy the BoringVault oracle first
+* (deployments/oracles/highyieldusdclendingcluster_usd.json) and set
+* `HighYieldUsdcLendingCluster_USD_oracle` in ChainValues.sol to its address.
+*/
+contract DeployHighYieldUsdcLendingClusterTvlAdapter is Script, MerkleTreeHelper {
+    Deployer private deployer = Deployer(0x771263e3Bc6aCDa5aE388A3F8A0c2dd7A17275FC);
+
+    function run() external {
+        setSourceChainName("mainnet");
+        vm.startBroadcast(vm.envUint("DEPLOYER01"));
+
+        bytes memory creationCode = type(Erc20TvlAdapter).creationCode;
+        bytes memory constructorArgs = abi.encode(
+            getAddress(sourceChain, "highYieldUsdcLendingCluster"),
+            getAddress(sourceChain, "HighYieldUsdcLendingCluster_USD_oracle"),
+            getAddress(sourceChain, "USDC"),
+            getAddress(sourceChain, "USDC_USD_oracle")
+        );
+
+        deployer.deployContract(
+            "HighYieldUsdcLendingCluster/USDC Erc20TvlAdapter", creationCode, constructorArgs, 0
+        );
+
+        vm.stopBroadcast();
+    }
+}
+
+contract DeployLoopOptimiserClusterTvlAdapter is Script, MerkleTreeHelper {
+    Deployer private deployer = Deployer(0x771263e3Bc6aCDa5aE388A3F8A0c2dd7A17275FC);
+
+    function run() external {
+        setSourceChainName("mainnet");
+        vm.startBroadcast(vm.envUint("DEPLOYER01"));
+
+        bytes memory creationCode = type(Erc20TvlAdapter).creationCode;
+        bytes memory constructorArgs = abi.encode(
+            getAddress(sourceChain, "loopOptimiserCluster"),
+            getAddress(sourceChain, "LoopOptimiserCluster_USD_oracle"),
+            getAddress(sourceChain, "USDC"),
+            getAddress(sourceChain, "USDC_USD_oracle")
+        );
+
+        deployer.deployContract(
+            "LoopOptimiserCluster/USDC Erc20TvlAdapter", creationCode, constructorArgs, 0
+        );
 
         vm.stopBroadcast();
     }
@@ -304,5 +407,31 @@ contract DeployUniswapV3PositionTvlAdapterScript is Script, MerkleTreeHelper {
         deployer.deployContract("RLUSD_USDC_100 UniswapV3PositionTvlAdapter Example", creationCode, constructorArgs, 0);
 
         vm.stopBroadcast();
+    }
+}
+
+// ETH Carry idle-wstETH dust adapter: counts the un-supplied wstETH (Magpie
+// slippage-band leftover) in WETH 18-dec, priced off the SAME BGD wstETH/USD
+// price-cap feed + Chainlink ETH/USD that WethUsdcMorphoBalanceAdapter uses, so
+// the dust is valued identically to the Morpho-marked collateral. Registered as
+// an extra `strategies` AUM row on the ETH carry vault (no double-count: the
+// main adapter reads the Morpho position, this reads balanceOf).
+contract DeployEthCarryWstEthDustTvlAdapter is Script {
+    address WSTETH = 0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0;
+    address WSTETH_USD_CHAINLINK_FEED = 0xe1D97bF61901B075E9626c8A2340a7De385861Ef; // BGD WstETHPriceCapAdapter (latestAnswer, 8dec)
+    address WETH_USD_CHAINLINK_FEED = 0x5f4eC3Df9cbd43714FE2740f5E3616155c5b8419; // Chainlink ETH/USD
+    address ETH_CARRY_VAULT = 0x5373690c930553648f0aaA2e53B51f0C59290B7d;
+
+    function run() external {
+        vm.startBroadcast(vm.envUint("PK"));
+
+        WstEthWethBalanceTvlAdapter adapter =
+            new WstEthWethBalanceTvlAdapter(WSTETH, WSTETH_USD_CHAINLINK_FEED, WETH_USD_CHAINLINK_FEED);
+
+        vm.stopBroadcast();
+
+        console.log("WstEthWethBalanceTvlAdapter", address(adapter));
+        // sanity: idle wstETH on the ETH carry vault, valued in WETH (18 dec)
+        console.log("idle wstETH TVL (WETH 18dec)", adapter.getUserTvl(ETH_CARRY_VAULT));
     }
 }

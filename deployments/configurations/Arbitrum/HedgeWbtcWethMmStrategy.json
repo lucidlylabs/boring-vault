@@ -1,0 +1,221 @@
+{
+  "deploymentParameters": {
+    "logLevel": 4,
+    "privateKeyEnvName": "DEPLOYER",
+    "chainName": "arbitrum",
+    "evmVersion": "cancun",
+    "desiredNumberOfDeploymentTxs": 10,
+    "txBundlerAddressOrName": {
+      "address": "0x771263e3Bc6aCDa5aE388A3F8A0c2dd7A17275FC",
+      "name": "txBundlerAddress"
+    },
+    "setupRoles": true,
+    "setupTestUser": false,
+    "saveDeploymentDetails": true,
+    "testUserAddressOrName": {
+      "address": "0x0000000000000000000000000000000000000000",
+      "name": "dev1Address"
+    },
+    "deployerContractAddressOrName": {
+      "address": "0x0000000000000000000000000000000000000000",
+      "name": "deployerAddress"
+    },
+    "nativeWrapperAddressOrName": {
+      "address": "0x0000000000000000000000000000000000000000",
+      "name": "WETH"
+    },
+    "deploymentOwnerAddressOrName": {
+      "address": "0x0000000000000000000000000000000000000000",
+      "name": "dev0Address"
+    },
+    "systemOwnerAddressOrName": {
+      "address": "0x0000000000000000000000000000000000000000",
+      "name": "dev0Address"
+    },
+    "deploymentFileName": "addresses/Arbitrum/HedgedWbtcLpStrategy.json"
+  },
+  "rolesAuthorityConfiguration": {
+    "rolesAuthorityDeploymentName": "HedgedWbtcWethMmStrategy rolesAuthorityV1.0"
+  },
+  "lensConfiguration": {
+    "lensDeploymentName": "HedgedWbtcWethMmStrategy lensV1.0"
+  },
+  "boringVaultConfiguration": {
+    "boringVaultDeploymentName": "HedgedWbtcWethMmStrategy BoringVaultV1.0",
+    "boringVaultName":"HedgedWbtcLpStrategy",
+    "boringVaultSymbol": "HedgedWbtcLpStrategy",
+    "boringVaultDecimals": 8
+  },
+  "managerConfiguration": {
+    "managerDeploymentName": "HedgedWbtcWethMmStrategy managerV1.0",
+    "balancerVaultAddressOrName": {
+      "address": "0x0000000000000000000000000000000000000000",
+      "name": "balancerVault"
+    }
+  },
+  "accountantConfiguration": {
+    "accountantDeploymentName": "HedgedWbtcWethMmStrategy AccountantV1.0",
+    "accountantParameters": {
+      "kind": {
+        "variableRate": true,
+        "fixedRate": false
+      },
+      "payoutConfiguration": {
+        "payoutTo": "0xce1BF18D049638B3ee9dF934aeE5e5fC42BBFDb3",
+        "optionalPaymentSplitterName": "HedgedWbtcWethMmStrategy PaymentSplitterV1.0",
+        "splits": []
+      },
+      "accountantDeploymentParameters": {
+        "allowedExchangeRateChangeLower": 9050,
+        "allowedExchangeRateChangeUpper": 10050,
+        "baseAddressOrName": {
+          "address": "0x0000000000000000000000000000000000000000",
+          "name": "WBTC"
+        },
+        "minimumUpateDelayInSeconds": 3600,
+        "performanceFee": 100,
+        "platformFee": 0,
+        "startingExchangeRate": 1000000
+      }
+    }
+  },
+  "tellerConfiguration": {
+    "tellerDeploymentName": "HedgedWbtcWethMmStrategy TellerV1.0",
+    "tellerParameters": {
+      "allowPublicDeposits": false,
+      "shareLockPeriod": 86400,
+      "kind": {
+        "teller": false,
+        "tellerWithRemediation": false,
+        "tellerWithCcip": false,
+        "tellerWithLayerZero": true
+      },
+      "ccip": {
+        "routerAddressOrName": {
+          "address": "0x0000000000000000000000000000000000000000",
+          "name": "ccipRouter"
+        },
+        "ccipChains": [
+          {
+            "chainSelector": 1,
+            "allowMessagesFrom": true,
+            "allowMessagesTo": true,
+            "targetTellerOrSelf": {
+              "address": "0x0000000000000000000000000000000000000000",
+              "self": true
+            },
+            "messageGasLimit": 100000
+          }
+        ]
+      },
+      "layerZero": {
+        "endpointAddressOrName": {
+          "address": "0x1a44076050125825900e736c501f859c50fE728c",
+          "name": "LayerZeroEndPoint"
+        },
+        "lzTokenAddressOrName": {
+          "address": "0x6985884C4392D348587B19cb9eAAf157F13271cd",
+          "name": "ZRO"
+        },
+        "lzChains": [
+          {
+            "chainId": 42161,
+            "allowMessagesFrom": true,
+            "allowMessagesTo": true,
+            "targetTellerOrSelf": {
+              "address": "0x0000000000000000000000000000000000000000",
+              "self": true
+            },
+            "messageGasLimit": 100000
+          }
+        ]
+      }
+    }
+  },
+  "boringQueueConfiguration": {
+    "boringQueueDeploymentName": "BTC Strategy A BoringOnChainQueueV1.0",
+    "boringQueueSolverName": "BTC Strategy A BoringSolverV1.0",
+    "queueParameters": {
+      "allowPublicWithdrawals": false,
+      "allowPublicSelfWithdrawals": false,
+      "kind": {
+        "boringQueue": true,
+        "boringQueueWithTracking": false
+      }
+    }
+  },
+  "droneConfiguration": {
+    "droneDeploymentBaseName": "BTC Strategy A Boring Drone",
+    "droneCount": 1,
+    "safeGasToForwardNative": 21000
+  },
+  "pauserConfiguration": {
+    "shouldDeploy": true,
+    "pauserDeploymentName": "BTC Strategy A Pauser",
+    "makeGenericPauser": [
+      "0x0000000000000000000000000000000000000000"
+    ],
+    "makeGenericUnpauser": [
+      "0x0000000000000000000000000000000000000000"
+    ],
+    "makePauseAll": [
+      "0x0000000000000000000000000000000000000000"
+    ],
+    "makeUnpauseAll": [
+      "0x0000000000000000000000000000000000000000"
+    ],
+    "senderToPausable": [
+      {
+        "sender": "0x0000000000000000000000000000000000000000",
+        "pausable": "0x0000000000000000000000000000000000000000"
+      }
+    ]
+  },
+  "timelockConfiguration": {
+    "shouldDeploy": false,
+    "timelockDeploymentName": "BTC Strategy A Timelock",
+    "timelockParameters": {
+      "minDelay": 86400,
+      "proposers": [
+        "0x0000000000000000000000000000000000000000"
+      ],
+      "executors": [
+        "0x0000000000000000000000000000000000000000"
+      ]
+    }
+  },
+  "accountantAssets": [
+    {
+      "addressOrName": {
+        "address": "0x0000000000000000000000000000000000000000",
+        "name": "WBTC"
+      },
+      "isPeggedToBase": true,
+      "rateProvider": "0x0000000000000000000000000000000000000000"
+    }
+  ],
+  "depositAssets": [
+    {
+      "addressOrName": {
+        "address": "0x0000000000000000000000000000000000000000",
+        "name": "WBTC"
+      },
+      "allowDeposits": true,
+      "allowWithdraws": true,
+      "sharePremium": 0
+    }
+  ],
+  "withdrawAssets": [
+    {
+      "addressOrName": {
+        "address": "0x0000000000000000000000000000000000000000",
+        "name": "WBTC"
+      },
+      "maxDiscount": 100,
+      "minDiscount": 0,
+      "minimumSecondsToDeadline": 0,
+      "minimumShares": 0,
+      "secondsToMaturity": 60
+    }
+  ]
+}

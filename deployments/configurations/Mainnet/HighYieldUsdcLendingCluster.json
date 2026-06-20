@@ -1,0 +1,221 @@
+{
+  "deploymentParameters": {
+    "logLevel": 4,
+    "privateKeyEnvName": "PRIVATE_KEY_1",
+    "chainName": "mainnet",
+    "evmVersion": "cancun",
+    "desiredNumberOfDeploymentTxs": 25,
+    "txBundlerAddressOrName": {
+      "address": "0x0000000000000000000000000000000000000000",
+      "name": "txBundlerAddress"
+    },
+    "setupRoles": true,
+    "setupTestUser": false,
+    "saveDeploymentDetails": true,
+    "testUserAddressOrName": {
+      "address": "0x0000000000000000000000000000000000000000",
+      "name": "dev1Address"
+    },
+    "deployerContractAddressOrName": {
+      "address": "0x0000000000000000000000000000000000000000",
+      "name": "deployerAddress"
+    },
+    "nativeWrapperAddressOrName": {
+      "address": "0x0000000000000000000000000000000000000000",
+      "name": "WETH"
+    },
+    "deploymentOwnerAddressOrName": {
+      "address": "0x0000000000000000000000000000000000000000",
+      "name": "deployerAddress"
+    },
+    "finalOwnerAddressOrName": {
+      "address": "0x0000000000000000000000000000000000000000",
+      "name": "dev1Address"
+    },
+    "deploymentFileName": "addresses/Mainnet/HighYieldUsdcLendingCluster.json"
+  },
+  "rolesAuthorityConfiguration": {
+    "rolesAuthorityDeploymentName": "HighYieldUsdcLendingCluster rolesAuthorityV3.0"
+  },
+  "lensConfiguration": {
+    "lensDeploymentName": "HighYieldUsdcLendingCluster lensV3.0"
+  },
+  "boringVaultConfiguration": {
+    "boringVaultDeploymentName": "HighYieldUsdcLendingCluster boringVaultV3.0",
+    "boringVaultName": "HighYieldUsdcLendingCluster",
+    "boringVaultSymbol": "hyUSDCLendingCluster",
+    "boringVaultDecimals": 6
+  },
+  "managerConfiguration": {
+    "managerDeploymentName": "HighYieldUsdcLendingCluster managerV3.0",
+    "balancerVaultAddressOrName": {
+      "address": "0x0000000000000000000000000000000000000000",
+      "name": "balancerVault"
+    }
+  },
+  "accountantConfiguration": {
+    "accountantDeploymentName": "HighYieldUsdcLendingCluster accountantV3.0",
+    "accountantParameters": {
+      "kind": {
+        "variableRate": true,
+        "fixedRate": false
+      },
+      "payoutConfiguration": {
+        "payoutTo": "0xce1BF18D049638B3ee9dF934aeE5e5fC42BBFDb3",
+        "optionalPaymentSplitterName": "HighYieldUsdcLendingCluster Payment Splitter V3.0",
+        "splits": []
+      },
+      "accountantDeploymentParameters": {
+        "allowedExchangeRateChangeLower": 9900,
+        "allowedExchangeRateChangeUpper": 11000,
+        "baseAddressOrName": {
+          "address": "0x0000000000000000000000000000000000000000",
+          "name": "USDC"
+        },
+        "minimumUpateDelayInSeconds": 3600,
+        "performanceFee": 1000,
+        "platformFee": 0,
+        "startingExchangeRate": 1000000
+      }
+    }
+  },
+  "tellerConfiguration": {
+    "tellerDeploymentName": "HighYieldUsdcLendingCluster TellerV3.0",
+    "tellerParameters": {
+      "allowPublicDeposits": true,
+      "shareLockPeriod": 60,
+      "kind": {
+        "teller": false,
+        "tellerWithRemediation": false,
+        "tellerWithCcip": false,
+        "tellerWithLayerZero": true
+      },
+      "ccip": {
+        "routerAddressOrName": {
+          "address": "0x0000000000000000000000000000000000000000",
+          "name": "ccipRouter"
+        },
+        "ccipChains": [
+          {
+            "chainSelector": 1,
+            "allowMessagesFrom": true,
+            "allowMessagesTo": true,
+            "targetTellerOrSelf": {
+              "address": "0x0000000000000000000000000000000000000000",
+              "self": true
+            },
+            "messageGasLimit": 100000
+          }
+        ]
+      },
+      "layerZero": {
+        "endpointAddressOrName": {
+          "address": "0x0000000000000000000000000000000000000000",
+          "name": "LayerZeroEndPoint"
+        },
+        "lzTokenAddressOrName": {
+          "address": "0x0000000000000000000000000000000000000000",
+          "name": "ZRO"
+        },
+        "lzChains": [
+          {
+            "chainId": 1,
+            "allowMessagesFrom": true,
+            "allowMessagesTo": true,
+            "targetTellerOrSelf": {
+              "address": "0x0000000000000000000000000000000000000000",
+              "self": true
+            },
+            "messageGasLimit": 100000
+          }
+        ]
+      }
+    }
+  },
+  "boringQueueConfiguration": {
+    "boringQueueDeploymentName": "HighYieldUsdcLendingCluster BoringOnChainQueueV3.0",
+    "boringQueueSolverName": "HighYieldUsdcLendingCluster BoringSolverV3.0",
+    "queueParameters": {
+      "allowPublicWithdrawals": true,
+      "allowPublicSelfWithdrawals": false,
+      "kind": {
+        "boringQueue": true,
+        "boringQueueWithTracking": false
+      }
+    }
+  },
+  "droneConfiguration": {
+    "droneDeploymentBaseName": "HighYieldUsdcLendingCluster boring drone V3.0",
+    "droneCount": 1,
+    "safeGasToForwardNative": 21000
+  },
+  "pauserConfiguration": {
+    "shouldDeploy": true,
+    "pauserDeploymentName": "HighYieldUsdcLendingCluster pauser V3.0",
+    "makeGenericPauser": [
+      "0x0000000000000000000000000000000000000000"
+    ],
+    "makeGenericUnpauser": [
+      "0x0000000000000000000000000000000000000000"
+    ],
+    "makePauseAll": [
+      "0x0000000000000000000000000000000000000000"
+    ],
+    "makeUnpauseAll": [
+      "0x0000000000000000000000000000000000000000"
+    ],
+    "senderToPausable": [
+      {
+        "sender": "0x0000000000000000000000000000000000000000",
+        "pausable": "0x0000000000000000000000000000000000000000"
+      }
+    ]
+  },
+  "timelockConfiguration": {
+    "shouldDeploy": true,
+    "timelockDeploymentName": "HighYieldUsdcLendingCluster timelock V3.0",
+    "timelockParameters": {
+      "minDelay": 86400,
+      "proposers": [
+        "0x0000000000000000000000000000000000000000"
+      ],
+      "executors": [
+        "0x0000000000000000000000000000000000000000"
+      ]
+    }
+  },
+  "accountantAssets": [
+    {
+      "addressOrName": {
+        "address": "0x0000000000000000000000000000000000000000",
+        "name": "USDC"
+      },
+      "isPeggedToBase": true,
+      "rateProvider": ""
+    }
+  ],
+  "depositAssets": [
+    {
+      "addressOrName": {
+        "address": "0x0000000000000000000000000000000000000000",
+        "name": "USDC"
+      },
+      "allowDeposits": true,
+      "allowWithdraws": true,
+      "sharePremium": 0
+    }
+  ],
+  "withdrawAssets": [
+    {
+      "addressOrName": {
+        "address": "0x0000000000000000000000000000000000000000",
+        "name": "USDC"
+      },
+      "maxDiscount": 100,
+      "minDiscount": 0,
+      "minimumSecondsToDeadline": 604800,
+      "minimumShares": 0,
+      "secondsToMaturity": 60
+    }
+  ]
+}

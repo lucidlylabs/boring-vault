@@ -140,8 +140,8 @@ contract ChainValues {
     function _addTacBuildValues() private {
         values[tacBuild]["deployerAddress"] = 0x771263e3Bc6aCDa5aE388A3F8A0c2dd7A17275FC.toBytes32();
         values[tacBuild]["txBundlerAddress"] = 0x771263e3Bc6aCDa5aE388A3F8A0c2dd7A17275FC.toBytes32();
-        values[tacBuild]["dev0Address"] = 0x1b514df3413DA9931eB31f2Ab72e32c0A507Cad5.toBytes32();
-        values[tacBuild]["dev1Address"] = 0x1b514df3413DA9931eB31f2Ab72e32c0A507Cad5.toBytes32();
+        values[tacBuild]["dev0Address"] = 0x90760A784953829095969204f87d6DFEc29a6ca9.toBytes32();
+        values[tacBuild]["dev1Address"] = 0x90760A784953829095969204f87d6DFEc29a6ca9.toBytes32();
         values[tacBuild]["WTAC"] = 0xB63B9f0eb4A6E6f191529D71d4D88cc8900Df2C9.toBytes32();
         values[tacBuild]["USDT0"] = 0xAF988C3f7CB2AceAbB15f96b19388a259b6C438f.toBytes32();
         values[tacBuild]["vault"] = address(1).toBytes32();
@@ -163,8 +163,8 @@ contract ChainValues {
     function _addMonadValues() private {
         values[monad]["deployerAddress"] = 0x771263e3Bc6aCDa5aE388A3F8A0c2dd7A17275FC.toBytes32();
         values[monad]["txBundlerAddress"] = 0x771263e3Bc6aCDa5aE388A3F8A0c2dd7A17275FC.toBytes32();
-        values[monad]["dev0Address"] = 0x1b514df3413DA9931eB31f2Ab72e32c0A507Cad5.toBytes32();
-        values[monad]["dev1Address"] = 0x1b514df3413DA9931eB31f2Ab72e32c0A507Cad5.toBytes32();
+        values[monad]["dev0Address"] = 0x90760A784953829095969204f87d6DFEc29a6ca9.toBytes32();
+        values[monad]["dev1Address"] = 0x90760A784953829095969204f87d6DFEc29a6ca9.toBytes32();
         values[monad]["balancerVault"] = address(1).toBytes32();
 
         // tokens
@@ -198,8 +198,8 @@ contract ChainValues {
     function _addPlasmaValues() private {
         values[plasma]["deployerAddress"] = 0x771263e3Bc6aCDa5aE388A3F8A0c2dd7A17275FC.toBytes32();
         values[plasma]["txBundlerAddress"] = 0x771263e3Bc6aCDa5aE388A3F8A0c2dd7A17275FC.toBytes32();
-        values[plasma]["dev0Address"] = 0x1b514df3413DA9931eB31f2Ab72e32c0A507Cad5.toBytes32();
-        values[plasma]["dev1Address"] = 0x1b514df3413DA9931eB31f2Ab72e32c0A507Cad5.toBytes32();
+        values[plasma]["dev0Address"] = 0x90760A784953829095969204f87d6DFEc29a6ca9.toBytes32();
+        values[plasma]["dev1Address"] = 0x90760A784953829095969204f87d6DFEc29a6ca9.toBytes32();
 
         values[plasma]["USDT0"] = 0xB8CE59FC3717ada4C02eaDF9682A9e934F625ebb.toBytes32();
         values[plasma]["USDT0_OFT_Adapter"] = 0x02ca37966753bDdDf11216B73B16C1dE756A7CF9.toBytes32();
@@ -222,7 +222,7 @@ contract ChainValues {
         // UniswapV3
         values[plasma]["uniswapV3NonFungiblePositionManager"] = 0x743E03cceB4af2efA3CC76838f6E8B50B63F184c.toBytes32();
         values[plasma]["uniV3Router"] = 0x807F4E281B7A3B324825C64ca53c69F0b418dE40.toBytes32();
-        values[plasma]["universalRouter"] = 0x1b35fbA9357fD9bda7ed0429C8BbAbe1e8CC88fc.toBytes32();
+        values[plasma]["universalRouter"] = 0x90760A784953829095969204f87d6DFEc29a6ca9.toBytes32();
 
         // Aave V3
         values[plasma]["v3Pool"] = 0x925a2A7214Ed92428B5b1B090F80b25700095e12.toBytes32();
@@ -232,8 +232,8 @@ contract ChainValues {
     function _addHyperEvmValues() private {
         values[hyperevm]["deployerAddress"] = 0x771263e3Bc6aCDa5aE388A3F8A0c2dd7A17275FC.toBytes32();
         values[hyperevm]["txBundlerAddress"] = 0x771263e3Bc6aCDa5aE388A3F8A0c2dd7A17275FC.toBytes32();
-        values[hyperevm]["dev0Address"] = 0x1b514df3413DA9931eB31f2Ab72e32c0A507Cad5.toBytes32();
-        values[hyperevm]["dev1Address"] = 0x1b514df3413DA9931eB31f2Ab72e32c0A507Cad5.toBytes32();
+        values[hyperevm]["dev0Address"] = 0x90760A784953829095969204f87d6DFEc29a6ca9.toBytes32();
+        values[hyperevm]["dev1Address"] = 0x90760A784953829095969204f87d6DFEc29a6ca9.toBytes32();
         values[hyperevm]["balancerVault"] = 0xbA1333333333a1BA1108E8412f11850A5C319bA9.toBytes32();
         // Hyperliquid CoreWriter - sends transactions to HyperCore
         values[hyperevm]["coreWriter"] = 0x3333333333333333333333333333333333333333.toBytes32();
@@ -275,10 +275,10 @@ contract ChainValues {
         // Liquid Ecosystem
         values[mainnet]["deployerAddress"] = 0x771263e3Bc6aCDa5aE388A3F8A0c2dd7A17275FC.toBytes32();
         values[mainnet]["deployerAddress2"] = 0x771263e3Bc6aCDa5aE388A3F8A0c2dd7A17275FC.toBytes32();
-        values[mainnet]["dev0Address"] = 0x1b514df3413DA9931eB31f2Ab72e32c0A507Cad5.toBytes32();
-        values[mainnet]["dev1Address"] = 0x1b514df3413DA9931eB31f2Ab72e32c0A507Cad5.toBytes32();
-        values[mainnet]["dev3Address"] = 0x1b514df3413DA9931eB31f2Ab72e32c0A507Cad5.toBytes32();
-        values[mainnet]["dev4Address"] = 0x1b514df3413DA9931eB31f2Ab72e32c0A507Cad5.toBytes32();
+        values[mainnet]["dev0Address"] = 0x90760A784953829095969204f87d6DFEc29a6ca9.toBytes32();
+        values[mainnet]["dev1Address"] = 0x90760A784953829095969204f87d6DFEc29a6ca9.toBytes32();
+        values[mainnet]["dev3Address"] = 0x90760A784953829095969204f87d6DFEc29a6ca9.toBytes32();
+        values[mainnet]["dev4Address"] = 0x90760A784953829095969204f87d6DFEc29a6ca9.toBytes32();
         values[mainnet]["liquidV1PriceRouter"] = 0x693799805B502264f9365440B93C113D86a4fFF5.toBytes32();
         values[mainnet]["liquidPayoutAddress"] = 0xA9962a5BfBea6918E958DeE0647E99fD7863b95A.toBytes32();
         values[mainnet]["liquidMultisig"] = 0xCEA8039076E35a825854c5C2f85659430b06ec96.toBytes32();
@@ -456,6 +456,8 @@ contract ChainValues {
         values[mainnet]["cUSD"] = 0xcCcc62962d17b8914c62D74FfB843d73B2a3cccC.toBytes32();
         values[mainnet]["stcUSD"] = 0x88887bE419578051FF9F4eb6C858A951921D8888.toBytes32();
         values[mainnet]["roycoJrUsdcCluster"] = 0x71861827Aa95cA48148bdA0b40BC740d1c421070.toBytes32();
+        values[mainnet]["highYieldUsdcLendingCluster"] = 0xA762361D505E33D08D5170DfcBf8254a2d58C2B8.toBytes32();
+        values[mainnet]["loopOptimiserCluster"] = 0x31aCffb26E80A319018cbd049CeA3389635dFc41.toBytes32();
         values[mainnet]["apyUSD"] = 0x38EEb52F0771140d10c4E9A9a72349A329Fe8a6A.toBytes32();
         values[mainnet]["apxUSD"] = 0x98A878b1Cd98131B271883B390f68D2c90674665.toBytes32();
         values[mainnet]["sNUSD"] = 0x08EFCC2F3e61185D0EA7F8830B3FEc9Bfa2EE313.toBytes32();
@@ -946,10 +948,19 @@ contract ChainValues {
         values[mainnet]["PT-iUSD-4SEP2025_USDC_915"] =
         0x3a3b0aab54883f5b2561d8327fbe234142db4f50f87574cd07daf2ed3fbee01a;
         values[mainnet]["siUSD_USDC_915"] = 0xbbf7ce1b40d32d3e3048f5cf27eeaa6de8cb27b80194690aab191a63381d8c99;
+        // Loop Optimiser Cluster: USD3 (ERC4626 over USDC) loop + PublicAllocator suppliers
+        values[mainnet]["USD3"] = 0x056B269Eb1f75477a8666ae8C7fE01b64dD55eCc.toBytes32();
+        values[mainnet]["USD3_USDC_915"] = 0xe3df58f9d3011b7481ff36b939fa5f8da642f34ea5792d25d3958dbf1efa26d7;
+        values[mainnet]["publicAllocator"] = 0xfd32fA2ca22c76dD6E550706Ad913FC6CE91c75D.toBytes32();
         values[mainnet]["wstETH_USDC_90"] = 0x7e585a933ffe8443c371b4f8cfeb4430f5f6a14c2f32a898c26662c67a1cb8b8;
         values[mainnet]["PTcUSD29Jan2026_USDC_915"] = 0x802ec6e878dc9fe6905b8a0a18962dcca10440a87fa2242fbf4a0461c7b0c789;
         values[mainnet]["PTstcUSD29Jan2026_USDC_915"] =
         0x03f715ef1ae508ab3e1faf4dffdbf2a077d1f0ad10c5aad42cf4438d5e3328af;
+        values[mainnet]["cbBTC_USDC_86"] = 0x64d65c9a2d91c36d56fbc42d69e979335320169b3df63bf92789e2c8883fcc64;
+        values[mainnet]["AA_FalconXUSDC_USDC_77"] = 0xe83d72fa5b00dcd46d9e0e860d95aa540d5ec106da5833108a9f826f21f36f52;
+        values[mainnet]["mF_ONE_USDC_915"] = 0xef2c308b5abecf5c8750a1aa82b47c558005feb7a03f4f8e1ad682d71ac8d0ba;
+        values[mainnet]["srRoyUSDC_USDC_915"] = 0xacc49fbf58feb1ac971acce68f8adc177c43682d6a7087bbd4991a05cb7a2c67;
+        values[mainnet]["fxSAVE_USDC_86"] = 0x43e925e52d7873fa8acac90dd5f246087d55b3a34c344b71884a6352491ff459;
 
         values[mainnet]["WBTC_USDC_86"] = 0x3a85e619751152991742810df6ec69ce473daef99e28a64ab2340d7b7ccfee49;
         values[mainnet]["WBTC_USDT_86"] = 0xa921ef34e2fc7a27ccc50ae7e4b154e16c9799d3387076c421423ef52ac4df99;
@@ -992,6 +1003,7 @@ contract ChainValues {
         values[mainnet]["gauntletUSDCcore"] = 0x8eB67A509616cd6A7c1B3c8C21D48FF57df3d458.toBytes32();
         values[mainnet]["gauntletUSDCprime"] = 0xdd0f28e19C1780eb6396170735D45153D261490d.toBytes32();
         values[mainnet]["gauntletUSDCfrontier"] = 0xc582F04d8a82795aa2Ff9c8bb4c1c889fe7b754e.toBytes32();
+        values[mainnet]["gauntletUSDCfrontierV2"] = 0x9a1D6bd5b8642C41F25e0958129B85f8E1176F3e.toBytes32();
         values[mainnet]["steakhouseUSDC"] = 0xBEEF01735c132Ada46AA9aA4c54623cAA92A64CB.toBytes32();
         values[mainnet]["smokehouseUSDC"] = 0xBEeFFF209270748ddd194831b3fa287a5386f5bC.toBytes32();
         values[mainnet]["steakhouseUSDT"] = 0xbEef047a543E45807105E51A8BBEFCc5950fcfBa.toBytes32();
@@ -1629,6 +1641,9 @@ contract ChainValues {
         values[mainnet]["royco-jr-syrupUSDC_USD_oracle"] = 0xf0AE373FA07D9DCA03F2A084042Fd8132016cBE5.toBytes32();
         values[mainnet]["royco-jr-stcUSD_USD_oracle"] = 0x9019e0f52beA0b49bE66FA0D26aD2B8b8C254585.toBytes32();
         values[mainnet]["roycoJrUsdcClusterUSDC_USD_oracle"] = 0x8082e7Bbe282f8b4399686E4E0e10Ca64Cb916aD.toBytes32();
+        values[mainnet]["GauntletUsdcFrontierV2_USD_oracle"] = 0x5D64E2228e60d6F919c9C233bA052EDeB25A9713.toBytes32();
+        values[mainnet]["HighYieldUsdcLendingCluster_USD_oracle"] = 0x7Aa2149294aC2389536870080c3270c67Af3DEa1.toBytes32();
+        values[mainnet]["LoopOptimiserCluster_USD_oracle"] = 0xfa7aFb369bd713260A4f68F747910F06660001Eb.toBytes32();
 
         // chainlink feeds
         values[mainnet]["USDC_USD_oracle"] = 0x8fFfFfd4AfB6115b954Bd326cbe7B4BA576818f6.toBytes32();
@@ -1642,8 +1657,8 @@ contract ChainValues {
     function _addBaseValues() private {
         values[base]["deployerAddress"] = 0x771263e3Bc6aCDa5aE388A3F8A0c2dd7A17275FC.toBytes32();
         values[base]["txBundlerAddress"] = 0x771263e3Bc6aCDa5aE388A3F8A0c2dd7A17275FC.toBytes32();
-        values[base]["dev0Address"] = 0x1b514df3413DA9931eB31f2Ab72e32c0A507Cad5.toBytes32();
-        values[base]["dev1Address"] = 0x1b514df3413DA9931eB31f2Ab72e32c0A507Cad5.toBytes32();
+        values[base]["dev0Address"] = 0x90760A784953829095969204f87d6DFEc29a6ca9.toBytes32();
+        values[base]["dev1Address"] = 0x90760A784953829095969204f87d6DFEc29a6ca9.toBytes32();
         values[base]["feeAddress"] = 0xce1BF18D049638B3ee9dF934aeE5e5fC42BBFDb3.toBytes32();
         values[base]["liquidPayoutAddress"] = 0xce1BF18D049638B3ee9dF934aeE5e5fC42BBFDb3.toBytes32();
 
@@ -1695,6 +1710,7 @@ contract ChainValues {
 
         // Aave V3
         values[base]["v3Pool"] = 0xA238Dd80C259a72e81d7e4664a9801593F98d1c5.toBytes32();
+        values[base]["v3RewardsController"] = 0xf9cc4F0D883F1a1eb2c253bdb46c254Ca51E1F44.toBytes32();
 
         // Merkl
         values[base]["merklDistributor"] = 0x3Ef3D8bA38EBe18DB133cEc108f4D14CE00Dd9Ae.toBytes32();
@@ -1711,6 +1727,7 @@ contract ChainValues {
         values[base]["aerodrome_Weth_Reth_v2_05_gauge"] = 0xAa3D51d36BfE7C5C63299AF71bc19988BdBa0A06.toBytes32();
         values[base]["aerodrome_Sfrxeth_Wsteth_v2_30_gauge"] = 0xCe7Cb6260fCBf17485cd2439B89FdDf8B0Eb39cC.toBytes32();
         values[base]["aerodrome_Eurc_Usdc_v3_07_gauge"] = 0x85af8D930cB738954d307D6E62F04dd05D839C37.toBytes32();
+        values[base]["aerodrome_Weth_CbBtc_v3_0125_gauge"] = 0x61E0B10423a0009C3f83ab4313813d29437d0817.toBytes32();
 
         // MorphoBlue
         values[base]["morphoBlue"] = 0xBBBBBbbBBb9cC5e90e3b3Af64bdAF62C37EEFFCb.toBytes32();
@@ -1767,17 +1784,22 @@ contract ChainValues {
         // fly.trade
         values[base]["magpieRouterV3"] = 0x5E766616AaBFB588E23a8EA854e9dbd1042afFD3.toBytes32();
         values[base]["kyberAggregationRouterV2"] = 0x6131B5fae19EA4f9D964eAc0408E4408b66337b5.toBytes32();
+        values[base]["magpieDexAggregatorCore"] = 0x09AD820aaC5779683B481c4674208A4e1B024Afa.toBytes32();
+        values[base]["magpieDexAggregator"] = 0x20F6ee51340aDEed01A59B0e65cB3703f3dc860c.toBytes32();
 
         // layerzero
         values[base]["LayerZeroEndPoint"] = 0x1a44076050125825900e736c501f859c50fE728c.toBytes32();
+
+        // hedgedBtcMmStrategy
+        values[base]["morphoBlueFlashLoanAdapterAddress"] = 0x2c8e905169298454226bC2A5eF13416E8B057737.toBytes32();
     }
 
     function _addArbitrumValues() private {
         // Liquid Ecosystem
         values[arbitrum]["deployerAddress"] = 0x5BD97A73333B6EC2e38B687bcED159566A14C5BA.toBytes32();
-        values[arbitrum]["dev0Address"] = 0x1b514df3413DA9931eB31f2Ab72e32c0A507Cad5.toBytes32();
-        values[arbitrum]["dev1Address"] = 0x1b514df3413DA9931eB31f2Ab72e32c0A507Cad5.toBytes32();
-        values[arbitrum]["liquidPayoutAddress"] = 0x1b514df3413DA9931eB31f2Ab72e32c0A507Cad5.toBytes32();
+        values[arbitrum]["dev0Address"] = 0x90760A784953829095969204f87d6DFEc29a6ca9.toBytes32();
+        values[arbitrum]["dev1Address"] = 0x90760A784953829095969204f87d6DFEc29a6ca9.toBytes32();
+        values[arbitrum]["liquidPayoutAddress"] = 0x90760A784953829095969204f87d6DFEc29a6ca9.toBytes32();
         values[arbitrum]["txBundlerAddress"] = 0x5BD97A73333B6EC2e38B687bcED159566A14C5BA.toBytes32();
 
         // DeFi Ecosystem
@@ -2711,10 +2733,10 @@ contract ChainValues {
         values[katana]["deployerAddress"] = 0x771263e3Bc6aCDa5aE388A3F8A0c2dd7A17275FC.toBytes32();
         values[katana]["deployerAddress1"] = 0x771263e3Bc6aCDa5aE388A3F8A0c2dd7A17275FC.toBytes32();
         values[katana]["txBundlerAddress"] = 0x771263e3Bc6aCDa5aE388A3F8A0c2dd7A17275FC.toBytes32();
-        values[katana]["dev0Address"] = 0x1b514df3413DA9931eB31f2Ab72e32c0A507Cad5.toBytes32();
-        values[katana]["dev1Address"] = 0x1b514df3413DA9931eB31f2Ab72e32c0A507Cad5.toBytes32();
-        values[katana]["dev2Address"] = 0x1b514df3413DA9931eB31f2Ab72e32c0A507Cad5.toBytes32();
-        values[katana]["liquidPayoutAddress"] = 0x1b514df3413DA9931eB31f2Ab72e32c0A507Cad5.toBytes32();
+        values[katana]["dev0Address"] = 0x90760A784953829095969204f87d6DFEc29a6ca9.toBytes32();
+        values[katana]["dev1Address"] = 0x90760A784953829095969204f87d6DFEc29a6ca9.toBytes32();
+        values[katana]["dev2Address"] = 0x90760A784953829095969204f87d6DFEc29a6ca9.toBytes32();
+        values[katana]["liquidPayoutAddress"] = 0x90760A784953829095969204f87d6DFEc29a6ca9.toBytes32();
         values[katana]["uniswapV3PositionManager"] = address(1).toBytes32();
         values[katana]["uniswapV3NonFungiblePositionManager"] = address(1).toBytes32();
         values[katana]["vault"] = address(1).toBytes32();

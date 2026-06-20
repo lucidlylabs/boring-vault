@@ -17,20 +17,18 @@ contract DeployMorphoFlashLoanAdapter is Script, MerkleTreeHelper {
         bytes memory creationCode;
         bytes memory constructorArgs;
 
-        vm.createSelectFork("mainnet");
-        setSourceChainName("mainnet");
+        vm.createSelectFork("base");
+        setSourceChainName("base");
 
-        vm.startBroadcast(vm.envUint("BORING_DEVELOPER"));
+        vm.startBroadcast(vm.envUint("DEPLOYER"));
 
         creationCode = type(MorphoFlashLoanAdapter).creationCode;
         constructorArgs = abi.encode(
             getAddress(sourceChain, "morphoBlue"),
-            0x96Ee83F0C132A8b29866c8Ae6E149D6e6822b291,
-            0x617f47CC5021607a46d9d76942d8103d5cc47175
+            0xbEA97618434D925B0F9EdAB63aDF4Ce46F373b51,
+            0xCED7B28a74A40D300f54f3e01DF0385238672451
         );
-        deployer.deployContract(
-            "MorphoFlashLoanAdapter_infiniFiUsdcClusterEthereumV2", creationCode, constructorArgs, 0
-        );
+        deployer.deployContract("MorphoFlashLoanAdapter_HedgedBtcMmStrategyBaseV1", creationCode, constructorArgs, 0);
 
         vm.stopBroadcast();
     }

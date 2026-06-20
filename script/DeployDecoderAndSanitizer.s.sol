@@ -34,6 +34,9 @@ import {
     InfiniFiUsdcClusterDecoderAndSanitizer
 } from "src/base/DecodersAndSanitizers/InfiniFiUsdcClusterDecoderAndSanitizer.sol";
 import {
+    LoopOptimiserClusterDecoderAndSanitizer
+} from "src/base/DecodersAndSanitizers/LoopOptimiserClusterDecoderAndSanitizer.sol";
+import {
     MonadStablecoinStrategyDecoderAndSanitizer
 } from "src/base/DecodersAndSanitizers/MonStablecoinStrategyDecoderAndSanitizer.sol";
 import {HlCoreVaultDecoderAndSanitizer} from "src/base/DecodersAndSanitizers/HlCoreVaultDecoderAndSanitizer.sol";
@@ -41,6 +44,9 @@ import {SyUsdtEthereumDecoderAndSanitizer} from "src/base/DecodersAndSanitizers/
 import {
     HyperliquidCoreWriterDecoderAndSanitizer
 } from "src/base/DecodersAndSanitizers/Protocols/HyperliquidCoreWriterDecoderAndSanitizer.sol";
+import {
+    AerodromeV3MagpieFullDecoderAndSanitizer
+} from "src/base/DecodersAndSanitizers/AerodromeV3MagpieFullDecoderAndSanitizer.sol";
 import {BaseDecoderAndSanitizer} from "src/base/DecodersAndSanitizers/BaseDecoderAndSanitizer.sol";
 import {BoringDrone} from "src/base/Drones/BoringDrone.sol";
 
@@ -152,6 +158,16 @@ contract DeployInfiniFiUsdcClusterDecoderAndSanitizer is Script, ContractNames, 
         constructorArgs = abi.encode(getAddress(sourceChain, "magpieRouterV3"));
         deployer.deployContract("InfiniFiUsdcClusterDecoderAndSanitizerV0.1", creationCode, constructorArgs, 0);
 
+        vm.stopBroadcast();
+    }
+}
+
+contract DeployLoopOptimiserClusterDecoderAndSanitizer is Script, ContractNames, MainnetAddresses, MerkleTreeHelper {
+    function run() external {
+        vm.createSelectFork("mainnet");
+        setSourceChainName("mainnet");
+        vm.startBroadcast(vm.envUint("LOOP_OPTIMISER_OWNER"));
+        new LoopOptimiserClusterDecoderAndSanitizer(getAddress(sourceChain, "magpieRouterV3"));
         vm.stopBroadcast();
     }
 }
@@ -446,6 +462,30 @@ contract DeployBaseStableStrategyDecoderAndSanitizer is Script, ContractNames, M
         new BaseStablecoinStrategyDecoderAndSanitizer(
             getAddress(sourceChain, "aerodromeNonFungiblePositionManager"), getAddress(sourceChain, "magpieRouterV3")
         );
+        vm.stopBroadcast();
+    }
+}
+
+contract DeployAerodromeV3MagpieFullDecoderAndSanitizer is Script, MerkleTreeHelper {
+    uint256 public privateKey;
+    Deployer public deployer = Deployer(0x771263e3Bc6aCDa5aE388A3F8A0c2dd7A17275FC);
+
+    function setUp() external {
+        privateKey = vm.envUint("DEPLOYER");
+    }
+
+    function run() external {
+        bytes memory creationCode;
+        bytes memory constructorArgs;
+        vm.createSelectFork("base");
+        setSourceChainName(base);
+
+        creationCode = type(AerodromeV3MagpieFullDecoderAndSanitizer).creationCode;
+        constructorArgs = abi.encode(
+            getAddress(sourceChain, "aerodromeNonFungiblePositionManager"), getAddress(sourceChain, "magpieRouterV3")
+        );
+        deployer.deployContract("AerodromeV3MagpieFullDecoderAndSanitizerV1", creationCode, constructorArgs, 0);
+
         vm.stopBroadcast();
     }
 }
