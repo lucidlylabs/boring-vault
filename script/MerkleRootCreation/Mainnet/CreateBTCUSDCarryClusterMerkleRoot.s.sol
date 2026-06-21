@@ -38,7 +38,7 @@ contract CreateBTCUSDCarryClusterMerkleRootScript is Script, MerkleTreeHelper {
     address public accountantAddress = 0xA7F084687acB40C91A61bDc2BBF383df99eB8900;
     address public boringVault = 0x272BCD869CbDFcb32c335dB2f1F6C54Eb1A50aCc;
     address public managerAddress = 0xE059cDcc94E7937FC7f7EeD9daAFaAd79B066099;
-    address public rawDataDecoderAndSanitizer = 0x857c230Ea0Ea158FAa0E80f30B95615DF3304776;
+    address public rawDataDecoderAndSanitizer = 0xCE1eBE81112b6393F472b23E44db040ed72e0AB5;
     address public flashLoanAdapter = 0xCf8298839F8b710B87ba9225b1a29390Fb818759;
     address public rolesAuthority = 0x43A37629C8030b38fCeC2817AAbE62501E74bA88;
 
@@ -63,7 +63,7 @@ contract CreateBTCUSDCarryClusterMerkleRootScript is Script, MerkleTreeHelper {
         setAddress(true, mainnet, "rawDataDecoderAndSanitizer", rawDataDecoderAndSanitizer);
         setAddress(true, mainnet, "morphoBlueFlashLoanAdapterAddress", flashLoanAdapter);
 
-        ManageLeaf[] memory leafs = new ManageLeaf[](128);
+        ManageLeaf[] memory leafs = new ManageLeaf[](256);
 
         ERC20[] memory feeAssets = new ERC20[](1);
         feeAssets[0] = getERC20(sourceChain, "cbBTC");
@@ -87,6 +87,7 @@ contract CreateBTCUSDCarryClusterMerkleRootScript is Script, MerkleTreeHelper {
         kind[5] = SwapKind.BuyAndSell;
         kind[6] = SwapKind.BuyAndSell;
         _addMagpieSwapLeafs(leafs, swapAssets, kind);
+        _addKyberSwapLeafs(leafs, swapAssets, kind);
 
         ERC20[] memory supplyAssets = new ERC20[](2);
         supplyAssets[0] = getERC20(sourceChain, "cbBTC");

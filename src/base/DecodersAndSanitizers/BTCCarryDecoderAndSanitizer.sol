@@ -14,6 +14,7 @@ import {CCIPDecoderAndSanitizer} from "./Protocols/CCIPDecoderAndSanitizer.sol";
 import {OdosDecoderAndSanitizer} from "./Protocols/OdosDecoderAndSanitizer.sol";
 import {TellerDecoderAndSanitizer} from "./Protocols/TellerDecoderAndSanitizer.sol";
 import {MagpieDecoderAndSanitizer} from "./MagpieDecoderAndSanitizer.sol";
+import {KyberSwapDecoderAndSanitizer} from "./Protocols/KyberSwapDecoderAndSanitizer.sol";
 import {
     MorphoV1FlashLoanAdapterDecoderAndSanitizer
 } from "src/base/DecodersAndSanitizers/Protocols/MorphoV1FlashLoanAdapterDecoderAndSanitizer.sol";
@@ -29,12 +30,14 @@ contract BTCCarryDecoderAndSanitizer is
     PendleRouterDecoderAndSanitizer,
     CCIPDecoderAndSanitizer,
     MagpieDecoderAndSanitizer,
+    KyberSwapDecoderAndSanitizer,
     TellerDecoderAndSanitizer,
     MorphoV1FlashLoanAdapterDecoderAndSanitizer
 {
-    constructor(address _uniswapV3NonFungiblePositionManager, address _flyTradeRouterV3)
+    constructor(address _uniswapV3NonFungiblePositionManager, address _flyTradeRouterV3, address _kyberRouter)
         UniswapV3DecoderAndSanitizer(_uniswapV3NonFungiblePositionManager)
         MagpieDecoderAndSanitizer(_flyTradeRouterV3)
+        KyberSwapDecoderAndSanitizer(_kyberRouter)
     {}
 
     //============================== HANDLE FUNCTION COLLISIONS ===============================

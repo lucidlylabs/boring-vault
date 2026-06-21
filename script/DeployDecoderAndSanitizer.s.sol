@@ -254,7 +254,8 @@ contract DeployBTCCarryDecoderAndSanitizer is Script, ContractNames, MainnetAddr
 
         new BTCCarryDecoderAndSanitizer(
             getAddress(sourceChain, "uniswapV3NonFungiblePositionManager"),
-            getAddress(sourceChain, "magpieDexAggregator")
+            getAddress(sourceChain, "magpieDexAggregator"),
+            getAddress(sourceChain, "kyberAggregationRouterV2")
         );
 
         vm.stopBroadcast();
