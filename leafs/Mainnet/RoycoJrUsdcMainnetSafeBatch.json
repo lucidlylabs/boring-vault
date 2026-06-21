@@ -1,0 +1,18 @@
+{
+  "version": "1.0",
+  "chainId": "1",
+  "createdAt": 1781651543000,
+  "meta": {
+    "name": "Royco JR USDC cluster: set new manage root (add KyberSwap)",
+    "description": "Rotate strategist 0x31Cf9D74d825E8BcF9608275B85dD9F1f4B3b429 to the regenerated root 0x57e474107d881930e39012055a2abda84707f4e61f0190e17d696473a8efea23 (KyberSwap leaves + new decoder 0x5619904B935B7051794c3dc7cF924FE74dE56F7D). Strategist already holds STRATEGIST_ROLE, so no setUserRole needed."
+  },
+  "transactions": [
+    {
+      "to": "0x441973fAe7432a39d13bA4620ebc12Fa43c1C416",
+      "value": "0",
+      "data": "0x21801a9900000000000000000000000031cf9d74d825e8bcf9608275b85dd9f1f4b3b42957e474107d881930e39012055a2abda84707f4e61f0190e17d696473a8efea23",
+      "contractMethod": null,
+      "contractInputsValues": null
+    }
+  ]
+}

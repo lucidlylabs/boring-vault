@@ -125,17 +125,15 @@ contract DeployRoycoJrUsdcClusterDecoderAndSanitizer is Script, ContractNames, M
     Deployer public deployer = Deployer(0x771263e3Bc6aCDa5aE388A3F8A0c2dd7A17275FC);
 
     function run() external {
-        bytes memory creationCode;
-        bytes memory constructorArgs;
-
         vm.createSelectFork("mainnet");
         setSourceChainName("mainnet");
 
-        vm.startBroadcast(vm.envUint("DEPLOYER01"));
+        vm.startBroadcast(vm.envUint("PRIVATE_KEY_1"));
 
-        constructorArgs = abi.encode(getAddress(sourceChain, "magpieDexAggregator"));
-        creationCode = type(RoycoJrUsdcDecoderAndSanitizer).creationCode;
-        deployer.deployContract("RoycoJrUsdcClusterDecoderAndSanitizerV0.3", creationCode, constructorArgs, 0);
+        new RoycoJrUsdcDecoderAndSanitizer(
+            getAddress(sourceChain, "magpieDexAggregator"),
+            getAddress(sourceChain, "kyberAggregationRouterV2")
+        );
 
         vm.stopBroadcast();
     }
