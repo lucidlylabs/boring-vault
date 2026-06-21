@@ -8,10 +8,31 @@ import {ERC4626} from "@solmate/tokens/ERC4626.sol";
 import {MerkleTreeHelper} from "test/resources/MerkleTreeHelper/MerkleTreeHelper.sol";
 
 import "forge-std/Script.sol";
+import {console} from "forge-std/console.sol";
 
-contract CreateLoopOptimiserClusterLeafs is Script, MerkleTreeHelper {
-    uint256 public privateKey;
-
+/**
+ * @notice Safe-multisig variant of CreateLoopOptimiserClusterMerkleRoot. Builds the SAME leafs +
+ *         merkle root as the EOA script and writes the leafs JSON, then -- instead of broadcasting --
+ *         emits the two setManageRoot calls as calldata + a Safe Transaction Builder batch for the
+ *         loop-cluster owner Safe to execute. Needs NO private key.
+ *
+ *  Run (note: NO --broadcast, NO key):
+ *    forge script \
+ *      script/MerkleRootCreation/Mainnet/CreateLoopOptimiserClusterMerkleRootSafe.s.sol:CreateLoopOptimiserClusterLeafsSafe \
+ *      --rpc-url $ETHEREUM_RPC_URL -vvvv
+ *
+ *  Outputs:
+ *    - ./leafs/Mainnet/LoopOptimiserClusterStrategistLeafs.json  (leafs -- identical to the EOA script)
+ *    - ./leafs/Mainnet/LoopOptimiserClusterSafeBatch.json        (Safe Transaction Builder import file)
+ *    - console: the new root + per-tx (to, data)
+ *
+ *  Then in the Safe web app -> Apps -> Transaction Builder, import LoopOptimiserClusterSafeBatch.json
+ *  (or paste each (to, data) as a raw custom transaction, value 0), sign, execute.
+ *
+ *  The strategist/flashloan-adapter ROLES are already granted (the cluster is live), so only the two
+ *  setManageRoot(strategist|flashLoanAdapter, newRoot) calls are emitted.
+ */
+contract CreateLoopOptimiserClusterLeafsSafe is Script, MerkleTreeHelper {
     address internal constant BORING_VAULT = 0x31aCffb26E80A319018cbd049CeA3389635dFc41;
     address internal constant MANAGER = 0x7141A06771fc62f9F5aa714CeD79EA7dc8Bce64F;
     address internal constant ACCOUNTANT = 0xd050B8f3b1568dF89e1659a0812c7beDc626881c;
@@ -23,11 +44,7 @@ contract CreateLoopOptimiserClusterLeafs is Script, MerkleTreeHelper {
     // The LIVE loop-cluster strategist EOA (verified on-chain: it currently holds the manage root).
     address internal constant STRATEGIST = 0x451c73033a4548553b916ce7AF69AB8c8FA34504;
 
-    uint8 public constant MANAGER_ROLE = 1;
-    uint8 public constant STRATEGIST_ROLE = 7;
-
     function setUp() external {
-        privateKey = vm.envUint("LOOP_OPTIMISER_OWNER");
         vm.createSelectFork("mainnet");
         setSourceChainName("mainnet");
 
@@ -44,20 +61,63 @@ contract CreateLoopOptimiserClusterLeafs is Script, MerkleTreeHelper {
         _addLeafs(leafs);
 
         bytes32[][] memory manageTree = _generateMerkleTree(leafs);
-        bytes32 manageRoot = manageTree[manageTree.length - 1][0];
-        _generateLeafs("./leafs/Mainnet/LoopOptimiserClusterStrategistLeafs.json", leafs, manageRoot, manageTree);
+        bytes32 newRoot = manageTree[manageTree.length - 1][0];
+        _generateLeafs("./leafs/Mainnet/LoopOptimiserClusterStrategistLeafs.json", leafs, newRoot, manageTree);
 
-        ManagerWithMerkleVerification manager = ManagerWithMerkleVerification(MANAGER);
-        RolesAuthority rolesAuthority = RolesAuthority(ROLES_AUTHORITY);
+        // The only privileged calls the Safe must execute: re-point both manage roots to the new root.
+        // (The flashloan adapter re-enters the manager so it carries the same root.)
+        address[] memory tos = new address[](2);
+        bytes[] memory datas = new bytes[](2);
+        string[] memory labels = new string[](2);
 
-        vm.startBroadcast(privateKey);
-        // The flashloan adapter re-enters the manager, so it carries the same root and the manage roles.
-        manager.setManageRoot(STRATEGIST, manageRoot);
-        manager.setManageRoot(FLASHLOAN_ADAPTER, manageRoot);
-        rolesAuthority.setUserRole(STRATEGIST, STRATEGIST_ROLE, true);
-        rolesAuthority.setUserRole(FLASHLOAN_ADAPTER, MANAGER_ROLE, true);
-        rolesAuthority.setUserRole(FLASHLOAN_ADAPTER, STRATEGIST_ROLE, true);
-        vm.stopBroadcast();
+        tos[0] = MANAGER;
+        datas[0] = abi.encodeWithSelector(ManagerWithMerkleVerification.setManageRoot.selector, STRATEGIST, newRoot);
+        labels[0] = "manager.setManageRoot(strategist, newRoot)";
+
+        tos[1] = MANAGER;
+        datas[1] =
+            abi.encodeWithSelector(ManagerWithMerkleVerification.setManageRoot.selector, FLASHLOAN_ADAPTER, newRoot);
+        labels[1] = "manager.setManageRoot(flashLoanAdapter, newRoot)";
+
+        console.log("=== new manage root ===");
+        console.logBytes32(newRoot);
+        console.log("=== Safe transactions (chainId 1, value 0) ===");
+        for (uint256 i; i < tos.length; ++i) {
+            console.log(labels[i]);
+            console.log("  to:");
+            console.logAddress(tos[i]);
+            console.log("  data:");
+            console.logBytes(datas[i]);
+        }
+
+        _writeSafeBatch(tos, datas);
+    }
+
+    /// @dev Writes a Safe Transaction Builder import file (https://app.safe.global -> Transaction Builder).
+    function _writeSafeBatch(address[] memory tos, bytes[] memory datas) internal {
+        string memory txs = "";
+        for (uint256 i; i < tos.length; ++i) {
+            string memory one = string.concat(
+                '{"to":"',
+                vm.toString(tos[i]),
+                '","value":"0","data":"',
+                vm.toString(datas[i]),
+                '","contractMethod":null,"contractInputsValues":null}'
+            );
+            txs = i == 0 ? one : string.concat(txs, ",", one);
+        }
+        string memory batch = string.concat(
+            '{"version":"1.0","chainId":"1","createdAt":',
+            vm.toString(block.timestamp * 1000),
+            ',"meta":{"name":"LoopOptimiserCluster: setManageRoot (add stcUSD/USDT loop)",',
+            '"description":"Generated by CreateLoopOptimiserClusterMerkleRootSafe.s.sol"},"transactions":[',
+            txs,
+            "]}"
+        );
+        string memory outPath = "./leafs/Mainnet/LoopOptimiserClusterSafeBatch.json";
+        vm.writeFile(outPath, batch);
+        console.log("Wrote Safe Transaction Builder batch:");
+        console.log(outPath);
     }
 
     function _addLeafs(ManageLeaf[] memory leafs) internal {
@@ -67,13 +127,10 @@ contract CreateLoopOptimiserClusterLeafs is Script, MerkleTreeHelper {
         _addLeafsForFeeClaiming(leafs, getAddress(sourceChain, "accountantAddress"), feeAssets, false);
         _addMorphoBlueFlashLoanLeafs(leafs, getAddress(sourceChain, "USDC"));
 
-        // siUSD loop: Infini gateway wrap + Morpho collateral.
-        // Supply leafs first: they add the approve(USDC -> MorphoBlue) the repay path needs
-        // (the collateral helper alone skips it). Mirrors the ETH/BTC carry cluster scripts.
+        // siUSD loop: Infini gateway wrap + Morpho collateral. Supply leafs first (approve(USDC->Morpho)).
         _addInfiniV1Leafs(leafs, getAddress(sourceChain, "USDC"));
         _addMorphoBlueSupplyLeafs(leafs, getBytes32(sourceChain, "siUSD_USDC_915"));
         _addMorphoBlueCollateralLeafs(leafs, getBytes32(sourceChain, "siUSD_USDC_915"));
-        // PublicAllocator suppliers of the siUSD market (one leaf per source vault)
         address[] memory siusdSuppliers = new address[](8);
         siusdSuppliers[0] = 0xF9bdDd4A9b3A45f980e11fDDE96e16364dDBEc49; // Yearn OG USDC
         siusdSuppliers[1] = 0xc582F04d8a82795aa2Ff9c8bb4c1c889fe7b754e; // Gauntlet USDC Frontier
@@ -87,27 +144,21 @@ contract CreateLoopOptimiserClusterLeafs is Script, MerkleTreeHelper {
             _addMorphoPublicAllocatorLeafs(leafs, siusdSuppliers[i], getBytes32(sourceChain, "siUSD_USDC_915"));
         }
 
-        // USD3 loop: ERC4626 wrap (USD3 is an ERC4626 over USDC) + Morpho collateral.
-        // Supply leafs first for the approve(USDC -> MorphoBlue) repay leaf (see siUSD note).
+        // USD3 loop: ERC4626 wrap + Morpho collateral.
         _addERC4626Leafs(leafs, ERC4626(getAddress(sourceChain, "USD3")));
         _addMorphoBlueSupplyLeafs(leafs, getBytes32(sourceChain, "USD3_USDC_915"));
         _addMorphoBlueCollateralLeafs(leafs, getBytes32(sourceChain, "USD3_USDC_915"));
-        // PublicAllocator supplier of the USD3 market
         _addMorphoPublicAllocatorLeafs(
             leafs, 0xe05faDf242331808f504661BEA65972594869826, getBytes32(sourceChain, "USD3_USDC_915")
         );
 
-        // stcUSD loop (NON-USDC loan): collateral = stcUSD, loan = USDT.
-        // Wrap path is USDC -> cUSD (Cap mint) -> stcUSD (ERC4626); _addCapLeafs adds the full
-        // approve/mint/burn + stcUSD deposit/redeem set. Supply leafs add approve(USDT -> MorphoBlue)
-        // the repay path needs (loan token is USDT here). The USDT<->USDC loan-token bridge is a
-        // Magpie swap (both directions), pinned to magpieDexAggregator.
+        // stcUSD loop (NON-USDC loan): collateral = stcUSD, loan = USDT. USDC->cUSD(Cap mint)->stcUSD,
+        // + Morpho stcUSD/USDT, + Magpie USDT<->USDC bridge (both directions).
         address[] memory capDepositTokens = new address[](1);
         capDepositTokens[0] = getAddress(sourceChain, "USDC");
         _addCapLeafs(leafs, capDepositTokens);
         _addMorphoBlueSupplyLeafs(leafs, getBytes32(sourceChain, "stcUsdUsdtMarketId"));
         _addMorphoBlueCollateralLeafs(leafs, getBytes32(sourceChain, "stcUsdUsdtMarketId"));
-        // Magpie USDT <-> USDC bridge legs (BuyAndSell = both directions).
         address[] memory magpieTokens = new address[](2);
         magpieTokens[0] = getAddress(sourceChain, "USDC");
         magpieTokens[1] = getAddress(sourceChain, "USDT");

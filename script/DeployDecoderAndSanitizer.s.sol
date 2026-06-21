@@ -164,7 +164,7 @@ contract DeployLoopOptimiserClusterDecoderAndSanitizer is Script, ContractNames,
     function run() external {
         vm.createSelectFork("mainnet");
         setSourceChainName("mainnet");
-        vm.startBroadcast(vm.envUint("LOOP_OPTIMISER_OWNER"));
+        vm.startBroadcast(vm.envUint("DEPLOYER"));
         new LoopOptimiserClusterDecoderAndSanitizer(getAddress(sourceChain, "magpieRouterV3"));
         vm.stopBroadcast();
     }

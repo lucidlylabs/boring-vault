@@ -6,6 +6,7 @@ import {MorphoBlueDecoderAndSanitizer} from "./Protocols/MorphoBlueDecoderAndSan
 import {ERC4626DecoderAndSanitizer} from "./Protocols/ERC4626DecoderAndSanitizer.sol";
 import {NativeWrapperDecoderAndSanitizer} from "./Protocols/NativeWrapperDecoderAndSanitizer.sol";
 import {InfiniDecoderAndSanitizer} from "./Protocols/InfiniDecoderAndSanitizer.sol";
+import {CapDecoderAndSanitizer} from "./Protocols/CapDecoderAndSanitizer.sol";
 import {MagpieDecoderAndSanitizer} from "./MagpieDecoderAndSanitizer.sol";
 import {MorphoV1FlashLoanAdapterDecoderAndSanitizer} from "./Protocols/MorphoV1FlashLoanAdapterDecoderAndSanitizer.sol";
 import {MorphoPublicAllocatorDecoderAndSanitizer} from "./Protocols/MorphoPublicAllocatorDecoderAndSanitizer.sol";
@@ -13,6 +14,7 @@ import {MorphoPublicAllocatorDecoderAndSanitizer} from "./Protocols/MorphoPublic
 contract LoopOptimiserClusterDecoderAndSanitizer is
     MorphoBlueDecoderAndSanitizer,
     ERC4626DecoderAndSanitizer,
+    CapDecoderAndSanitizer,
     NativeWrapperDecoderAndSanitizer,
     InfiniDecoderAndSanitizer,
     MagpieDecoderAndSanitizer,

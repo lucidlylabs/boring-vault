@@ -11,6 +11,7 @@ import {UniV4PositionTvlAdapter} from "src/adapters/Univ4TvlAdapter.sol";
 import {MorphoBlueTvlAdapter} from "src/adapters/MorphoBlueTvlAdapter.sol";
 import {MorphoLendingClusterTvlAdapter} from "src/adapters/MorphoLendingClusterTvlAdapter.sol";
 import {Erc20TvlAdapter} from "src/adapters/Erc20TvlAdapter.sol";
+import {MorphoLoopTvlAdapter} from "src/adapters/MorphoLoopTvlAdapter.sol";
 import {CapCusdBalanceAdapter} from "src/adapters/CapCusdBalanceAdapter.sol";
 import {CbBtcUsdcAaveV3BalanceAdapter} from "src/adapters/cbBtcUsdcAaveV3BalanceAdapter.sol";
 import {CbBtcUsdcMorphoBalanceAdapter} from "src/adapters/cbBtcUsdcMorphoBalanceAdapter.sol";
@@ -380,6 +381,85 @@ contract DeployLoopOptimiserClusterTvlAdapter is Script, MerkleTreeHelper {
 
         deployer.deployContract(
             "LoopOptimiserCluster/USDC Erc20TvlAdapter", creationCode, constructorArgs, 0
+        );
+
+        vm.stopBroadcast();
+    }
+}
+
+// Loop cluster non-USDC-loan loop: stcUSD collateral / USDT loan. TVL = stcUSD value (stcUSD/USD)
+// minus USDT debt value (USDT/USD), denominated in USDC base terms (USDC/USD). getUserPositionValues
+// returns (collateral, debt, supplied) -- the shape the strategy's get_position_values reads.
+contract DeployStcUsdUsdtLoopTvlAdapter is Script, MerkleTreeHelper {
+    Deployer private deployer = Deployer(0x771263e3Bc6aCDa5aE388A3F8A0c2dd7A17275FC);
+
+    function run() external {
+        setSourceChainName("mainnet");
+        vm.startBroadcast(vm.envUint("DEPLOYER01"));
+
+        bytes memory creationCode = type(MorphoLoopTvlAdapter).creationCode;
+        bytes memory constructorArgs = abi.encode(
+            getBytes32(sourceChain, "stcUsdUsdtMarketId"),
+            getAddress(sourceChain, "stcUSD_USD_oracle"), // collateral USD feed
+            getAddress(sourceChain, "USDT_USD_oracle"), // debt (USDT) USD feed
+            getAddress(sourceChain, "USDC_USD_oracle"), // base (USDC) USD feed
+            getAddress(sourceChain, "USDC") // base token
+        );
+
+        deployer.deployContract(
+            "stcUSD-USDT-Loop/USDC MorphoLoopTvlAdapter", creationCode, constructorArgs, 0
+        );
+
+        vm.stopBroadcast();
+    }
+}
+
+// Loop cluster naked-USDT dust adapter: counts any leftover USDT (swap residue, below the $50 sweep
+// floor) in NAV, valued at USDT/USD in USDC base terms. Registered as its OWN strategies row.
+contract DeployLoopClusterUsdtDustAdapter is Script, MerkleTreeHelper {
+    Deployer private deployer = Deployer(0x771263e3Bc6aCDa5aE388A3F8A0c2dd7A17275FC);
+
+    function run() external {
+        setSourceChainName("mainnet");
+        vm.startBroadcast(vm.envUint("DEPLOYER01"));
+
+        bytes memory creationCode = type(Erc20TvlAdapter).creationCode;
+        bytes memory constructorArgs = abi.encode(
+            getAddress(sourceChain, "USDT"),
+            getAddress(sourceChain, "USDT_USD_oracle"),
+            getAddress(sourceChain, "USDC"),
+            getAddress(sourceChain, "USDC_USD_oracle")
+        );
+
+        deployer.deployContract(
+            "LoopCluster USDT-dust Erc20TvlAdapter", creationCode, constructorArgs, 0
+        );
+
+        vm.stopBroadcast();
+    }
+}
+
+// Loop cluster naked-stcUSD dust adapter: counts naked stcUSD collateral (the sub-sweep / 1bps
+// leftover that sits in the vault, NOT in the Morpho position) in NAV, valued at stcUSD/USD in USDC
+// base terms. Parity with the siUSD/USD3 collateral-dust rows. The syUSD CapStcusdBalanceAdapter is
+// the wrong fit for this vault -- use the generic Erc20TvlAdapter.
+contract DeployLoopClusterStcUsdDustAdapter is Script, MerkleTreeHelper {
+    Deployer private deployer = Deployer(0x771263e3Bc6aCDa5aE388A3F8A0c2dd7A17275FC);
+
+    function run() external {
+        setSourceChainName("mainnet");
+        vm.startBroadcast(vm.envUint("DEPLOYER01"));
+
+        bytes memory creationCode = type(Erc20TvlAdapter).creationCode;
+        bytes memory constructorArgs = abi.encode(
+            getAddress(sourceChain, "stcUSD"),
+            getAddress(sourceChain, "stcUSD_USD_oracle"),
+            getAddress(sourceChain, "USDC"),
+            getAddress(sourceChain, "USDC_USD_oracle")
+        );
+
+        deployer.deployContract(
+            "LoopCluster stcUSD-dust Erc20TvlAdapter", creationCode, constructorArgs, 0
         );
 
         vm.stopBroadcast();

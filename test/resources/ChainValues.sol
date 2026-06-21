@@ -458,6 +458,9 @@ contract ChainValues {
         values[mainnet]["roycoJrUsdcCluster"] = 0x71861827Aa95cA48148bdA0b40BC740d1c421070.toBytes32();
         values[mainnet]["highYieldUsdcLendingCluster"] = 0xA762361D505E33D08D5170DfcBf8254a2d58C2B8.toBytes32();
         values[mainnet]["loopOptimiserCluster"] = 0x31aCffb26E80A319018cbd049CeA3389635dFc41.toBytes32();
+        // stcUSD (collateral) / USDT (loan) Morpho market -- the loop cluster's non-USDC-loan loop.
+        values[mainnet]["stcUsdUsdtMarketId"] =
+            0xdbf4bc065d4e76f4505a523f2bba5e5ccdca94c16d67c3a6ff1dadbcbb26d4aa;
         values[mainnet]["apyUSD"] = 0x38EEb52F0771140d10c4E9A9a72349A329Fe8a6A.toBytes32();
         values[mainnet]["apxUSD"] = 0x98A878b1Cd98131B271883B390f68D2c90674665.toBytes32();
         values[mainnet]["sNUSD"] = 0x08EFCC2F3e61185D0EA7F8830B3FEc9Bfa2EE313.toBytes32();
