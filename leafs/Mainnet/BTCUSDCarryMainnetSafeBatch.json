@@ -1,0 +1,32 @@
+{
+  "version": "1.0",
+  "chainId": "1",
+  "createdAt": 1781651543000,
+  "meta": {
+    "name": "BTC/USD carry cluster: set new manage root (add KyberSwap)",
+    "description": "Rotate all three BTC carry roots to 0xfaebdebf4485a4d719452975808a8895522c6e2a69012c623b3a4018a94ddd9a (KyberSwap leaves + new decoder 0x5619904B935B7051794c3dc7cF924FE74dE56F7D) on manager 0xE059cDcc94E7937FC7f7EeD9daAFaAd79B066099. Calls: live strategist 0x502364Da1969f4102269eDcE9BFaBfa59adc9d5C, flash-loan adapter 0xCf8298839F8b710B87ba9225b1a29390Fb818759, backup strategist 0x0307AD25281C99F22A8F3Af9e272fE3968810239 (currently unset on BTC). Replaces old root 0xf63e7cd6f15bcd4b52a656bed24bb38718049d96359df3cc944a29d6729a2cc8. Coordinate with deploying the updated BTC carry container (new decoder + new leaf JSON)."
+  },
+  "transactions": [
+    {
+      "to": "0xE059cDcc94E7937FC7f7EeD9daAFaAd79B066099",
+      "value": "0",
+      "data": "0x21801a99000000000000000000000000502364da1969f4102269edce9bfabfa59adc9d5cfaebdebf4485a4d719452975808a8895522c6e2a69012c623b3a4018a94ddd9a",
+      "contractMethod": null,
+      "contractInputsValues": null
+    },
+    {
+      "to": "0xE059cDcc94E7937FC7f7EeD9daAFaAd79B066099",
+      "value": "0",
+      "data": "0x21801a99000000000000000000000000cf8298839f8b710b87ba9225b1a29390fb818759faebdebf4485a4d719452975808a8895522c6e2a69012c623b3a4018a94ddd9a",
+      "contractMethod": null,
+      "contractInputsValues": null
+    },
+    {
+      "to": "0xE059cDcc94E7937FC7f7EeD9daAFaAd79B066099",
+      "value": "0",
+      "data": "0x21801a990000000000000000000000000307ad25281c99f22a8f3af9e272fe3968810239faebdebf4485a4d719452975808a8895522c6e2a69012c623b3a4018a94ddd9a",
+      "contractMethod": null,
+      "contractInputsValues": null
+    }
+  ]
+}
