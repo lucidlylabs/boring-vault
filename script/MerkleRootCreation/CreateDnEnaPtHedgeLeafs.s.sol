@@ -10,7 +10,7 @@ contract CreateDnEnaPtHedgeLeafsScript is Script, MerkleTreeHelper {
     address public ethPtVault = 0x3A140976d40d4fd23579dE5BaDFE59a78a94e168;
     address public hyperEvmHedgeVault = 0x3A140976d40d4fd23579dE5BaDFE59a78a94e168;
     address public ethRawDataDecoderAndSanitizer = 0x838AfF8182E8Df0965C34ad517564e3A8e02b091;
-    address public hyperEvmRawDataDecoderAndSanitizer = 0xdA43EC8EFDf9F5926B50a4f20b0550008Ac770c2;
+    address public hyperEvmRawDataDecoderAndSanitizer = 0x1637f47175aB512d44E73a6f6475695B201Abdaf;
     address public ethManagerAddress = 0xD29E5c69D11c826f36e40eB70f9Ee01BdC282E6A;
     address public hyperEvmManagerAddress = 0xD29E5c69D11c826f36e40eB70f9Ee01BdC282E6A;
     address public ethAccountantAddress = 0x962590Ec3F666e8b5CCCF599cc01335c4F561211;
@@ -25,10 +25,11 @@ contract CreateDnEnaPtHedgeLeafsScript is Script, MerkleTreeHelper {
     address public hyperEvmCcipRouter = 0x13b3332b66389B1467CA6eBd6fa79775CCeF65ec;
     address public cctpTokenMessengerV2 = 0x28b5a0e9C621a5BadaA536219b3a228C8168cf5d;
     address public hyperEvmCctpForwarder = 0xb21D281DEdb17AE5B501F6AA8256fe38C4e45757;
+    address public hyperEvmLendingPool = 0x00A89d7a5A02160f20150EbEA7a2b5E4879A1A8b;
     uint32 public enaPerpAssetId = 122;
     uint64 public ccipHyperEvmDestinationSelector = 2442541497099098535;
 
-    function run() external {
+    function run() external virtual {
         generateEthereumLeafs();
         generateHyperEvmLeafs();
     }
@@ -97,6 +98,7 @@ contract CreateDnEnaPtHedgeLeafsScript is Script, MerkleTreeHelper {
 
         _addDnCoreWriterLeafs(leafs);
         _addHyperEvmCctpReturnLeafs(leafs);
+        _addHyperEvmLendingLeafs(leafs);
 
         bytes32[][] memory manageTree = _generateMerkleTree(leafs);
         _generateLeafs("./leafs/HyperEvm/DnPtSenaLeafs.json", leafs, manageTree[manageTree.length - 1][0], manageTree);
@@ -394,5 +396,51 @@ contract CreateDnEnaPtHedgeLeafsScript is Script, MerkleTreeHelper {
         leafs[leafIndex].argumentAddresses[0] = ethPtVault;
         leafs[leafIndex].argumentAddresses[1] = hyperEvmUsdc;
         leafs[leafIndex].argumentAddresses[2] = address(0);
+    }
+
+    function _addHyperEvmLendingLeafs(ManageLeaf[] memory leafs) internal {
+        address hyperEvmUsdc = getAddress(sourceChain, "USDC");
+        address decoderAndSanitizer = getAddress(sourceChain, "rawDataDecoderAndSanitizer");
+
+        unchecked {
+            leafIndex++;
+        }
+        leafs[leafIndex] = ManageLeaf(
+            hyperEvmUsdc,
+            false,
+            "approve(address,uint256)",
+            new address[](1),
+            "Approve HyperEVM lending pool to spend USDC",
+            decoderAndSanitizer
+        );
+        leafs[leafIndex].argumentAddresses[0] = hyperEvmLendingPool;
+
+        unchecked {
+            leafIndex++;
+        }
+        leafs[leafIndex] = ManageLeaf(
+            hyperEvmLendingPool,
+            false,
+            "supply(address,uint256,address,uint16)",
+            new address[](2),
+            "Supply HyperEVM USDC to lending pool",
+            decoderAndSanitizer
+        );
+        leafs[leafIndex].argumentAddresses[0] = hyperEvmUsdc;
+        leafs[leafIndex].argumentAddresses[1] = hyperEvmHedgeVault;
+
+        unchecked {
+            leafIndex++;
+        }
+        leafs[leafIndex] = ManageLeaf(
+            hyperEvmLendingPool,
+            false,
+            "withdraw(address,uint256,address)",
+            new address[](2),
+            "Withdraw HyperEVM USDC from lending pool",
+            decoderAndSanitizer
+        );
+        leafs[leafIndex].argumentAddresses[0] = hyperEvmUsdc;
+        leafs[leafIndex].argumentAddresses[1] = hyperEvmHedgeVault;
     }
 }

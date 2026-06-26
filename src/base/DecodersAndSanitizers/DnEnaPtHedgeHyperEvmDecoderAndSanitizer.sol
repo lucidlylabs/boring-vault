@@ -1,10 +1,12 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity 0.8.21;
 
+import {AaveV3DecoderAndSanitizer} from "./Protocols/AaveV3DecoderAndSanitizer.sol";
 import {CctpCoreDepositWalletDecoderAndSanitizer} from "./Protocols/CctpCoreDepositWalletDecoderAndSanitizer.sol";
 import {CoreWriterDecoderAndSanitizer} from "./Protocols/HlCoreWriterDecoderAndSanitizerTemp.sol";
 
 contract DnEnaPtHedgeHyperEvmDecoderAndSanitizer is
+    AaveV3DecoderAndSanitizer,
     CctpCoreDepositWalletDecoderAndSanitizer,
     CoreWriterDecoderAndSanitizer
 {
