@@ -10,7 +10,7 @@ contract CreateDnEnaPtHedgeLeafsScript is Script, MerkleTreeHelper {
     address public ethPtVault = 0x3A140976d40d4fd23579dE5BaDFE59a78a94e168;
     address public hyperEvmHedgeVault = 0x3A140976d40d4fd23579dE5BaDFE59a78a94e168;
     address public ethRawDataDecoderAndSanitizer = 0x838AfF8182E8Df0965C34ad517564e3A8e02b091;
-    address public hyperEvmRawDataDecoderAndSanitizer = 0x1637f47175aB512d44E73a6f6475695B201Abdaf;
+    address public hyperEvmRawDataDecoderAndSanitizer = 0xb4929342EAe2d9D1cA9BBE760bd9B6F9Cf329Ed5;
     address public ethManagerAddress = 0xD29E5c69D11c826f36e40eB70f9Ee01BdC282E6A;
     address public hyperEvmManagerAddress = 0xD29E5c69D11c826f36e40eB70f9Ee01BdC282E6A;
     address public ethAccountantAddress = 0x962590Ec3F666e8b5CCCF599cc01335c4F561211;
@@ -112,6 +112,8 @@ contract CreateDnEnaPtHedgeLeafsScript is Script, MerkleTreeHelper {
     }
 
     function _setCommonHyperEvmAddresses() internal {
+        hyperEvmRawDataDecoderAndSanitizer =
+            vm.envOr("HYPEREVM_DN_DECODER", hyperEvmRawDataDecoderAndSanitizer);
         setAddress(true, hyperevm, "boringVault", hyperEvmHedgeVault);
         setAddress(true, hyperevm, "managerAddress", hyperEvmManagerAddress);
         setAddress(true, hyperevm, "accountantAddress", hyperEvmAccountantAddress);
@@ -303,6 +305,11 @@ contract CreateDnEnaPtHedgeLeafsScript is Script, MerkleTreeHelper {
     function _addDnCoreWriterLeafs(ManageLeaf[] memory leafs) internal {
         address coreWriter = getAddress(sourceChain, "coreWriter");
         address decoderAndSanitizer = getAddress(sourceChain, "rawDataDecoderAndSanitizer");
+        address actionLimitOrder = address(uint160(1));
+        address actionUsdClassTransfer = address(uint160(7));
+        address actionSendAsset = address(uint160(13));
+        address usdcSystem = 0x2000000000000000000000000000000000000000;
+        address hyperCoreUsdcTokenId = address(0);
 
         unchecked {
             leafIndex++;
@@ -311,10 +318,12 @@ contract CreateDnEnaPtHedgeLeafsScript is Script, MerkleTreeHelper {
             coreWriter,
             false,
             "sendRawAction(bytes)",
-            new address[](0),
+            new address[](2),
             string.concat("Place limit order for perp asset ", vm.toString(enaPerpAssetId)),
             decoderAndSanitizer
         );
+        leafs[leafIndex].argumentAddresses[0] = actionLimitOrder;
+        leafs[leafIndex].argumentAddresses[1] = address(uint160(enaPerpAssetId));
 
         unchecked {
             leafIndex++;
@@ -323,34 +332,11 @@ contract CreateDnEnaPtHedgeLeafsScript is Script, MerkleTreeHelper {
             coreWriter,
             false,
             "sendRawAction(bytes)",
-            new address[](0),
-            string.concat("Cancel order by OID for perp asset ", vm.toString(enaPerpAssetId)),
-            decoderAndSanitizer
-        );
-
-        unchecked {
-            leafIndex++;
-        }
-        leafs[leafIndex] = ManageLeaf(
-            coreWriter,
-            false,
-            "sendRawAction(bytes)",
-            new address[](0),
-            string.concat("Cancel order by CLOID for perp asset ", vm.toString(enaPerpAssetId)),
-            decoderAndSanitizer
-        );
-
-        unchecked {
-            leafIndex++;
-        }
-        leafs[leafIndex] = ManageLeaf(
-            coreWriter,
-            false,
-            "sendRawAction(bytes)",
-            new address[](0),
+            new address[](1),
             "Transfer USD between spot and perp on HyperCore",
             decoderAndSanitizer
         );
+        leafs[leafIndex].argumentAddresses[0] = actionUsdClassTransfer;
 
         unchecked {
             leafIndex++;
@@ -359,10 +345,14 @@ contract CreateDnEnaPtHedgeLeafsScript is Script, MerkleTreeHelper {
             coreWriter,
             false,
             "sendRawAction(bytes)",
-            new address[](0),
-            string.concat("Send asset to ", vm.toString(hyperEvmHedgeVault), " subAccount ", vm.toString(address(0))),
+            new address[](4),
+            "Send HyperCore spot USDC to HyperEVM",
             decoderAndSanitizer
         );
+        leafs[leafIndex].argumentAddresses[0] = actionSendAsset;
+        leafs[leafIndex].argumentAddresses[1] = usdcSystem;
+        leafs[leafIndex].argumentAddresses[2] = address(0);
+        leafs[leafIndex].argumentAddresses[3] = hyperCoreUsdcTokenId;
     }
 
     function _addHyperEvmCctpReturnLeafs(ManageLeaf[] memory leafs) internal {
