@@ -39,8 +39,12 @@ contract RoycoJrUsdcDeployedE2ETest is Test, MerkleTreeHelper {
 
         strategist = makeAddr("roycoJrUsdcStrategist");
 
-        rawDataDecoderAndSanitizer =
-            address(new RoycoJrUsdcDecoderAndSanitizer(getAddress(sourceChain, "magpieDexAggregator")));
+        rawDataDecoderAndSanitizer = address(
+            new RoycoJrUsdcDecoderAndSanitizer(
+                getAddress(sourceChain, "magpieDexAggregator"),
+                getAddress(sourceChain, "kyberAggregationRouterV2")
+            )
+        );
 
         setAddress(false, sourceChain, "boringVault", BORING_VAULT);
         setAddress(false, sourceChain, "managerAddress", MANAGER);

@@ -12051,7 +12051,9 @@ contract MerkleTreeHelper is CommonBase, ChainValues, Test {
             getAddress(sourceChain, "rawDataDecoderAndSanitizer")
         );
 
-        leafs[leafIndex].argumentAddresses[0] = composer;
+        // sendParam.to is the FINAL recipient on Katana (the boringVault, same address cross-chain),
+        // not the composer — the OFT delivers directly to `to`. argumentAddresses[1] is the refund.
+        leafs[leafIndex].argumentAddresses[0] = getAddress(sourceChain, "boringVault");
         leafs[leafIndex].argumentAddresses[1] = getAddress(sourceChain, "boringVault");
     }
 

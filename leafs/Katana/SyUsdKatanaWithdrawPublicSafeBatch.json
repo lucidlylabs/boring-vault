@@ -1,0 +1,18 @@
+{
+  "version": "1.0",
+  "chainId": "747474",
+  "createdAt": 1751315400000,
+  "meta": {
+    "name": "syUSD Katana: make requestOnChainWithdraw public",
+    "description": "setPublicCapability(queue, requestOnChainWithdraw.selector, true) on the syUSD Katana RolesAuthority so users can request vbUSDC withdrawals on Katana (matches Ethereum). vbUSDC is already a registered withdraw asset and is priceable by the accountant."
+  },
+  "transactions": [
+    {
+      "to": "0xf7F3ace7f6cA2Cb1E7ccbE3Bf2Da13D001D36fdF",
+      "value": "0",
+      "data": "0xc6b0263e000000000000000000000000f632c10b19f2a0451cd4a653fc9ca0c15ea1040b6bb3b476000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001",
+      "contractMethod": null,
+      "contractInputsValues": null
+    }
+  ]
+}

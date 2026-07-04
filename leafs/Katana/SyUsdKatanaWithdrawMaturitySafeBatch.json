@@ -1,0 +1,18 @@
+{
+  "version": "1.0",
+  "chainId": "747474",
+  "createdAt": 1782900000000,
+  "meta": {
+    "name": "syUSD Katana: set vbUSDC withdraw maturity to 60s",
+    "description": "updateWithdrawAsset(vbUSDC) on the syUSD Katana queue to change secondsToMaturity 604800->60 (matching Ethereum). Other params preserved: minimumSecondsToDeadline=0, minDiscount=0, maxDiscount=100, minimumShares=0."
+  },
+  "transactions": [
+    {
+      "to": "0xF632c10b19f2a0451cD4A653fC9ca0c15eA1040b",
+      "value": "0",
+      "data": "0xeed4b3f8000000000000000000000000203a662b0bd271a6ed5a60edfbd04bfce608fd36000000000000000000000000000000000000000000000000000000000000003c0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000640000000000000000000000000000000000000000000000000000000000000000",
+      "contractMethod": null,
+      "contractInputsValues": null
+    }
+  ]
+}
