@@ -1,0 +1,10 @@
+{
+  "privateKeyEnvName": "DEPLOYER01",
+  "deploymentName": "LucidlyChainlinkInfiniLockedTokenOracleV1_liUSD13w_USD",
+  "name": "liUSD-13w/USD",
+  "eulerOracle": "0x7D3da4436a415A729be72BFC39eADDa04e2bE393",
+  "lockedToken": "0xbd3f9814eB946E617f1d774A6762cDbec0bf087A",
+  "baseFeed1": "0x0000000000000000000000000000000000000000",
+  "baseFeed2": "0x0000000000000000000000000000000000000000",
+  "outputDecimals": 8
+}
