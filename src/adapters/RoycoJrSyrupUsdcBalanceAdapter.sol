@@ -13,6 +13,8 @@ contract RoycoJrSyrupUsdcBalanceAdapter {
     /// @dev Junior tranche shares -> syrupUSDC -> USDC. All preview-based, no oracles.
     /// JT.previewRedeem returns AssetClaims { stAssets, jtAssets, nav }: only jtAssets is the
     /// claimable underlying asset (syrupUSDC) for a junior holder.
+    /// syrupUSDC.convertToExitAssets gives the current spot value of the syrupUSDC shares net
+    /// of Maple's exit fees. previewRedeem on Maple V2 only returns nonzero for queued requests.
     function getUserTvl(address _user) external view returns (uint256 tvl) {
         bytes memory payload = abi.encodeWithSignature("balanceOf(address)", _user);
         (bool success, bytes memory returnData) = jr_tranche_address.staticcall(payload);
@@ -26,9 +28,9 @@ contract RoycoJrSyrupUsdcBalanceAdapter {
         (, uint256 jtAssets,) = abi.decode(returnData, (uint256, uint256, uint256));
         if (jtAssets == 0) return 0;
 
-        payload = abi.encodeWithSignature("previewRedeem(uint256)", jtAssets);
+        payload = abi.encodeWithSignature("convertToExitAssets(uint256)", jtAssets);
         (success, returnData) = syrup_usdc_address.staticcall(payload);
-        require(success, "syrupUSDC previewRedeem staticcall failed");
+        require(success, "syrupUSDC convertToExitAssets staticcall failed");
         tvl = abi.decode(returnData, (uint256));
     }
 }
